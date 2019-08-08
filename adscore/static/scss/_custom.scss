@@ -1,4 +1,8 @@
 /* base template */
+body {
+  background-color: #e8e8e8;
+}
+
 .s-ads-icon {
   display: inline-block;
   width: 45px;
@@ -141,5 +145,15 @@
 }
 
 main>.container {
-  margin-top: -1.5rem;
+  background-color: $white;
+}
+
+.results-list .card {
+  border: 1px solid rgba(0, 0, 0, 0);
+
+  &:hover {
+    border: 1px solid rgba(0, 0, 0, .125);
+  }
+
+  transition: border 0.5s;
 }
