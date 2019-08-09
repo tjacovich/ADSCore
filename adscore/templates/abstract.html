@@ -28,7 +28,7 @@
 
 
     {% if doc %}
-    <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" aria-disabled="true" data-widget-id="ShowCitations">
+    <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" aria-disabled="true" data-widget-id="ShowCitations">
     {% if doc.citation_count and doc.citation_count > 0 %}
     <div class="abstract-nav s-nav ">
     {% else %}
@@ -46,7 +46,7 @@
 
 
     {% if doc %}
-    <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" data-widget-id="ShowReferences">
+    <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" data-widget-id="ShowReferences">
     {% if doc.reference_count > 0 %}
     <div class="abstract-nav s-nav ">
     {% else %}
@@ -63,7 +63,7 @@
 
     {% if doc %}
     {% if doc.read_count and doc.read_count > 0 %}
-    <a href="{{ url_for('index', q='trending(bibcode:'+doc.bibcode+')', sort='score desc') }}" aria-disabled="true" data-widget-id="ShowCoreads">
+    <a href="{{ url_for('search', q='trending(bibcode:'+doc.bibcode+')', sort='score desc') }}" aria-disabled="true" data-widget-id="ShowCoreads">
     <div class="abstract-nav s-nav ">
     {% else %}
     <div class="abstract-nav s-nav   s-nav-inactive ">
@@ -77,7 +77,7 @@
 
 
     {% if doc %}
-    <a href="{{ url_for('index', q='similar(bibcode:'+doc.bibcode+')', sort='score desc') }}" data-widget-id="ShowSimilar">
+    <a href="{{ url_for('search', q='similar(bibcode:'+doc.bibcode+')', sort='score desc') }}" data-widget-id="ShowSimilar">
     <div class="abstract-nav s-nav  ">
             <span class="s-content">
             Similar Papers
@@ -124,7 +124,7 @@
     <ul class="list-inline">
             {% if doc.author %}
               {% for author in doc.author[:50] %}
-              <li class="author"><a href="{{ url_for('index', q='author:\"' + author + '\"') }}">{{ author }}</a></li>{% if not loop.last %};{% endif %}
+              <li class="author"><a href="{{ url_for('search', q='author:\"' + author + '\"') }}">{{ author }}</a></li>{% if not loop.last %};{% endif %}
               {% endfor %}
           {% endif %}
                 {% if doc.author|length > 50 %}

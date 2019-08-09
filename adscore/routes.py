@@ -25,11 +25,19 @@ def index():
     Modern form if no search parameters are sent, otherwise show search results
     """
     form = ModernForm(request.args)
+    return render_template('modern-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+
+@app.route(SERVER_BASE_URL+'search/', methods=['GET'])
+def search():
+    """
+    Modern form if no search parameters are sent, otherwise show search results
+    """
+    form = ModernForm(request.args)
     if len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
-    return render_template('modern-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+    return redirect(url_for('index'))
 
 @app.route(SERVER_BASE_URL+'classic-form', methods=['GET'])
 def classic_form():
@@ -93,7 +101,7 @@ def classic_form():
         query.append(" OR ".join(["bibstem:({})".format(b) for b in bibstems]))
 
     if query:
-        return redirect(url_for('index', q=" ".join(query)))
+        return redirect(url_for('search', q=" ".join(query)))
     else:
         return render_template('classic-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
@@ -114,7 +122,7 @@ def paper_form():
     if form.page.data:
         query.append("page:{}".format(form.page.data))
     if query:
-        return redirect(url_for('index', q=" ".join(query)))
+        return redirect(url_for('search', q=" ".join(query)))
     else:
         return render_template('paper-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
@@ -128,7 +136,7 @@ def paper_form_bibcodes():
     if form.bibcodes.data and len(form.bibcodes.data.split()) > 0:
         results = api.store_query(form.bibcodes.data.split()) # Split will get rid of \r\n
         q = "docs({})".format(results['qid'])
-        return redirect(url_for('index', q=q))
+        return redirect(url_for('search', q=q))
     return render_template('paper-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
 
@@ -164,3 +172,15 @@ def export(identifier):
     else:
         data = None
     return render_template('abstract-export.html', base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'))
+
+@app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
+def core_always():
+    r = redirect(url_for('index'))
+    r.set_cookie('core', 'always')
+    return r
+
+@app.route(SERVER_BASE_URL+'core/never', methods=['GET'])
+def core_never():
+    r = redirect(url_for('index'))
+    r.delete_cookie('core')
+    return r
