@@ -26,12 +26,12 @@
                 </div>
                 <div class="col-3 col-md-2">
                   {% if doc.citation_count and doc.citation_count > 0 %}
-                  <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count" class="text-secondary">cited: {{ doc.citation_count }}</a>
+                  <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count" class="text-secondary">cited: {{ doc.citation_count }}</a>
                   {% endif %}
                 </div>
-                <div class="col-1 col-md-3 float-right">
+                <div class="col-1 col-md-3 text-right">
                   {% if doc.reference_count > 0 %}
-                  <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" aria-disabled="false" class="text-secondary" title="quick links to lists of references, citations and more">
+                  <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" aria-disabled="false" class="text-secondary" title="quick links to lists of references, citations and more">
                     <i class="fa fa-list" aria-hidden="true"></i>
                   </a>
                   {% else %}
@@ -80,7 +80,7 @@
         {% if form.rows.data == num %}
         <button class="btn btn-outline-primary active" type="button">{{ num }}</button>
         {% else %}
-        <a href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}" class="btn btn-outline-primary">{{ num }}</a>
+        <a href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}" class="btn btn-outline-primary">{{ num }}</a>
         {% endif %}
         {% endfor %}
       </div>
@@ -88,7 +88,7 @@
     <div class="col-md-6 mt-4 mt-md-0">
       {% macro page_item(page, active=False, special=False) %}
       <li class="page-item {% if active %}active{% elif not special %} d-none d-md-block{% endif %}">
-        <a href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.rows.data * (page - 1) }}" class="page-link" aria-label="Go to page {{ page }}">
+        <a href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.rows.data * (page - 1) }}" class="page-link" aria-label="Go to page {{ page }}">
           {% if special == 'start' %}
             <span class="sr-only">First page</span>
             <i class="fa fa-chevron-left" aria-hidden="true"></i>
@@ -108,7 +108,7 @@
       <nav aria-label="Page navigation" id="results-navigation">
         <ul class="pagination justify-content-md-end justify-content-center results-pager">
           <li class="page-item {% if not prev_enabled %}disabled{% endif %}">
-            <a class="page-link" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}" aria-label="Previous">
+            <a class="page-link" href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}" aria-label="Previous">
               Previous
             </a>
           </li>
@@ -152,7 +152,7 @@
           {% endif %}
 
           <li class="page-item {% if not next_enabled %}disabled{% endif %}">
-            <a class="page-link" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}" aria-label="Next">
+            <a class="page-link" href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}" aria-label="Next">
               Next
             </a>
           </li>

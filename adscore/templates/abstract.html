@@ -24,7 +24,7 @@
 <h1 class="sr-only">Abstract Page</h1>
 <div class="container my-3">
   <div class="row">
-    <div class="col-md-3 mt-5 mt-md-0 order-last order-md-0">
+    <div class="col-md-3">
       <ul class="nav flex-column abstract-nav">
 
         {{ nav_item(
@@ -36,7 +36,7 @@
 
         {{ nav_item(
           'Citations',
-          url_for('search', q='citations(bibcode:'+doc.bibcode+')'),
+          url_for('index', q='citations(bibcode:'+doc.bibcode+')'),
           False,
           not (doc and doc.citation_count and doc.citation_count > 0),
           doc.citation_count
@@ -44,7 +44,7 @@
 
         {{ nav_item(
           'References',
-          url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc'),
+          url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc'),
           False,
           not (doc and doc.reference_count and doc.reference_count > 0),
           doc.reference_count
@@ -52,7 +52,7 @@
 
         {{ nav_item(
           'Co-Reads',
-          url_for('search', q='trending(bibcode:'+doc.bibcode+')', sort='score desc'),
+          url_for('index', q='trending(bibcode:'+doc.bibcode+')', sort='score desc'),
           False,
           not (doc and doc.read_count and doc.read_count > 0),
           doc.read_count
@@ -60,7 +60,7 @@
 
         {{ nav_item(
           'Similar Papers',
-          url_for('search', q='similar(bibcode:'+doc.bibcode+')', sort='score desc'),
+          url_for('index', q='similar(bibcode:'+doc.bibcode+')', sort='score desc'),
           False,
           not doc
         )}}
@@ -87,7 +87,7 @@
         <ul class="list-inline">
           {% if doc.author %}
           {% for author in doc.author[:50] %}
-          <li class="list-inline-item"><a href="{{ url_for('search', q='author:\"' + author + '\"') }}">{{ author }}</a>{% if not loop.last %};{% endif %}</li>
+          <li class="list-inline-item"><a href="{{ url_for('index', q='author:\"' + author + '\"') }}">{{ author }}</a>{% if not loop.last %};{% endif %}</li>
           {% endfor %}
           {% if doc.author|length > 50 %}
           <li class="list-inline-item">

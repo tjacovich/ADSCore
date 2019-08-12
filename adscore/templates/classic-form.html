@@ -5,43 +5,35 @@
 {% include 'partials/landing-header.html' %}
 
 {% macro logic_radios(name, description='') -%}
-<div class="float-right">
-  <div class="form-check form-check-inline classic-form__logic-radios">
-    <input type="radio" class="form-check-input" name="{{ name }}" id="{{ name }}__and" checked value="AND" aria-describedby="{{ name }}__description">
-    <label for="{{ name }}__and" class="form-check-label">and</label>
-  </div>
-  <div class="form-check form-check-inline classic-form__logic-radios">
-    <input type="radio" class="form-check-input" name="{{ name }}" id="{{ name }}__or" value="OR" aria-describedby="{{ name }}__description">
-    <label for="{{ name }}__or" class="form-check-label">or</label>
-  </div>
-  <div class="form-check form-check-inline classic-form__logic-radios">
-    <input type="radio" class="form-check-input" name="{{ name }}" id="{{ name }}__bool" value="BOOLEAN" aria-describedby="{{ name }}__description">
-    <label for="{{ name }}__bool" class="form-check-label">boolean</label>
-  </div>
+<div class="form-group form-check-inline classic-form__logic-radios pull-right">
+  <input type="radio" class="form-check-input" name="{{ name }}" id="{{ name }}__and" checked value="AND" aria-describedby="{{ name }}__description">
+  <label for="{{ name }}__and" class="form-check-label">and</label>
+
+  <input type="radio" class="form-check-input ml-2" name="{{ name }}" id="{{ name }}__or" value="OR" aria-describedby="{{ name }}__description">
+  <label for="{{ name }}__or" class="form-check-label">or</label>
+
+  <input type="radio" class="form-check-input ml-2" name="{{ name }}" id="{{ name }}__bool" value="BOOLEAN" aria-describedby="{{ name }}__description">
+  <label for="{{ name }}__bool" class="form-check-label">boolean</label>
   <small id="{{ name }}__description" class="form-text text-muted sr-only">{{ description }}</small>
 </div>
 {%- endmacro %}
 
 <h2 class="sr-only">Classic Form</h2>
-<div class="container pt-4">
-  <div class="form-row justify-content-center">
+<div class="container">
+  <div class="row justify-content-center">
     <div class="col-md-10">
       <form action="{{ base_url }}classic-form">
-        <div class="form-row">
-          <div class="form-check form-check-inline mt-3 pl-0">
-            <span class="mr-3" id="collections_label">Collections to query:</span>
-          </div>
-          <div class="form-check form-check-inline mt-3">
-            <input type="checkbox" class="form-check-input" name="astronomy" checked aria-describedby="collections_label">
-            <label class="form-check-label" for="astronomy">Astronomy</label>
-          </div>
-          <div class="form-check form-check-inline mt-3">
-            <input type="checkbox" class="form-check-input" name="physics" id="physics" aria-describedby="collections_label">
-            <label class="form-check-label" for="physics">Physics</label>
-          </div>
+        <div class="form-group form-check-inline mt-3">
+          <span class="mr-3" id="collections_label">Collections to query:</span>
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" name="astronomy" checked aria-describedby="collections_label"> Astronomy
+          </label>
+          <label class="form-check-label ml-2">
+            <input type="checkbox" class="form-check-input" name="physics" aria-describedby="collections_label"> Physics
+          </label>
         </div>
 
-        <div class="form-row mt-3">
+        <div class="row">
           <div class="col-md-6">
             <label for="classic-author-list"><b>Author</b></label>
             {{ logic_radios('author_logic', 'logic operator for author list') }}
@@ -60,7 +52,7 @@
           </div>
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group">
           <label><b>Publication date</b> between</label>
           <div class="d-flex">
             <input type="text" class="form-control" name="month_from" aria-describedby="month_from" placeholder="MM" maxlength="2">
@@ -77,29 +69,27 @@
           <small id="year_to" class="form-text text-muted sr-only">Year to</small>
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group">
           <label for="title"><b>Title</b></label>
           {{ logic_radios('title_logic', 'logic operator for title') }}
           <input type="text" class="form-control" name="title" id="title" aria-describedby="title-description" placeholder="Title">
           <small id="title-description" class="form-text text-muted sr-only">Title</small>
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group">
           <label for="abstract"><b>Abstract/Keywords</b></label>
           {{ logic_radios('abstract_logic', 'logic operator for abstract/keywords') }}
           <input type="text" class="form-control" name="abstract" id="abstract" aria-describedby="abstract-description">
           <small id="abstract-description" class="form-text text-muted sr-only">Abstract and keywords</small>
         </div>
 
-        <div class="form-check form-check-inline mt-3 pl-0">
-          <div class="form-check form-check-inline mt-3">
-            <input type="checkbox" class="form-check-input" name="refereed" checked>
-            <label class="form-check-label" for="refereed">Refereed only</label>
-          </div>
-          <div class="form-check form-check-inline mt-3">
-            <input type="checkbox" class="form-check-input" name="article" id="article">
-            <label class="form-check-label" for="article">Articles only</label>
-          </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label mr-4">
+            <input class="form-check-input" type="checkbox" name="refereed" id="refereed" value="false"> Refereed only
+          </label>
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="article" id="article" value="false"> Articles only
+          </label>
         </div>
 
         <div class="form-group mt-3">
@@ -111,7 +101,7 @@
           <small id="bibstem-description" class="form-text text-muted sr-only">Comma-separated bibstems of journal</small>
         </div>
 
-        <div class="d-flex justify-content-end mt-3">
+        <div class="d-flex justify-content-end">
           <button class="btn btn-default mr-1" role="button" type="reset">
             <i class="fa fa-times" aria-hidden="true"></i> Clear
           </button>

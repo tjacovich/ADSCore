@@ -5,7 +5,7 @@
 {% include 'partials/landing-header.html' %}
 
 <h2 class="sr-only">Paper Form</h2>
-<div class="container pt-4">
+<div class="container">
   <div class="row justify-content-center">
     <div class="col-md-10">
       <div class="row mt-3">
@@ -36,7 +36,7 @@
               <small id="page-description" class="form-text text-muted sr-only">Page</small>
             </div>
 
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end">
               <button class="btn btn-default mr-1" role="button" type="reset">
                 <i class="fa fa-times" aria-hidden="true"></i> Clear
               </button>
@@ -50,10 +50,10 @@
           <form action="{{ base_url }}paper-form" method="POST">
             <div class="form-group mt-4 mt-sm-0">
               <label for="bibcodes"><b>List of Bibcodes</b></label>
-              <p class="mb-0"><small class="form-text text-muted">Enter Bibcodes (e.g. 1989ApJ...342L..71R), one per line.</small></p>
-              <textarea class="form-control" name="bibcodes" id="bibcodes" rows="5" cols="30"></textarea>
+              <small class="form-text text-muted">Enter Bibcodes (e.g. 1989ApJ...342L..71R), one per line.</small>
+              <textarea class="form-control" name="bibcodes" id="bibcodes" rows="12" cols="30"></textarea>
             </div>
-            <div class="d-flex justify-content-end mt-3">
+            <div class="d-flex justify-content-end">
               <button class="btn btn-default mr-1" role="button" type="reset">
                 <i class="fa fa-times" aria-hidden="true"></i> Clear
               </button>
