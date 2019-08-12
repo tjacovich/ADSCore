@@ -10973,23 +10973,4 @@ main > .container {
   .results-list .card:hover {
     border: 1px solid rgba(0, 0, 0, 0.125); }
 
-.custom-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none; }
-
-.abstract-nav {
-  border-right: 2px solid #f8f9fa; }
-  .abstract-nav .nav-link.active {
-    color: #fff;
-    background-color: #2152b9; }
-  .abstract-nav .nav-item:hover {
-    background-color: #f8f9fa; }
-  .abstract-nav .nav-item:last-child {
-    border-bottom: 2px solid #f8f9fa; }
-
-.abstract-text p {
-  font-size: 1.1rem;
-  line-height: 1.7rem; }
-
 /*# sourceMappingURL=style.css.map */
