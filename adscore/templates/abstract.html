@@ -123,7 +123,7 @@
         {% set has_eprint_pdf = "EPRINT_PDF" in doc.esources %}
         {% set has_eprint_html = "EPRINT_HTML" in doc.esources %}
 
-        {% if has_pub_pdf or has_pub_html %}
+        {% if has_pub_pdf and has_pub_html %}
         <div class="row">
           <div class="col-sm-2 mr-auto"><b>Publisher</b></div>
           <div class="col-sm-3">
