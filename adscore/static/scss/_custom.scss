@@ -12,10 +12,6 @@
   }
 }
 
-main>.container {
-  min-height: 600px;
-}
-
 .s-ads-icon-text {
   $font-size: 1.2rem;
   display: inline-block;
@@ -45,7 +41,6 @@ main>.container {
 
   @include media-breakpoint-up(sm) {
     height: 9rem;
-    border-bottom: 1px solid $white;
   }
 }
 
@@ -159,8 +154,16 @@ main>.container {
   transition: border 0.5s;
 }
 
+// removes double arrows from select elements
+.custom-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 // abstract page
 .abstract-nav {
+  border-right: 2px solid $gray-100;
 
   .nav-link.active {
     color: $white;
@@ -171,12 +174,8 @@ main>.container {
     background-color: $gray-100;
   }
 
-  @include media-breakpoint-up(sm) {
-    .nav-item:last-child {
-      border-bottom: 2px solid $gray-100;
-    }
-
-    border-right: 2px solid $gray-100;
+  .nav-item:last-child {
+    border-bottom: 2px solid $gray-100;
   }
 }
 
