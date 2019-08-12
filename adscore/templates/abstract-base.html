@@ -1,1 +1,14 @@
+{% extends 'base-form.html' %}
+{% block title %}
+{% if doc %}
+{% for title in doc.title %}
+{{ title }}{% if not loop.last %};{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock %}
+{% block content %}
+<h1 class="sr-only">Abstract Page</h1>
+<div class="container">
 
+</div>
+{% endblock content %}

@@ -1,28 +1,9 @@
-{% macro num_results() %}
-{% if results %}
-<b>{{ "{:,.0f}".format(results.numFound) }}</b>
-<span class="text-muted">results </span>
-{% if stats and stats.stats_fields.citation_count %}
-with <b>{{ "{:,.0f}".format(stats.stats_fields.citation_count.sum) }}</b><span class="text-muted"> total citations</span>
-{% endif %}
-{% if stats and stats.stats_fields.citation_count_norm %}
-with <b>{{ "{:,.0f}".format(stats.stats_fields.citation_count_norm.sum) }}</b><span class="text-muted"> total normalized citations</span>
-{% endif %}
-{% endif %}
-{% endmacro %}
-
 <div class="row justify-content-center" role="search">
   <div class="col-sm-10">
     <form action="{{ base_url }}">
-      <div class="form-group mt-3 mt-sm-2">
+      <div class="form-group mt-5">
         {% if results %}
-        <div class="d-flex">
-          <small class="form-text text-muted mb-1">{{ qtime }} | {{ g.request_time() }}</small>
-          <small class="form-text ml-auto d-sm-none">
-          {{ num_results() }}
-          </small>
-        </div>
-
+        <small class="form-text text-muted mb-1">{{ qtime }} | {{ g.request_time() }}</small>
         {% endif %}
         <label for="search" class="sr-only"><h2>search</h2></label>
         <div class="input-group">
@@ -39,8 +20,17 @@ with <b>{{ "{:,.0f}".format(stats.stats_fields.citation_count_norm.sum) }}</b><s
     </form>
 
     <div class="row">
-      <div class="col-md-8 d-none d-sm-block">
-        {{ num_results() }}
+      <div class="col-md-8">
+        {% if results %}
+        <b>{{ "{:,.0f}".format(results.numFound) }}</b>
+        <span class="text-muted">results </span>
+        {% if stats and stats.stats_fields.citation_count %}
+        with <b>{{ "{:,.0f}".format(stats.stats_fields.citation_count.sum) }}</b><span class="text-muted"> total citations</span>
+        {% endif %}
+        {% if stats and stats.stats_fields.citation_count_norm %}
+        with <b>{{ "{:,.0f}".format(stats.stats_fields.citation_count_norm.sum) }}</b><span class="text-muted"> total normalized citations</span>
+        {% endif %}
+        {% endif %}
       </div>
 
       {% if results %}

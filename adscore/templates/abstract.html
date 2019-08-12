@@ -1,17 +1,302 @@
-{% extends 'base-form.html' %}
-{% block title %}
-{% if doc %}
-{% for title in doc.title %}{{ title|trim }}{% if not loop.last %};{% endif %}
-{% endfor %}
-{% endif %}
-{% endblock %}
+{% extends "abstract-base.html" %}
+
 {% block content %}
-<h1 class="sr-only">Abstract Page</h1>
-<div class="container">
-  <div class="row">
-    <div class="col-md-10">
-      tell
+
+    <div class="row s-dynamic-page-body" id="dynamic-page-body">
+        <div class="s-abstract-content">
+
+            <div class="col-sm-2 nav-container s-nav-container" id="left-column"> <div>
+<nav>
+    <div class="s-nav-header s-view-nav"> <i class="icon-list"></i> <h3>view </h3> </div>
+
+
+    {% if doc %}
+    <a href="{{ url_for('abs', identifier=doc.bibcode) }}" data-widget-id="ShowAbstract">
+    <div class="abstract-nav s-nav  s-nav-selected  ">
+            <span class="s-content">
+            Abstract
+            </span>
+    </div>
+    </a>
+    {% else %}
+    <div class="abstract-nav s-nav  s-nav-selected  s-nav-inactive">
+            <span class="s-content">
+            Abstract
+            </span>
+    </div>
+    {% endif %}
+
+
+    {% if doc %}
+    <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" aria-disabled="true" data-widget-id="ShowCitations">
+    {% if doc.citation_count and doc.citation_count > 0 %}
+    <div class="abstract-nav s-nav ">
+    {% else %}
+    <div class="abstract-nav s-nav   s-nav-inactive ">
+    {% endif %}
+            <span class="s-content">
+            Citations 
+            {% if doc.citation_count and doc.citation_count > 0 %}
+            <span class="num-items">({{ doc.citation_count }})</span>
+            {% endif %}
+            </span>
+    </div>
+    </a>
+    {% endif %}
+
+
+    {% if doc %}
+    <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" data-widget-id="ShowReferences">
+    {% if doc.reference_count > 0 %}
+    <div class="abstract-nav s-nav ">
+    {% else %}
+    <div class="abstract-nav s-nav   s-nav-inactive ">
+    {% endif %}
+            <span class="s-content">
+            References
+            <span class="num-items">({{ doc.reference_count }})</span>
+            </span>
+    </div>
+    </a>
+    {% endif %}
+
+
+    {% if doc %}
+    {% if doc.read_count and doc.read_count > 0 %}
+    <a href="{{ url_for('search', q='trending(bibcode:'+doc.bibcode+')', sort='score desc') }}" aria-disabled="true" data-widget-id="ShowCoreads">
+    <div class="abstract-nav s-nav ">
+    {% else %}
+    <div class="abstract-nav s-nav   s-nav-inactive ">
+    {% endif %}
+            <span class="s-content">
+            Co-Reads
+            </span>
+    </div>
+    </a>
+    {% endif %}
+
+
+    {% if doc %}
+    <a href="{{ url_for('search', q='similar(bibcode:'+doc.bibcode+')', sort='score desc') }}" data-widget-id="ShowSimilar">
+    <div class="abstract-nav s-nav  ">
+            <span class="s-content">
+            Similar Papers
+            </span>
+    </div>
+    </a>
+    {% endif %}
+
+
+    {% if doc %}
+    <a href="{{ url_for('export', identifier=doc.bibcode) }}" data-widget-id="ShowExportcitation__default">
+      <div class="abstract-nav s-nav  ">
+        <span class="content">
+          Export Citation
+        </span>
+      </div>
+    </a>
+    {% endif %}
+
+</nav>
+</div></div>
+
+            <div class="col-sm-9 col-md-7 s-middle-column" id="middle-column">
+                <!--id is for screen readers-->
+                <div class="main-content-container s-main-content-container" id="main-content" tabindex="-1">
+                    <div class="print-visible"><h2 style="margin-left:6.1%;">NASA/ADS</h2> </div>
+
+                    <div id="abstract-title-container" class="s-abstract-title-container"></div>
+                    <div id="current-subview">
+                        <div data-widget="ShowAbstract">
+                          <article class="s-abstract-metadata"><!--<div id="article-navigation">|</div>-->
+{% if doc %}
+
+
+<h2 class="s-abstract-title">
+    {% for title in doc.title %}
+    {{ title|safe }}{% if not loop.last %};{% endif %}
+    {% endfor %}
+    <a href=""></a>
+</h2>
+
+
+<div id="authors-and-aff" class="s-authors-and-aff">
+    <ul class="list-inline">
+            {% if doc.author %}
+              {% for author in doc.author[:50] %}
+              <li class="author"><a href="{{ url_for('search', q='author:\"' + author + '\"') }}">{{ author }}</a></li>{% if not loop.last %};{% endif %}
+              {% endfor %}
+          {% endif %}
+                {% if doc.author|length > 50 %}
+                  <li>
+                    <em>and {{ doc.author|length - 50 }} more</em>
+                  </li>
+                {% endif %}
+    </ul>
+</div>
+
+<div class="s-abstract-text">
+    <h4 class="sr-only">Abstract</h4>
+    <p>
+        {{ doc.abstract|safe }}
+    </p>
+</div>
+
+<br>
+<dl class="s-abstract-dl-horizontal">
+
+    <dt>Publication:</dt>
+    <dd>
+    <div id="article-publication">{{ doc.pub }}</div>
+    </dd>
+
+    <dt>Pub Date:</dt>
+    <dd>{{ doc.pubdate[:-3] }}</dd>
+
+
+    <dt>Bibcode:</dt>
+    <dd>
+          {{ doc.bibcode }}
+    </dd>
+
+
+
+
+</dl>
+{% else %}
+  <div class="row text-center">
+    <span class="fa-stack fa-lg text-danger">
+      <i class="fa fa-stack-2x fa-circle-o"></i>
+      <i class="fa fa-stack-1x fa-exclamation"></i>
+    </span>
+  </div>
+  <div class="row text-center">
+    <div class="h4">
+      Something Went Wrong
+    </div>
+    <div class="h4">
+      Please Retry Your Search
     </div>
   </div>
+
+{% endif %}
+
+</article>
+                        </div>
+                        <div data-widget="ShowCitations"></div>
+                        <div data-widget="ShowReferences"></div>
+                        <div data-widget="ShowCoreads"></div>
+                        <div data-widget="ShowSimilar"></div>
+                        <div data-widget="ShowTableofcontents"></div>
+                        <div data-widget="ShowGraphics"></div>
+                        <div data-widget="ShowExportcitation" data-origin="abstract"></div>
+                        <div data-widget="ShowMetrics" data-allow-redirect="false"></div>
+                        <div data-widget="MetaTagsWidget"><div></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="s-right-col-container col-sm-3 col-lg-2 s-right-column" id="right-col-container">
+                <div data-widget="ShowResources">
+<div>
+<div data-reactroot="" class="s-right-col-widget-container" style="padding: 10px;">
+
+  {% if "ESOURCE" in doc.property %}
+  <div class="resources__container">
+<div class="resources__full__list">
+<div class="resources__header__row">
+<i class="fa fa-file-text-o" aria-hidden="true">
+</i>
+<div class="resources__header__title">
+full text sources</div>
+{% if "PUB_OPENACCESS" in doc.property %}
+{% set pub_unlock = "unlock" %}
+{% else %}
+{% set pub_unlock = "" %}
+{% endif %}
+{% if "OPENACCESS" in doc.property %}
+{% set unlock = "unlock" %}
+{% else %}
+{% set unlock = "" %}
+{% endif %}
 </div>
+{% if "PUB_PDF" in doc.esources or "PUB_HTML" in doc.esources %}
+<div class="resources__content">
+<div class="resources__content__title">
+Publisher</div>
+<div class="resources__content__links">
+<span>
+  {% if "PUB_PDF" in doc.esources %}
+  <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="resources__content__link {{ pub_unlock }}">
+<i class="fa fa-file-pdf-o" aria-hidden="true">
+</i>
+</a>
+  {% endif %}
+<div class="resources__content__link__separator">
+|</div>
+</span>
+<span>
+  {% if "PUB_HTML" in doc.esources %}
+  <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="resources__content__link {{ pub_unlock }}">
+<i class="fa fa-file-text" aria-hidden="true">
+</i>
+</a>
+  {% endif %}
+</span>
+</div>
+</div>
+{% endif %}
+{% if "EPRINT_PDF" in doc.esources or "EPRINT_HTML" in doc.esources %}
+<div class="resources__content">
+<div class="resources__content__title">
+arXiv</div>
+<div class="resources__content__links">
+<span>
+  {% if "EPRINT_PDF" in doc.esources %}
+  <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="resources__content__link {{ unlock }}">
+<i class="fa fa-file-pdf-o" aria-hidden="true">
+</i>
+</a>
+  {% endif %}
+<div class="resources__content__link__separator">
+|</div>
+</span>
+<span>
+  {% if "EPRINT_HTML" in doc.esources %}
+  <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="resources__content__link {{ unlock }}">
+<i class="fa fa-file-text" aria-hidden="true">
+</i>
+</a>
+  {% endif %}
+</span>
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+
+{% else %}
+  <h3 class="s-right-col-widget-title">No Sources Found</h3>
+    <div class="resources__container"></div>
+{% endif %}
+
+
+
+
+
+</div>
+</div>
+</div>
+
+                <div data-widget="ShowAssociated"><div><!-- react-empty: 1 --></div></div>
+            </div>
+
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+</div>
+
+</div></div>
+</div>
+
 {% endblock %}

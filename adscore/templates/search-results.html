@@ -11,7 +11,7 @@
         {% for doc in results.docs %}
         <li class="my-1">
           <div class="card">
-            <div class="card-body py-1 px-0 px-md-4">
+            <div class="card-body py-1">
               <div class="row">
                 <div class="col-1 d-none d-md-block">
                   {{ form.start.data+loop.index }}
@@ -29,7 +29,7 @@
                   <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count" class="text-secondary">cited: {{ doc.citation_count }}</a>
                   {% endif %}
                 </div>
-                <div class="col-1 col-md-3 text-right">
+                <div class="col-1">
                   {% if doc.reference_count > 0 %}
                   <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" aria-disabled="false" class="text-secondary" title="quick links to lists of references, citations and more">
                     <i class="fa fa-list" aria-hidden="true"></i>
@@ -118,8 +118,8 @@
           {{ page_item(2) }}
 
           {% elif current_page != 1 %}
-
           {{ page_item(1, False, "start") }}
+
           {% for page in range(current_page - 3, current_page) %}
           {{ page_item(page) }}
 
