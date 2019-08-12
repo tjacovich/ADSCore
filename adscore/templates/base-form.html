@@ -12,14 +12,15 @@
     <title>{% block title %}{% endblock %} - NASA/ADS</title>
     <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
     <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script type="text/javascript" src="/static/js/check-cookie.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
   </head>
 
   <body>
     <div id="main" class="d-flex flex-column vh-100">
       {% include "partials/navbar.html" %}
-      <main role="main" class="flex-grow-1">{% block content %}{% endblock %}</main>
+      <main role="main" class="flex-grow-1">
+        {% block content %}{% endblock %}
+      </main>
       {% include "partials/footer.html" %}
     </div>
   </body>

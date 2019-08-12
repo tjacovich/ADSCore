@@ -11,7 +11,7 @@
         {% for doc in results.docs %}
         <li class="my-1">
           <div class="card">
-            <div class="card-body py-1">
+            <div class="card-body">
               <div class="row">
                 <div class="col-1 d-none d-md-block">
                   {{ form.start.data+loop.index }}
@@ -31,13 +31,13 @@
                 </div>
                 <div class="col-1">
                   {% if doc.reference_count > 0 %}
-                  <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" aria-disabled="false" class="text-secondary" title="quick links to lists of references, citations and more">
-                    <i class="fa fa-list" aria-hidden="true"></i>
-                  </a>
+                  <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" class="btn btn-link text-secondary" aria-disabled="false" title="quick links to lists of references, citations and more">
+                        <i class="s-list-icon" aria-hidden="true"></i>
+                      </a>
                   {% else %}
-                  <a href="#" class="text-secondary" aria-disabled="true" title="quick links to lists of references, citations etc">
-                    <i class="fa fa-list" aria-hidden="true"></i>
-                  </a>
+                  <a href="#" class="btn btn-link text-secondary" aria-disabled="true" title="quick links to lists of references, citations etc">
+                        <i class="s-list-icon" aria-hidden="true"></i>
+                      </a>
                   {% endif %}
                 </div>
               </div>
