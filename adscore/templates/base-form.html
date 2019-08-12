@@ -4,25 +4,28 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!-->
 <html class="no-js" lang="en">
-  <!--<![endif]-->
+<!--<![endif]-->
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}{% endblock %} - NASA/ADS</title>
-    <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
-    <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
-    <link rel="stylesheet" href="static/css/style.css">
-  </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %}{% endblock %} - NASA/ADS</title>
+  <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
+  {# <link rel="stylesheet" href="//ui.adsabs.harvard.edu/styles/css/styles.css"> #}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
 
-  <body>
-    <div id="main" class="d-flex flex-column vh-100">
-      {% include "partials/navbar.html" %}
-      <main role="main" class="flex-grow-1">
-        {% block content %}{% endblock %}
-      </main>
-      {% include "partials/footer.html" %}
-    </div>
-  </body>
+<body>
+  <div id="main" class="d-flex flex-column vh-100">
+    {% include "header.html" %}
+    <main role="main" class="flex-grow-1 bg-light">
+      {% block content %}{% endblock %}
+    </main>
+    {% include "footer.html" %}
+  </div>
+</body>
 
 </html>

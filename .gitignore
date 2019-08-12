@@ -110,6 +110,3 @@ python/
 #vscode
 .vscode
 .jsbeautifyrc
-
-.editorconfig
-.sass-cache

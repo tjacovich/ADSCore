@@ -1,58 +1,29 @@
 {% extends "base-form.html" %}
+
 {% block content %}
-{% include 'partials/landing-header.html' %}
 
-<div class="container ">
-  {% include 'partials/search-bar.html' %}
-
-  <div class="row quick-reference-list text-muted justify-content-md-center mt-sm-4">
-    <div class="col-md-5">
-      <dl class="row">
-        <dt class="col-md-5 text-md-right">author</dt>
-        <dd role="definition" class="col-md-7"> author:"huchra, john" </dd>
-        <dt class="col-md-5 text-md-right">first author</dt>
-        <dd role="definition" class="col-md-7"> author:"^huchra, john" </dd>
-        <dt class="col-md-5 text-md-right">abstract + title</dt>
-        <dd role="definition" class="col-md-7"> abs:"dark energy" </dd>
-        <dt class="col-md-5 text-md-right">year</dt>
-        <dd role="definition" class="col-md-7"> year:2000 </dd>
-        <dt class="col-md-5 text-md-right">year range</dt>
-        <dd role="definition" class="col-md-7"> year:2000-2005 </dd>
-        <dt class="col-md-5 text-md-right">full text</dt>
-        <dd role="definition" class="col-md-7"> full:"gravity waves" </dd>
-        <dt class="col-md-5 text-md-right">publication</dt>
-        <dd role="definition" class="col-md-7"> bibstem:ApJ <i class="icon-help" data-toggle="tooltip" title="" data-original-title="this field requires the bibstem, or journal abbreviation--try going to the 'Paper' tab above for an easy-to-use form version"></i>
-        </dd>
-      </dl>
-    </div>
-
-    <div class="col-md-5">
-      <dl class="row">
-        <dt class="col-md-4 text-md-right">citations</dt>
-        <dd role="definition" class="col-md-8"> citations(author:"huchra, j") <i class="fa fa-question-circle" aria-hidden="true" ></i>
-          <i class="icon-help" data-toggle="tooltip" title="" data-original-title="finds all papers that cite a given set of papers"></i>
-        </dd>
-        <dt class="col-md-4 text-md-right">references</dt>
-        <dd role="definition" class="col-md-8"> references(author:"huchra, j") <i class="icon-help" data-toggle="tooltip" title="" data-original-title="finds all papers referenced by a given set of papers"></i>
-        </dd>
-        <dt class="col-md-4 text-md-right">reviews</dt>
-        <dd role="definition" class="col-md-8"> reviews("gamma-ray bursts") <i class="icon-help" data-toggle="tooltip" title="" data-original-title="finds articles citing the most relevant papers on the topic being researched"></i>
-        </dd>
-      </dl>
-      <hr class="hr">
-      <dl class="row">
-        <dt class="col-md-4 text-md-right">refereed</dt>
-        <dd role="definition" class="col-md-8"> property:refereed <i class="icon-help" data-toggle="tooltip" title="" data-original-title="limit to non-refereed papers by searching property:notrefereed"></i>
-        </dd>
-        <dt class="col-md-4 text-md-right">astronomy</dt>
-        <dd role="definition" class="col-md-8"> database:astronomy <i class="icon-help" data-toggle="tooltip" title="" data-original-title="limit to physics papers by searching database:physics"></i>
-        </dd>
-        <dt class="col-md-4 text-md-right">OR</dt>
-        <dd role="definition" class="col-md-8"> abs:(planet OR star) <i class="icon-help" data-toggle="tooltip" title="" data-original-title="default logic is AND, e.g. abs:(planet star) would be interpreted as abs:(planet AND star)"></i>
-        </dd>
-      </dl>
+<div class="s-starry-background-wrapper">
+  <div class="s-logo-header">
+    {# add image #}
+  </div>
+</div>
+<div class="container">
+  <div class="row" role="search">
+    <div class="col-sm-12">
+      <form action="{{ base_url }}">
+        <div class="form-group">
+          <div class="input-group">
+            {{ form.q(size=64, autofocus=true, class="form-control q ui-autocomplete-input", autocomplete="off") }}
+            <span class="input-group-append">
+              <button class="btn btn-primary" type="submit" aria-label="submit" title="submit">
+                <i class="fa fa-search"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
-  {% include 'partials/landing-footer.html' %}
 </div>
+
 {% endblock %}
