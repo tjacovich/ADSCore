@@ -4,7 +4,6 @@
 
 {% include 'partials/landing-header.html' %}
 
-<h2 class="sr-only">Paper Form</h2>
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-10">
@@ -13,7 +12,7 @@
           <form action="{{ base_url }}paper-form">
             <div class="form-group">
               <label for="bibstem"><b>Publication(s)</b></label>
-              <input type="text" class="form-control" name="bibstem" id="bibstem" autofocus aria-describedby="bibstem-description" placeholder="Comma-separated bibstems of journal">
+              <input type="text" class="form-control" name="bibstem" id="bibstem" aria-describedby="bibstem-description" placeholder="Comma-separated bibstems of journal">
               <small class="form-text">view our <a href="http://adsabs.harvard.edu/abs_doc/journals1.html" target="_blank" rel="noopener noreferrer">full list of bibstems</a></small>
               <small id="bibstem-description" class="form-text text-muted sr-only">Comma-separated bibstems of journal</small>
             </div>

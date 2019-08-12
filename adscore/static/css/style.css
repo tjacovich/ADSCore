@@ -6545,14 +6545,12 @@ a.text-dark:hover, a.text-dark:focus {
 
 .s-logo-header {
   color: #fff;
+  font-size: 1.5rem;
   padding-top: 1rem; }
-  .s-logo-header h1 {
-    font-size: 1.5rem; }
   @media (min-width: 576px) {
     .s-logo-header {
-      padding-top: 1rem; }
-      .s-logo-header h1 {
-        font-size: 2.5rem; } }
+      font-size: 2.5rem;
+      padding-top: 1rem; } }
 
 .s-logo-header > img {
   display: block;
@@ -6574,21 +6572,5 @@ a.text-dark:hover, a.text-dark:focus {
 
 .classic-form__date-separator {
   line-height: 2.2rem; }
-
-.results-list li {
-  font-size: 0.67rem; }
-  .results-list li h3 {
-    font-size: 0.67rem; }
-  @media (min-width: 576px) {
-    .results-list li {
-      font-size: 1.005rem; }
-      .results-list li h3 {
-        font-size: 1.005rem; } }
-
-.num-rows-control {
-  text-align: center; }
-  @media (min-width: 576px) {
-    .num-rows-control {
-      text-align: unset; } }
 
 /*# sourceMappingURL=style.css.map */

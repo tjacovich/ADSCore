@@ -1,163 +1,57 @@
 {% extends 'base-form.html' %}
 {% block title %}{{ form.q.data }}{% endblock %}
 {% block content %}
-<h1 class="sr-only">Search Results</h1>
 <div class="container">
   {% include 'partials/search-bar.html' %}
   <hr class="hr">
-  <article class="row mt-4">
-    <div class="col-12">
-      <ul class="list-unstyled results-list">
+  <div class="row mt-4">
+    <div class="col-md-9">
+      <ul class="list-unstyled">
         {% for doc in results.docs %}
-        <li class="my-1">
-          <div class="card">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-1 d-none d-md-block">
-                  {{ form.start.data+loop.index }}
-                </div>
-                <div class="col-4 col-md-4 text-truncate">
-                  <a href="{{ url_for('abs', identifier=doc.bibcode) }}" aria-label="bibcode" class="text-secondary">
-                  {{ doc.bibcode }}
-                  </a>
-                </div>
-                <div class="col-3 col-md-2">
-                  <span class="text-secondary">{{ doc.pubdate[:-3] }}</span>
-                </div>
-                <div class="col-3 col-md-2">
-                  {% if doc.citation_count and doc.citation_count > 0 %}
-                  <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count" class="text-secondary">cited: {{ doc.citation_count }}</a>
-                  {% endif %}
-                </div>
-                <div class="col-1">
-                  {% if doc.reference_count > 0 %}
-                  <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" class="btn btn-link text-secondary" aria-disabled="false" title="quick links to lists of references, citations and more">
-                        <i class="s-list-icon" aria-hidden="true"></i>
-                      </a>
-                  {% else %}
-                  <a href="#" class="btn btn-link text-secondary" aria-disabled="true" title="quick links to lists of references, citations etc">
-                        <i class="s-list-icon" aria-hidden="true"></i>
-                      </a>
-                  {% endif %}
-                </div>
-              </div>
-              <div class="row justify-content-end">
-                <div class="col-md-11">
-                  <a href="{{ url_for('abs', identifier=doc.bibcode) }}" class="text-primary">
-                      <h3 class="h6">{{ doc.title[0]|safe }}</h3>
-                      </a>
-                </div>
-              </div>
-              <div class="row justify-content-end">
-                <div class="col-md-11">
-                  {% if doc.author %}
-                  <ul class="list-inline text-secondary">
-                    {% for auth in doc.author[:10] %}
-                    <li class="list-inline-item">{{ auth }}{% if not loop.last %};{% endif %}</li>
-                    {% endfor %}
-                    {% if doc.author|length > 10 %}
-                    <li class="list-inline-item">
-                      <em>and {{ doc.author|length - 10 }} more</em>
-                    </li>
-                    {% endif %}
-                  </ul>
-                  {% endif %}
-                </div>
-              </div>
+        <li>
+          <div class="row">
+            <div class="col-md-1">
+              {{ form.start.data+loop.index }}
+            </div>
+            <div class="col-md-4">
+              <a href="{{ url_for('abs', identifier=doc.bibcode) }}" aria-label="bibcode" class="text-secondary">
+              {{ doc.bibcode }}
+              </a>
+            </div>
+            <div class="col-md-2">
+              <span class="text-secondary">{{ doc.pubdate[:-3] }}</span>
+            </div>
+            <div class="col-md-2">
+              {% if doc.citation_count and doc.citation_count > 0 %}
+              <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count" class="text-secondary">cited: {{ doc.citation_count }}</a>
+              {% endif %}
+            </div>
+            <div class="col-md-3">
+              {% if doc.reference_count > 0 %}
+              <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" class="btn btn-link text-secondary" aria-disabled="false" title="quick links to lists of references, citations and more">
+                <i class="s-list-icon" aria-hidden="true"></i>
+              </a>
+              {% else %}
+              <a href="#" class="btn btn-link text-secondary" aria-disabled="true" title="quick links to lists of references, citations etc">
+                <i class="s-list-icon" aria-hidden="true"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="row justify-content-end">
+            <div class="col-md-11">
+              <a href="{{ url_for('abs', identifier=doc.bibcode) }}" class="text-primary">
+              {{ doc.title[0]|safe }}
+              </a>
             </div>
           </div>
         </li>
         {% endfor %}
       </ul>
     </div>
-  </article>
-  <hr class="hr">
-  {% if results.docs | length > 1 %}
-  <div class="row mb-3">
-    <div class="col-md-6 num-rows-control">
-      <div class="btn-group" role="group" aria-label="Select number of rows per page">
-        {% for num in (25, 100, 500) %}
-        {% if form.rows.data == num %}
-        <button class="btn btn-outline-primary active" type="button">{{ num }}</button>
-        {% else %}
-        <a href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}" class="btn btn-outline-primary">{{ num }}</a>
-        {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    <div class="col-md-6 mt-4 mt-md-0">
-      {% macro page_item(page, active=False, special=False) %}
-      <li class="page-item {% if active %}active{% elif not special %} d-none d-md-block{% endif %}">
-        <a href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.rows.data * (page - 1) }}" class="page-link" aria-label="Go to page {{ page }}">
-          {% if special == 'start' %}
-            <i class="fa fa-chevron-left" aria-hidden="true"></i>
-          {% elif special == 'end' %}
-            <i class="fa fa-chevron-right" aria-hidden="true"></i>
-          {% else %}
-            {{ page }}
-          {% endif %}
-        </a>
-      </li>
-      {% endmacro %}
-      {% set current_page = ((form.start.data / form.rows.data) + 1) | int %}
-      {% set total_pages = (results.numFound / form.rows.data) | round(0, 'ceil')| int %}
-      {% set prev_enabled = form.start.data - form.rows.data >= 0 %}
-      {% set next_enabled = results.numFound - (form.start.data + form.rows.data) > 0 %}
-      <nav aria-label="Page navigation" id="results-navigation">
-        <ul class="pagination justify-content-md-end justify-content-center results-pager">
-          <li class="page-item {% if not prev_enabled %}disabled{% endif %}">
-            <a class="page-link" href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}" aria-label="Previous">
-              Previous
-            </a>
-          </li>
-          {% if current_page == 2 %}
-          {{ page_item(1) }}
-
-          {% elif current_page == 3 %}
-          {{ page_item(1) }}
-          {{ page_item(2) }}
-
-          {% elif current_page != 1 %}
-          {{ page_item(1, False, "start") }}
-
-          {% for page in range(current_page - 3, current_page) %}
-          {{ page_item(page) }}
-
-          {% endfor %}
-          {% endif %}
-
-          {{ page_item(current_page, True) }}
-
-          {% if current_page == total_pages - 1 %}
-          {{ page_item(total_pages) }}
-
-          {% elif current_page == total_pages - 2 %}
-          {{ page_item(total_pages - 1) }}
-          {{ page_item(total_pages) }}
-
-          {% elif current_page == total_pages - 2 %}
-          {{ page_item(total_pages - 2) }}
-          {{ page_item(total_pages - 1) }}
-          {{ page_item(total_pages) }}
-
-          {% elif current_page != total_pages %}
-          {% for page in range(current_page + 1, current_page + 4) %}
-          {{ page_item(page) }}
-          {% endfor %}
-
-          {{ page_item(total_pages, False, "end") }}
-
-          {% endif %}
-
-          <li class="page-item {% if not next_enabled %}disabled{% endif %}">
-            <a class="page-link" href="{{ base_url }}?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}" aria-label="Next">
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
+    <div class="col-md-3">
+      sort
     </div>
   </div>
-  {% endif %}
 </div>
 {% endblock %}
