@@ -106,3 +106,7 @@ python/
 
 # emacs
 *~
+
+.editorconfig
+.jsbeautifyrc
+.vscode/
