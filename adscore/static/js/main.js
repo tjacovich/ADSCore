@@ -29,19 +29,8 @@
     }
 
     window.APP_VERSION = 'v1.2.30';
+    window.__PRERENDERED = true;
     const BASEURL = 'https://dev.adsabs.harvard.edu/';
-
-    if (page === 'search' && data) {
-      const params = Object.keys(data).map(function(key) {
-        if (key === 'start') {
-          return 'p_=' + (data.start / data.rows).toFixed();
-        }
-        return key + '=' + encodeURIComponent(data[key]);
-      });
-      window.location.href = BASEURL + 'search/' + params.join('&');
-    } else if (page === 'abs') {
-      window.__PRERENDERED = true;
-    }
 
     const addScript = function(args) {
       let script = '<script type="text/javascript" ';
