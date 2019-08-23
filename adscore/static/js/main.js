@@ -18,30 +18,18 @@
     return "";
   }
 
-  // continuously checks for presence of core cookie, if it finds it
-  // it sets the flag on the document <html> element class list
-  (function checkCookie() {
-    const doc = document.documentElement;
-    const hasCore = doc.classList.contains('core');
-    const cookie = getCookie('core');
-    if (cookie !== '' && !hasCore) {
-      doc.className += ' core';
-    } else if (!cookie && hasCore) {
-      doc.className = doc.className.replace(' core', '');
-    }
-    setTimeout(checkCookie, 1000);
-  })();
-
-  // called at the bottom of the document,
-  // will watch for changes to the core class on the doc element
-  // before it will run
   window.startApp = function(page, data) {
-    if (document.documentElement.classList.contains('core')) {
-      window.setTimeout(window.startApp, 5000, page, data);
+
+    // looks for the cookie, and sets true if its 'always'
+    const coreCookie = getCookie('core') === 'always';
+
+    // only load bumblebee if we detect the core cookie and we are on abstract page
+    if (coreCookie || (!(/^\/abs\//.test(document.location.pathname)) && !coreCookie)) {
       return;
     }
-    window.APP_VERSION = 'v1.2.27';
-    const BASEURL = 'https://ui.adsabs.harvard.edu/';
+
+    window.APP_VERSION = 'v1.2.30';
+    const BASEURL = 'https://dev.adsabs.harvard.edu/';
 
     if (page === 'search' && data) {
       const params = Object.keys(data).map(function(key) {

@@ -8,7 +8,6 @@
 <title>
 {{ form.q.data }} - NASA/ADS</title>
 <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
-<meta property="bundle-prefix" content="https://ui.adsabs.harvard.edu/">
 <link rel="preload" href="//ui.adsabs.harvard.edu/styles/css/styles.css" as="style">
 <link rel="stylesheet" href="//ui.adsabs.harvard.edu/styles/css/styles.css">
 <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
@@ -53,7 +52,7 @@
 
         </div>
         <!-- /.navbar-collapse -->
-    
+
 </nav>
 <!-- /.container-fluid -->
 </div></div>
@@ -94,7 +93,7 @@
       <form name="main-query" action="{{ base_url }}">
         <div class="form-group has-feedback">
           <div class="input-group">
-            
+
             <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
             {{ form.q(size=64, class="form-control q ui-autocomplete-input", autocomplete="off") }}
             {{ form.sort(hidden=true) }}
@@ -211,7 +210,7 @@
   </div>
   {% endif %}
 {% endif %}
-        
+
 {% for doc in results.docs %}
 
 <li><div class="col-sm-12 ">
@@ -294,12 +293,12 @@
     </div>
 </div>
 </li>
-        
+
 {% endfor %}
-        
-        
-        
-        
+
+
+
+
 </ul>
   </div>
       <div class="row">
@@ -341,7 +340,7 @@
                           {% endif %}
                       </ul>
                   </nav>
-      
+
               </div>
           </div>
       </div>
