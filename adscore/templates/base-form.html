@@ -9,7 +9,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>{% block title %}{% endblock %} - NASA/ADS</title>
+  <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
   <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
   <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
   <script src="/static/js/main.js" type="text/javascript"></script>

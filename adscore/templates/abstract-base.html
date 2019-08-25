@@ -1,4 +1,11 @@
 {% extends 'base-form.html' %}
+{% block title %}
+  {% if doc %}
+  {% for title in doc.title %}
+  {{ title }}{% if not loop.last %};{% endif %}
+  {% endfor %}
+  {% endif %}
+{% endblock title %}
 
 {% block content %}
 <div id="abstract-page-layout" class="s-abstract-page-layout">
