@@ -1,45 +1,34 @@
 <div id="navbar-container">
   <div data-widget="NavbarWidget">
-    <div>
-      <nav class="navbar fluid navbar-inverse">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="//ui.adsabs.harvard.edu/styles/img/transparent_logo.svg" alt="ads icon">
-      <h1> <b>ads</b></h1>
-  </a>
-        </div>
+    <nav class="navbar fluid navbar-inverse">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="//ui.adsabs.harvard.edu/styles/img/transparent_logo.svg" alt="ads icon">
+          <h1> <b>ads</b></h1>
+        </a>
+      </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
-          <ul class="nav navbar-nav navbar-right">
-
-            <li>
-              <button type="button" class="btn btn-primary-faded feedback-button" style="transition: none;" data-toggle="modal" data-target="#feedback-modal">
-                <i class="fa fa-comment about-page-icon"></i>
-                {% if request.endpoint == "classic_form" %}
-                <a href="https://ui.adsabs.harvard.edu/classic-form" style="color: #FFFFFF">Full ADS</a>
-                {% elif request.endpoint == "paper_form" %}
-                <a href="https://ui.adsabs.harvard.edu/modern-form" style="color: #FFFFFF">Full ADS</a>
-                {% else %}
-                <a href="https://ui.adsabs.harvard.edu/" style="color: #FFFFFF">Full ADS</a>
-                {% endif %}
-              </button>
-            </li>
-
-          </ul>
-
-        </div>
-        <!-- /.navbar-collapse -->
-
-      </nav>
-      <!-- /.container-fluid -->
-    </div>
+      <div class="nav navbar-nav navbar-form navbar-right" style="margin-right: 1rem;">
+          {% if request.endpoint == "classic_form" %}
+          <a href="https://ui.adsabs.harvard.edu/classic-form" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+            <i class="fa fa-comment about-page-icon"></i> Full ADS
+          </a>
+          {% elif request.endpoint == "paper_form" %}
+          <a href="https://ui.adsabs.harvard.edu/modern-form" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+            <i class="fa fa-comment about-page-icon"></i> Full ADS
+          </a>
+          {% else %}
+          <a href="https://ui.adsabs.harvard.edu/" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+            <i class="fa fa-comment about-page-icon"></i> Full ADS
+          </a>
+          {% endif %}
+      </div>
+    </nav>
   </div>
 </div>
