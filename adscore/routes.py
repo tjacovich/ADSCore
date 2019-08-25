@@ -34,6 +34,10 @@ def search():
     """
     form = ModernForm(request.args)
     if len(form.q.data) > 0:
+        session['q'] = form.q.data
+        session['rows'] = form.rows.data
+        session['start'] = form.start.data
+        session['sort'] = form.sort.data
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
@@ -148,7 +152,7 @@ def abs(identifier):
     """
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
-    form = ModernForm(request.args)
+    form = ModernForm(q=session['q'], sort=session['sort'], rows=session['rows'], start=session['start'])
     if len(docs) > 0:
         doc = docs[0]
     else:
