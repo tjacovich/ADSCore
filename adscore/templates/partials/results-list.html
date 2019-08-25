@@ -1,0 +1,188 @@
+<div class="s-results-column" id="results-middle-column">
+  <div class="main-content-container s-main-content-container" id="main-content" tabindex="-1" role="main"
+    aria-label="container for search results and other main content">
+    <div data-widget="Results">
+      <div class="list-of-things">
+        <div class="s-results-widget results-widget" style="padding-top: 2rem;">
+
+          <div class="row">
+            <h2 class="sr-only">Search Results</h2>
+            <ul class="col-sm-12 results-list  s-results-list list-unstyled s-display-block" aria-label="list of results">
+
+              {% if not results %}
+              <div>
+                <div class="container-fluid">
+                  <div class="row text-center">
+                    <span class="fa-stack fa-lg text-danger">
+                      <i class="fa fa-stack-2x fa-circle-o"></i>
+                      <i class="fa fa-stack-1x fa-exclamation"></i>
+                    </span>
+                  </div>
+                  <div class="row text-center">
+                    <div class="h4">
+                      Something Went Wrong
+                    </div>
+                    <div class="h4">
+                      Please Retry Your Search
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              {% if results.docs | length == 0 %}
+              <div>
+                <div class="s-empty-view-msg">
+                  <div class="h4">
+                    Sorry no results were found for:</p>
+                  </div>
+                  <p><code>{{ form.q.data }}</code></p>
+                  <ul>
+                    <li>Try broadening your search</li>
+                    <li><a href="{{ base_url }}">Check out some examples</a></li>
+                    <li><a href="https://adsabs.github.io/help/search/search-syntax" target="_blank" rel="noopener">Read
+                        our help pages</a></li>
+                  </ul>
+                </div>
+              </div>
+              {% endif %}
+              {% endif %}
+
+              {% for doc in results.docs %}
+
+              <li>
+                <div class="col-sm-12 ">
+                  <div class="row s-top-row">
+
+                    <div class="col-xs-1 s-checkbox-col s-top-row-col">
+                      <label>
+                        {{ form.start.data+loop.index }}
+                      </label>
+                    </div>
+
+                    <div class="hidden-xs hidden-sm col-md-3 s-top-row-col identifier s-identifier">
+                      <a href="{{ url_for('abs', identifier=doc.bibcode) }}" aria-label="bibcode"
+                        class="abs-redirect-link">
+                        {{ doc.bibcode }}
+                      </a>
+                    </div>
+                    <div class="col-xs-2 col-md-2 col-md-offset-0 s-top-row-col" aria-label="date published">
+                      {{ doc.pubdate[:-3] }}
+                    </div>
+                    <div class="col-xs-3 col-sm-4 col-md-2 s-top-row-col">
+                      {% if doc.citation_count and doc.citation_count > 0 %}
+                      <a href="{{ url_for('index', q='citations(bibcode:'+doc.bibcode+')') }}" title="citation count"
+                        class="citations-redirect-link">cited: {{ doc.citation_count }}</a>
+                      {% endif %}
+                    </div>
+                    <div class="col-xs-4 col-sm-4 pull-right">
+                      <div class="s-results-links">
+
+
+
+                        <div class="letter-icon s-letter-icon">
+                          {% if doc.reference_count > 0 %}
+                          <a href="{{ url_for('index', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}"
+                            class="btn-link active-link s-active-link" style="transition: none;" aria-disabled="false">
+                            <i class="s-list-icon"
+                              aria-label="quick links to lists of references, citations and more"></i>
+                          </a>
+                          {% else %}
+                          <a href="#" class="btn-link disabled" aria-disabled="true"
+                            aria-label="quick links to lists of references, citations etc">
+                            <i class="s-list-icon" aria-hidden="true"></i>
+                          </a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row">
+
+                    <div class="col-xs-10 col-xs-offset-1">
+                      <a href="{{ url_for('abs', identifier=doc.bibcode) }}" class="abs-redirect-link">
+                        <h3 class="s-results-title">{{ doc.title[0]|safe }}</h3>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-xs-10 col-xs-offset-1">
+
+                      <ul class="list-inline just-authors s-results-authors less-authors" aria-label="authors">
+                        {% if doc.author %}
+                        {% for auth in doc.author[:10] %}
+                        <li class="article-author">{{ auth }}{% if not loop.last %};{% endif %}
+                        </li>
+                        {% endfor %}
+                        {% if doc.author|length > 10 %}
+                        <li>
+                          <em>and {{ doc.author|length - 10 }} more</em>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                      </ul>
+
+                    </div>
+
+                  </div>
+                </div>
+              </li>
+
+              {% endfor %}
+
+            </ul>
+          </div>
+
+          {% if results.docs | length > 1 %}
+          <div class="row">
+            <div class="col-sm-12 pagination-controls s-pagination-controls">
+              <div class="col-xs-5 per-page-container">
+                <div class="form-group">
+                  <label for="per-page-select" class="col-xs-4 control-label">Per Page</label>
+                  <div class="col-xs-8 col-sm-5">
+
+                    {% for num in (25, 100, 500) %}
+                    {% if form.rows.data == num %}
+                    <b>{{num}}</b>
+                    {% else %}
+                    <a
+                      href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-6">
+                <nav>
+                  <ul class="pager">
+                    {% if form.start.data - form.rows.data >= 0 %}
+                    <li class=""><a
+                        href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}"
+                        class="page-control previous-page"><i class="fa fa-chevron-circle-left"></i> prev</a></li>
+                    {% else %}
+                    <li class=" disabled "><a href="#" class="page-control previous-page"><i
+                          class="fa fa-chevron-circle-left"></i> prev</a></li>
+                    {% endif %}
+                    {{ ((form.start.data / form.rows.data) + 1) | int  }} of
+                    {{ (results.numFound / form.rows.data) | round(0, 'ceil')| int }}
+                    {% if results.numFound - (form.start.data + form.rows.data) > 0 %}
+                    <li class=""><a
+                        href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
+                        class="page-control next-page">next <i class="fa fa-chevron-circle-right"></i></a></li>
+                    {% else %}
+                    <li class=" disabled"><a href="#" class="page-control next-page">next <i
+                          class="fa fa-chevron-circle-right"></i></a></li>
+                    {% endif %}
+                  </ul>
+                </nav>
+
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

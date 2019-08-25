@@ -148,12 +148,13 @@ def abs(identifier):
     """
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
+    form = ModernForm(request.args)
     if len(docs) > 0:
         doc = docs[0]
     else:
         doc= None
         results['error'] = "Record not found."
-    return render_template('abstract.html', base_url=SERVER_BASE_URL, auth=session['auth'], doc=doc, error=results.get('error'))
+    return render_template('abstract.html', base_url=SERVER_BASE_URL, auth=session['auth'], doc=doc, error=results.get('error'), form=form)
 
 @app.route(SERVER_BASE_URL+'abs/<identifier>/exportcitation', methods=['GET'])
 def export(identifier):
@@ -162,6 +163,7 @@ def export(identifier):
     """
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
+    form = ModernForm(request.args)
     if len(docs) > 0:
         doc = docs[0]
     else:
@@ -171,7 +173,7 @@ def export(identifier):
         data = api.export_abstract(doc.get('bibcode')).get('export')
     else:
         data = None
-    return render_template('abstract-export.html', base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'))
+    return render_template('abstract-export.html', base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
 
 @app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
 def core_always():
