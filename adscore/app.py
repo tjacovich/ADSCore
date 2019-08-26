@@ -31,3 +31,4 @@ app.secret_key = SECRET_KEY
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SESSION_COOKIE_NAME'] = SESSION_COOKIE_NAME
 app.config['SESSION_COOKIE_PATH'] = SESSION_COOKIE_PATH
+app.config['MINIFY_PAGE'] = True

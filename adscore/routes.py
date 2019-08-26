@@ -5,7 +5,10 @@ from adscore import api
 from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.constants import SERVER_BASE_URL, SORT_OPTIONS
 from adscore.tools import is_expired
+from flask_htmlmin import HTMLMIN
 
+# minify html
+HTMLMIN(app)
 
 @app.before_request
 def before_request():
@@ -148,13 +151,20 @@ def paper_form_bibcodes():
 @app.route(SERVER_BASE_URL+'abs/<identifier>', methods=['GET'])
 def abs(identifier):
     """
-    Show abstrac given an identifier
+    Show abstract given an identifier
     """
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
-    form = ModernForm(q=session['q'], sort=session['sort'], rows=session['rows'], start=session['start'])
+    if 'q' in session:
+        form = ModernForm(q=session['q'], sort=session['sort'], rows=session['rows'], start=session['start'])
+    else:
+        form = ModernForm({}) 
     if len(docs) > 0:
         doc = docs[0]
+        if not isinstance(doc['title'], list):
+            doc['title'] = [doc['title']]
+        if 'page' in doc and isinstance(doc['page'], list) and len(doc['page']) > 0:
+            doc['page'] = doc['page'][0]
     else:
         doc= None
         results['error'] = "Record not found."

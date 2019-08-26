@@ -18,7 +18,7 @@
     return "";
   }
 
-  window.startApp = function(page, data) {
+  (function() {
 
     // looks for the cookie, and sets true if its 'always'
     const coreCookie = getCookie('core') === 'always';
@@ -32,19 +32,18 @@
     window.__PRERENDERED = true;
     const BASEURL = 'https://dev.adsabs.harvard.edu/';
 
-    const addScript = function(args) {
-      let script = '<script type="text/javascript" ';
-      script += Object.keys(args).map(function(arg) {
-        return arg + '=' + args[arg];
-      }).join(' ');
-      document.write(script + '></script>');
+    const addScript = function(args, cb) {
+      const script = document.createElement('script');
+      Object.keys(args).forEach((key) => {
+        script.setAttribute(key, args[key]);
+      });
+      script.onload = () => cb(script);
+      document.body.appendChild(script);
     }
 
     addScript({
-      src: BASEURL + 'libs/requirejs/require.js',
-      id: 'requirescript'
-    });
-    document.getElementById('requirescript').onload = function() {
+      src: BASEURL + 'libs/requirejs/require.js'
+    }, () => {
       require.config({
         baseUrl: BASEURL
       });
@@ -89,6 +88,6 @@
         }
         setTimeout(checkLoad, 10);
       })();
-    }
-  }
+    });
+  })();
 })();
