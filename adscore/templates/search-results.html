@@ -1,3 +1,4 @@
+{% set view = "results" %}
 {% extends 'base-form.html' %}
 {% block title %}{{ form.q.data }}{% endblock title %}
 {% block content %}
@@ -35,7 +36,7 @@
             {% else %}
               <div class="col-xs-12 col-md-8 col-md-offset-2">
             {% endif %}
-          
+
             {% include 'partials/results-list.html' %}
           </div>
           <div class="col-xs-12 col-md-2">
@@ -95,10 +96,4 @@
     </div>
   </div>
 </div>
-
-
-
-
-
-
 {% endblock content %}

@@ -1,11 +1,6 @@
+{% set view = "abstract" %}
 {% extends 'base-form.html' %}
-{% block title %}
-  {% if doc %}
-  {% for title in doc.title %}
-  {{ title }}{% if not loop.last %};{% endif %}
-  {% endfor %}
-  {% endif %}
-{% endblock title %}
+{% block title %}{% if doc %}{{ doc.title|join(';') }}{% endif %}{% endblock title %}
 
 {% block content %}
 <div id="abstract-page-layout" class="s-abstract-page-layout">
@@ -13,7 +8,7 @@
   <div class="row s-stable-search-bar-height s-results-control-row-container">
     <div class="s-search-bar-full-width-container">
       <div class="hidden-xs col-md-2" style="padding: 2.5rem 0 0 2.5rem;">
-        <a href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ form.rows.data }}" class="back-button btn btn-sm btn-default"> 
+        <a href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ form.rows.data }}" class="back-button btn btn-sm btn-default">
           <i class="fa fa-arrow-left"></i> Back to results
         </a>
       </div>

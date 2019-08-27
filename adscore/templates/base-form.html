@@ -7,13 +7,10 @@
 <!--<![endif]-->
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
-  <meta name="description" content="A powerful, streamlined new Astrophysics Data System">
-  <link rel="icon" type="image/png" sizes="32x32" href="//ui.adsabs.harvard.edu/styles/img/favicon.ico">
-  <script src="/assets/js/main.js" type="text/javascript"></script>
-  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://ui.adsabs.harvard.edu/styles/img/favicon.ico">
+  <link rel="stylesheet" href="https://ui.adsabs.harvard.edu/styles/css/styles.css">
+  {% include 'partials/meta.html' %}
 </head>
 
 <body>
@@ -22,7 +19,7 @@
     <div id="body-template-container">
       <div class="s-master-page-manager">
         {% include 'partials/navbar.html' %}
-        
+
         <div id="content-container">
           <div class="dynamic-container s-dynamic-container">
             {% block content %}{% endblock content %}
@@ -33,9 +30,6 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript">
-    startApp();
-  </script>
+  <script>(function(){function a(a){for(var b,d=a+"=",e=decodeURIComponent(document.cookie),f=e.split(";"),g=0;g<f.length;g++){for(b=f[g];" "==b.charAt(0);)b=b.substring(1);if(0==b.indexOf(d))return b.substring(d.length,b.length)}return""}document.documentElement.className=document.documentElement.className.replace("no-js","js"),function(){const b="always"===a("core");if(b||!/^\/abs\//.test(document.location.pathname)&&!b)return;window.APP_VERSION="v1.2.30",window.__PRERENDERED=!0;const c="https://dev.adsabs.harvard.edu/";(function(a,b){const c=document.createElement("script");Object.keys(a).forEach(b=>{c.setAttribute(b,a[b])}),c.onload=()=>b(c),document.body.appendChild(c)})({src:"https://dev.adsabs.harvard.edu/libs/requirejs/require.js"},()=>{require.config({baseUrl:c});var a,b={"":"landing-page",search:"search-page",abs:"abstract-page"},d=window.APP_VERSION?"?v="+window.APP_VERSION:"";try{var e=window.location,f=e["/"===e.pathname?"hash":"pathname"].replace(/#/g,"").split("/"),g=f.reverse().filter(function(a){return-1<Object.keys(b).indexOf(a)});g=g.length&&g[0],a=function(){require([c+b[g]+".config.js"+d],function(){},function(){require(["https://dev.adsabs.harvard.edu/discovery.config.js"+d])})}}catch(b){a=function(){require(["https://dev.adsabs.harvard.edu/discovery.config.js"+d])}}(function b(){return window.requirejs&&"function"==typeof a?a():void setTimeout(b,10)})()})}()})();</script>
 </body>
-
 </html>

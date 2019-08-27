@@ -18,7 +18,7 @@ if __name__ == "__main__":
         "target": "https://devapi.adsabs.harvard.edu/"
       },
       "/styles": {
-        "target": "https://dev.adsabs.harvard.edu/styles"
+        "target": "https://ui.adsabs.harvard.edu/styles"
       }
     })
 
