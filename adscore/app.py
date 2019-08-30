@@ -1,7 +1,8 @@
 import os
 import requests
 from flask import Flask
-from adscore.constants import SECRET_KEY, SESSION_COOKIE_NAME, SESSION_COOKIE_PATH
+from flask_minify import minify
+from adscore.constants import SECRET_KEY, SESSION_COOKIE_NAME, SESSION_COOKIE_PATH, ENVIRONMENT
 
 class MiniADSFlask(Flask):
     """ADS Flask worker; used by all the microservice applications.
@@ -32,3 +33,6 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SESSION_COOKIE_NAME'] = SESSION_COOKIE_NAME
 app.config['SESSION_COOKIE_PATH'] = SESSION_COOKIE_PATH
 app.config['MINIFY_PAGE'] = True
+if ENVIRONMENT != "localhost":
+    minify(app=app, html=True, js=True, cssless=True, cache=True, fail_safe=True, bypass=[])
+

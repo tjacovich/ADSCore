@@ -2,6 +2,7 @@ import os
 
 ADS_URL = os.environ.get('ADS_URL', "https://prod.adsabs.harvard.edu/")
 API_URL = ADS_URL+"v1/"
+ENVIRONMENT = os.environ.get('ENVIRONMENT', "localhost")
 SERVER_BASE_URL = os.environ.get('SERVER_BASE_URL', "/")
 BOOTSTRAP_SERVICE = os.environ.get('BOOTSTRAP_SERVICE', API_URL+"accounts/bootstrap")
 SEARCH_SERVICE = os.environ.get('SEARCH_SERVICE', API_URL+"search/query")
