@@ -19,6 +19,27 @@ def before_request():
     if 'auth' not in session or is_expired(session['auth']):
         session['auth'] = api.bootstrap()
 
+if ENVIRONMENT != "localhost":
+    # Temporary hack until:
+    #  - All BBB Javascript is served from one directory and not the root
+    #  - RequireJS requests the files from the right place and not /abs/
+    import requests
+    from flask import Response
+    @app.route('/<filename>.js', methods=['GET',])
+    @app.route('/abs/<filename>.js', methods=['GET',])
+    def proxy(filename):
+        params_dict = {}
+        if 'v' in request.args:
+            params_dict['v'] = request.args.get('v')
+            params = urllib.parse.urlencode(params_dict)
+            resp = requests.get(f'https://dev.adsabs.harvard.edu/{filename}.js?{params}')
+        else:
+            resp = requests.get(f'https://dev.adsabs.harvard.edu/{filename}.js')
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+        headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
+        response = Response(resp.content, resp.status_code, headers)
+        return response
+
 @app.route(SERVER_BASE_URL, methods=['GET'])
 def index():
     """
