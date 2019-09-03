@@ -1,4 +1,5 @@
 import time
+import urllib
 from flask import render_template, session, request, redirect, g, current_app, url_for
 from adscore.app import app
 from adscore import api
@@ -187,12 +188,31 @@ def export(identifier):
 
 @app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
 def core_always():
-    r = redirect(url_for('index'))
+    target_url = _build_target_url(request, url)
+    r = redirect(target_url)
     r.set_cookie('core', 'always')
     return r
 
 @app.route(SERVER_BASE_URL+'core/never', methods=['GET'])
-def core_never():
-    r = redirect(url_for('index'))
+@app.route(SERVER_BASE_URL+'core/never/<path:url>', methods=['GET'])
+def core_never(url=None):
+    target_url = _build_target_url(request, url)
+    r = redirect(target_url)
     r.delete_cookie('core')
     return r
+
+def _build_target_url(request, url):
+    if ENVIRONMENT == "localhost":
+        full_url = "https://dev.adsabs.harvard.edu/"
+    else:
+        full_url = request.url_root
+    params_dict = {}
+    for accepted_param in ('q', 'rows', 'start', 'sort'):
+        if accepted_param in request.args:
+            params_dict[accepted_param] = request.args.get(accepted_param)
+    params = urllib.parse.urlencode(params_dict)
+    if url:
+        full_url += url
+    if params:
+        full_url += params
+    return full_url
