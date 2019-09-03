@@ -64,7 +64,7 @@ def search():
         return render_template('search-results.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
     return redirect(url_for('index'))
 
-@app.route(SERVER_BASE_URL+'classic-form', methods=['GET'])
+@app.route(SERVER_BASE_URL+'classic-form', methods=['GET'], strict_slashes=False)
 def classic_form():
     """
     Classic form if no search parameters are sent, otherwise process the parameters
@@ -130,7 +130,7 @@ def classic_form():
     else:
         return render_template('classic-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
-@app.route(SERVER_BASE_URL+'paper-form', methods=['GET'])
+@app.route(SERVER_BASE_URL+'paper-form', methods=['GET'], strict_slashes=False)
 def paper_form():
     """
     Paper form (left form) if no search parameters are sent, otherwise process the parameters
@@ -151,7 +151,7 @@ def paper_form():
     else:
         return render_template('paper-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
-@app.route(SERVER_BASE_URL+'paper-form', methods=['POST'])
+@app.route(SERVER_BASE_URL+'paper-form', methods=['POST'], strict_slashes=False)
 def paper_form_bibcodes():
     """
     Paper form (right form) if no search parameters are sent, otherwise process the parameters
@@ -166,7 +166,7 @@ def paper_form_bibcodes():
 
 
 @app.route(SERVER_BASE_URL+'abs/<identifier>/abstract', methods=['GET'])
-@app.route(SERVER_BASE_URL+'abs/<identifier>', methods=['GET'])
+@app.route(SERVER_BASE_URL+'abs/<identifier>', methods=['GET'], strict_slashes=False)
 def abs(identifier):
     """
     Show abstract given an identifier
@@ -207,7 +207,7 @@ def export(identifier):
         data = None
     return render_template('abstract-export.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
 
-@app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
+@app.route(SERVER_BASE_URL+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(SERVER_BASE_URL+'core/always/<path:url>', methods=['GET'])
 def core_always(url=None):
     target_url = _build_target_url(request, url)
@@ -215,7 +215,7 @@ def core_always(url=None):
     r.set_cookie('core', 'always')
     return r
 
-@app.route(SERVER_BASE_URL+'core/never', methods=['GET'])
+@app.route(SERVER_BASE_URL+'core/never', methods=['GET'], strict_slashes=False)
 @app.route(SERVER_BASE_URL+'core/never/<path:url>', methods=['GET'])
 def core_never(url=None):
     target_url = _build_target_url(request, url)
