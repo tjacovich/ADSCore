@@ -30,7 +30,9 @@
     <meta name="citation_journal_title" content="{{ doc.pub }}">
     <meta name="citation_volume" content="{{ doc.volume }}">
     <meta name="citation_issue" content="{{ doc.issue }}">
+    {% if doc.doi and doc.doi|length > 0 %}
     <meta name="citation_doi" content="{{ doc.doi[0] }}">
+    {% endif %}
     <meta name="citation_issn" content="{{ doc.issn }}">
     <meta name="citation_isbn" content="{{ doc.isbn }}">
     {% for aff in doc.aff %}
