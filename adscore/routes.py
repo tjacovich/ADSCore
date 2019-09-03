@@ -208,7 +208,8 @@ def export(identifier):
     return render_template('abstract-export.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
 
 @app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
-def core_always():
+@app.route(SERVER_BASE_URL+'core/always/<path:url>', methods=['GET'])
+def core_always(url=None):
     target_url = _build_target_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'always')
