@@ -1,14 +1,11 @@
 import time
+import urllib
 from flask import render_template, session, request, redirect, g, current_app, url_for
 from adscore.app import app
 from adscore import api
 from adscore.forms import ModernForm, PaperForm, ClassicForm
-from adscore.constants import SERVER_BASE_URL, SORT_OPTIONS
+from adscore.constants import SERVER_BASE_URL, SORT_OPTIONS, ENVIRONMENT
 from adscore.tools import is_expired
-from flask_htmlmin import HTMLMIN
-
-# minify html
-HTMLMIN(app)
 
 @app.before_request
 def before_request():
@@ -28,7 +25,7 @@ def index():
     Modern form if no search parameters are sent, otherwise show search results
     """
     form = ModernForm(request.args)
-    return render_template('modern-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+    return render_template('modern-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
 @app.route(SERVER_BASE_URL+'search/', methods=['GET'])
 def search():
@@ -43,7 +40,7 @@ def search():
         session['sort'] = form.sort.data
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
-        return render_template('search-results.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
+        return render_template('search-results.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
     return redirect(url_for('index'))
 
 @app.route(SERVER_BASE_URL+'classic-form', methods=['GET'])
@@ -110,7 +107,7 @@ def classic_form():
     if query:
         return redirect(url_for('search', q=" ".join(query)))
     else:
-        return render_template('classic-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+        return render_template('classic-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
 @app.route(SERVER_BASE_URL+'paper-form', methods=['GET'])
 def paper_form():
@@ -131,7 +128,7 @@ def paper_form():
     if query:
         return redirect(url_for('search', q=" ".join(query)))
     else:
-        return render_template('paper-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+        return render_template('paper-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
 @app.route(SERVER_BASE_URL+'paper-form', methods=['POST'])
 def paper_form_bibcodes():
@@ -144,7 +141,7 @@ def paper_form_bibcodes():
         results = api.store_query(form.bibcodes.data.split()) # Split will get rid of \r\n
         q = "docs({})".format(results['qid'])
         return redirect(url_for('search', q=q))
-    return render_template('paper-form.html', base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+    return render_template('paper-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
 
 
 @app.route(SERVER_BASE_URL+'abs/<identifier>/abstract', methods=['GET'])
@@ -158,7 +155,7 @@ def abs(identifier):
     if 'q' in session:
         form = ModernForm(q=session['q'], sort=session['sort'], rows=session['rows'], start=session['start'])
     else:
-        form = ModernForm({}) 
+        form = ModernForm({})
     if len(docs) > 0:
         doc = docs[0]
         if not isinstance(doc['title'], list):
@@ -168,7 +165,7 @@ def abs(identifier):
     else:
         doc= None
         results['error'] = "Record not found."
-    return render_template('abstract.html', base_url=SERVER_BASE_URL, auth=session['auth'], doc=doc, error=results.get('error'), form=form)
+    return render_template('abstract.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], doc=doc, error=results.get('error'), form=form)
 
 @app.route(SERVER_BASE_URL+'abs/<identifier>/exportcitation', methods=['GET'])
 def export(identifier):
@@ -187,16 +184,35 @@ def export(identifier):
         data = api.export_abstract(doc.get('bibcode')).get('export')
     else:
         data = None
-    return render_template('abstract-export.html', base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
+    return render_template('abstract-export.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
 
 @app.route(SERVER_BASE_URL+'core/always', methods=['GET'])
 def core_always():
-    r = redirect(url_for('index'))
+    target_url = _build_target_url(request, url)
+    r = redirect(target_url)
     r.set_cookie('core', 'always')
     return r
 
 @app.route(SERVER_BASE_URL+'core/never', methods=['GET'])
-def core_never():
-    r = redirect(url_for('index'))
+@app.route(SERVER_BASE_URL+'core/never/<path:url>', methods=['GET'])
+def core_never(url=None):
+    target_url = _build_target_url(request, url)
+    r = redirect(target_url)
     r.delete_cookie('core')
     return r
+
+def _build_target_url(request, url):
+    if ENVIRONMENT == "localhost":
+        full_url = "https://dev.adsabs.harvard.edu/"
+    else:
+        full_url = request.url_root
+    params_dict = {}
+    for accepted_param in ('q', 'rows', 'start', 'sort'):
+        if accepted_param in request.args:
+            params_dict[accepted_param] = request.args.get(accepted_param)
+    params = urllib.parse.urlencode(params_dict)
+    if url:
+        full_url += url
+    if params:
+        full_url += params
+    return full_url

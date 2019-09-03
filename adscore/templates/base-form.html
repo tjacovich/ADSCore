@@ -30,6 +30,68 @@
       </div>
     </div>
   </div>
-  <script>(function(){function a(a){for(var b,d=a+"=",e=decodeURIComponent(document.cookie),f=e.split(";"),g=0;g<f.length;g++){for(b=f[g];" "==b.charAt(0);)b=b.substring(1);if(0==b.indexOf(d))return b.substring(d.length,b.length)}return""}document.documentElement.className=document.documentElement.className.replace("no-js","js"),function(){const b="always"===a("core");if(b||!/^\/abs\//.test(document.location.pathname)&&!b)return;window.APP_VERSION="v1.2.30",window.__PRERENDERED=!0;const c="https://dev.adsabs.harvard.edu/";(function(a,b){const c=document.createElement("script");Object.keys(a).forEach(b=>{c.setAttribute(b,a[b])}),c.onload=()=>b(c),document.body.appendChild(c)})({src:"https://dev.adsabs.harvard.edu/libs/requirejs/require.js"},()=>{require.config({baseUrl:c});var a,b={"":"landing-page",search:"search-page",abs:"abstract-page"},d=window.APP_VERSION?"?v="+window.APP_VERSION:"";try{var e=window.location,f=e["/"===e.pathname?"hash":"pathname"].replace(/#/g,"").split("/"),g=f.reverse().filter(function(a){return-1<Object.keys(b).indexOf(a)});g=g.length&&g[0],a=function(){require([c+b[g]+".config.js"+d],function(){},function(){require(["https://dev.adsabs.harvard.edu/discovery.config.js"+d])})}}catch(b){a=function(){require(["https://dev.adsabs.harvard.edu/discovery.config.js"+d])}}(function b(){return window.requirejs&&"function"==typeof a?a():void setTimeout(b,10)})()})}()})();</script>
+  <script>
+    (function() {
+      // turn off no-js if we have javascript
+      document.documentElement.className = document.documentElement.className.replace("no-js", "js");
+
+      function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
+
+      (function() {
+
+        // looks for the cookie, and sets true if its 'always'
+        const coreCookie = getCookie('core') === 'always';
+
+        // only load bumblebee if we detect the core cookie and we are on abstract page
+        if (coreCookie || (!(/^\/abs\//.test(document.location.pathname)) && !coreCookie)) {
+          return;
+        }
+
+        window.__PRERENDERED = true;
+        
+        {% if environment == "localhost" %}
+        const BASEURL = 'https://dev.adsabs.harvard.edu/';
+        {% else %}
+        const BASEURL = '/';
+        {% endif %}
+
+        const addScript = function(args, cb) {
+          const script = document.createElement('script');
+          Object.keys(args).forEach((key) => {
+            script.setAttribute(key, args[key]);
+          });
+          script.onload = function() { cb && cb(script); };
+          document.body.appendChild(script);
+        }
+
+        addScript({
+          src: BASEURL + 'libs/requirejs/require.js'
+        }, () => {
+          require.config({
+            baseUrl: BASEURL
+          });
+          addScript({
+            src: BASEURL + 'shim.js'
+          });
+        });
+
+      })();
+
+    })();
+  </script>
 </body>
 </html>
