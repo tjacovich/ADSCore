@@ -17,8 +17,12 @@ def before_request():
     g.request_time = lambda: "{:.3f}s".format((time.time() - g.request_start_time))
     if 'cookies' not in session:
         session['cookies'] = {}
+    if request.cookies.get('session'):
+        # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
+        # thus if the user was authenticated, it will use the user token
+        session['cookies']['session'] = request.cookies.get('session')
     if 'auth' not in session or is_expired(session['auth']):
-        session['auth'] = api.bootstrap()
+        session['auth'] = api.bootstrap(bbb_session)
 
 if ENVIRONMENT != "localhost":
     # Temporary hack until:
