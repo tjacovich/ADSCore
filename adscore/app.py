@@ -1,38 +1,25 @@
 import os
+import sys
 import requests
 from flask import Flask
 from flask_minify import minify
-from adscore.constants import SECRET_KEY, SESSION_COOKIE_NAME, SESSION_COOKIE_PATH, ENVIRONMENT
+from adsmutils import ADSFlask
 
-class MiniADSFlask(Flask):
-    """ADS Flask worker; used by all the microservice applications.
-    This class should be instantiated outside app.py
-    """
+def create_app(**config):
+    opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if opath not in sys.path:
+        sys.path.insert(0, opath)
 
-    def __init__(self, app_name, *args, **kwargs):
-        """
-        :param: app_name - string, name of the application (can be anything)
-        :keyword: local_config - dict, configuration that should be applied
-            over the default config (that is loaded from config.py and local_config.py)
-        """
-        Flask.__init__(self, app_name, *args, **kwargs)
+    if config:
+        app = ADSFlask(__name__, static_folder=None, local_config=config)
+    else:
+        app = ADSFlask(__name__, static_folder=None)
 
-        # HTTP connection pool
-        # - The maximum number of retries each connection should attempt: this
-        #   applies only to failed DNS lookups, socket connections and connection timeouts,
-        #   never to requests where data has made it to the server. By default,
-        #   requests does not retry failed connections.
-        # http://docs.python-requests.org/en/latest/api/?highlight=max_retries#requests.adapters.HTTPAdapter
-        self.client = requests.Session()
-        http_adapter = requests.adapters.HTTPAdapter(pool_connections=int(os.environ.get('REQUESTS_POOL_CONNECTIONS', 10)), pool_maxsize=int(os.environ.get('REQUESTS_POOL_MAXSIZE', 1000)), max_retries=int(os.environ.get('REQUESTS_POOL_RETRIES', 3)), pool_block=False)
-        self.client.mount('http://', http_adapter)
+    app.url_map.strict_slashes = False
 
-app = MiniADSFlask(__name__)
-app.secret_key = SECRET_KEY
-app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SESSION_COOKIE_NAME'] = SESSION_COOKIE_NAME
-app.config['SESSION_COOKIE_PATH'] = SESSION_COOKIE_PATH
-app.config['MINIFY_PAGE'] = True
-if ENVIRONMENT != "localhost":
-    minify(app=app, html=True, js=True, cssless=True, cache=True, fail_safe=True, bypass=[])
+    if app.config['ENVIRONMENT'] != "localhost":
+        minify(app=app, html=True, js=True, cssless=True, cache=True, fail_safe=True, bypass=[])
 
+    return app
+
+app = create_app()

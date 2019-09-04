@@ -110,3 +110,5 @@ python/
 .editorconfig
 .jsbeautifyrc
 .vscode/
+
+logs/

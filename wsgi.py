@@ -11,6 +11,7 @@ from werkzeug.wsgi import DispatcherMiddleware
 from adscore import app as application
 from werkzeug.middleware.http_proxy import ProxyMiddleware
 
+
 if __name__ == "__main__":
 
     application = ProxyMiddleware(application, {
@@ -22,6 +23,15 @@ if __name__ == "__main__":
       },
       "/styles": {
         "target": "https://dev.adsabs.harvard.edu/styles"
+      },
+      "/libs": {
+        "target": "https://dev.adsabs.harvard.edu/libs"
+      },
+      "/config": {
+        "target": "https://dev.adsabs.harvard.edu/config"
+      },
+      "/js": {
+        "target": "https://dev.adsabs.harvard.edu/js"
       },
       "/link_gateway": {
         "target": "https://dev.adsabs.harvard.edu/link_gateway"

@@ -5,7 +5,6 @@ from flask import render_template, session, request, redirect, g, current_app, u
 from adscore.app import app
 from adscore import api
 from adscore.forms import ModernForm, PaperForm, ClassicForm
-from adscore.constants import SERVER_BASE_URL, SORT_OPTIONS, ENVIRONMENT
 from adscore.tools import is_expired
 
 @app.before_request
@@ -22,39 +21,17 @@ def before_request():
         # thus if the user was authenticated, it will use the user token
         session['cookies']['session'] = request.cookies.get('session')
     if 'auth' not in session or is_expired(session['auth']):
-        session['auth'] = api.bootstrap(bbb_session)
+        session['auth'] = api.bootstrap()
 
-if ENVIRONMENT != "localhost":
-    # Temporary hack until:
-    #  - All BBB Javascript is served from one directory and not the root
-    #  - RequireJS requests the files from the right place and not /abs/
-    import requests
-    from flask import Response
-    @app.route('/config/<filename>.js', methods=['GET',])
-    @app.route('/abs/config/<filename>.js', methods=['GET',])
-    @app.route('/abs/<identifier>/config/<filename>.js', methods=['GET',])
-    def proxy(filename, identifier=None):
-        params_dict = {}
-        if 'v' in request.args:
-            params_dict['v'] = request.args.get('v')
-            params = urllib.parse.urlencode(params_dict)
-            resp = requests.get(f'https://dev.adsabs.harvard.edu/config/{filename}.js?{params}')
-        else:
-            resp = requests.get(f'https://dev.adsabs.harvard.edu/config/{filename}.js')
-        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-        headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
-        response = Response(resp.content, resp.status_code, headers)
-        return response
-
-@app.route(SERVER_BASE_URL, methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
 def index():
     """
     Modern form if no search parameters are sent, otherwise show search results
     """
     form = ModernForm(request.args)
-    return render_template('modern-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+    return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
-@app.route(SERVER_BASE_URL+'search/', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
 def search():
     """
     Modern form if no search parameters are sent, otherwise show search results
@@ -63,10 +40,10 @@ def search():
     if len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
-        return render_template('search-results.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=SORT_OPTIONS)
+        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     return redirect(url_for('index'))
 
-@app.route(SERVER_BASE_URL+'classic-form', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'classic-form', methods=['GET'], strict_slashes=False)
 def classic_form():
     """
     Classic form if no search parameters are sent, otherwise process the parameters
@@ -130,9 +107,9 @@ def classic_form():
     if query:
         return redirect(url_for('search', q=" ".join(query)))
     else:
-        return render_template('classic-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+        return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
-@app.route(SERVER_BASE_URL+'paper-form', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['GET'], strict_slashes=False)
 def paper_form():
     """
     Paper form (left form) if no search parameters are sent, otherwise process the parameters
@@ -151,9 +128,9 @@ def paper_form():
     if query:
         return redirect(url_for('search', q=" ".join(query)))
     else:
-        return render_template('paper-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
-@app.route(SERVER_BASE_URL+'paper-form', methods=['POST'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['POST'], strict_slashes=False)
 def paper_form_bibcodes():
     """
     Paper form (right form) if no search parameters are sent, otherwise process the parameters
@@ -164,11 +141,11 @@ def paper_form_bibcodes():
         results = api.store_query(form.bibcodes.data.split()) # Split will get rid of \r\n
         q = "docs({})".format(results['qid'])
         return redirect(url_for('search', q=q))
-    return render_template('paper-form.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], form=form)
+    return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
 
-@app.route(SERVER_BASE_URL+'abs/<identifier>/abstract', methods=['GET'])
-@app.route(SERVER_BASE_URL+'abs/<identifier>', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/abstract', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>', methods=['GET'], strict_slashes=False)
 def abs(identifier):
     """
     Show abstract given an identifier
@@ -197,9 +174,9 @@ def abs(identifier):
     else:
         doc= None
         results['error'] = "Record not found."
-    return render_template('abstract.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], doc=doc, error=results.get('error'))
+    return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
-@app.route(SERVER_BASE_URL+'abs/<identifier>/exportcitation', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/exportcitation', methods=['GET'])
 def export(identifier):
     """
     Export bibtex given an identifier
@@ -216,18 +193,18 @@ def export(identifier):
         data = api.export_abstract(doc.get('bibcode')).get('export')
     else:
         data = None
-    return render_template('abstract-export.html', environment=ENVIRONMENT, base_url=SERVER_BASE_URL, auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
+    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
 
-@app.route(SERVER_BASE_URL+'core/always', methods=['GET'], strict_slashes=False)
-@app.route(SERVER_BASE_URL+'core/always/<path:url>', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])
 def core_always(url=None):
     target_url = _build_target_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'always')
     return r
 
-@app.route(SERVER_BASE_URL+'core/never', methods=['GET'], strict_slashes=False)
-@app.route(SERVER_BASE_URL+'core/never/<path:url>', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'core/never', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'core/never/<path:url>', methods=['GET'])
 def core_never(url=None):
     target_url = _build_target_url(request, url)
     r = redirect(target_url)
@@ -235,10 +212,7 @@ def core_never(url=None):
     return r
 
 def _build_target_url(request, url):
-    if ENVIRONMENT == "localhost":
-        full_url = "https://dev.adsabs.harvard.edu/"
-    else:
-        full_url = request.url_root
+    full_url = request.url_root
     params_dict = {}
     for accepted_param in ('q', 'rows', 'start', 'sort'):
         if accepted_param in request.args:

@@ -1,7 +1,6 @@
 import urllib.parse
 from flask import session, current_app
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
-from adscore.constants import SEARCH_SERVICE, BOOTSTRAP_SERVICE, EXPORT_SERVICE, VAULT_SERVICE, OBJECTS_SERVICE, API_TIMEOUT
 
 
 def bootstrap():
@@ -10,7 +9,7 @@ def bootstrap():
     will be recovered from the API unless it has expired (in which case, a new
     renewed one will be received)
     """
-    r = current_app.client.get(BOOTSTRAP_SERVICE, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+    r = current_app.client.get(current_app.config['BOOTSTRAP_SERVICE'], cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
@@ -30,7 +29,7 @@ def abstract(identifier, retry_counter=0):
             'start': '0'
             })
     try:
-        r = current_app.client.get(SEARCH_SERVICE + "?" + params, headers=headers, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+        r = current_app.client.get(current_app.config['SEARCH_SERVICE'] + "?" + params, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         msg = str(e)
         return {"error": "{}".format(msg)}
@@ -64,7 +63,7 @@ def export_abstract(bibcode):
             'sort': 'date desc, bibcode desc',
             }
     try:
-        r = current_app.client.post(EXPORT_SERVICE, json=data, headers=headers, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+        r = current_app.client.post(current_app.config['EXPORT_SERVICE'], json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         msg = str(e)
         return {"error": "{}".format(msg)}
@@ -96,7 +95,7 @@ def store_query(bibcodes, sort="date desc, bibcode desc"):
                 'q': ["*:*"],
                 'sort': [sort]
             }
-    r = current_app.client.post(VAULT_SERVICE, json=data, headers=headers, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+    r = current_app.client.post(current_app.config['VAULT_SERVICE'], json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
@@ -111,7 +110,7 @@ def objects_query(object_names):
                 'query': ["object:({})".format(",".join(object_names))],
             }
     try:
-        r = current_app.client.post(OBJECTS_SERVICE, json=data, headers=headers, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+        r = current_app.client.post(current_app.config[OBJECTS_SERVICE], json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         msg = str(e)
         return {"error": "{}".format(msg)}
@@ -159,7 +158,7 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
                     'stats.field': stats_field
                 })
     try:
-        r = current_app.client.get(SEARCH_SERVICE + "?" + params, headers=headers, cookies=session['cookies'], timeout=API_TIMEOUT, verify=False)
+        r = current_app.client.get(current_app.config['SEARCH_SERVICE'] + "?" + params, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         msg = str(e)
         return {"error": "{}".format(msg)}

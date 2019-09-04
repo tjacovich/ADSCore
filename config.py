@@ -1,19 +1,18 @@
-import os
-
-ADS_URL = os.environ.get('ADS_URL', "https://prod.adsabs.harvard.edu/")
+LOGGING_LEVEL = "INFO"
+LOG_STDOUT = True
+ADS_URL = "https://dev.adsabs.harvard.edu/"
 API_URL = ADS_URL+"v1/"
-ENVIRONMENT = os.environ.get('ENVIRONMENT', "localhost")
-SERVER_BASE_URL = os.environ.get('SERVER_BASE_URL', "/")
-BOOTSTRAP_SERVICE = os.environ.get('BOOTSTRAP_SERVICE', API_URL+"accounts/bootstrap")
-SEARCH_SERVICE = os.environ.get('SEARCH_SERVICE', API_URL+"search/query")
-EXPORT_SERVICE = os.environ.get('EXPORT_SERVICE', API_URL+"export/bibtex")
-VAULT_SERVICE = os.environ.get('VAULT_SERVICE', API_URL+"vault/query")
-OBJECTS_SERVICE = os.environ.get('OBJECTS_SERVICE', API_URL+"objects/query")
+ENVIRONMENT = "localhost"
+SERVER_BASE_URL = "/"
+BOOTSTRAP_SERVICE = API_URL+"accounts/bootstrap"
+SEARCH_SERVICE = API_URL+"search/query"
+EXPORT_SERVICE = API_URL+"export/bibtex"
+VAULT_SERVICE = API_URL+"vault/query"
+OBJECTS_SERVICE =  API_URL+"objects/query"
 API_TIMEOUT = 90
 SECRET_KEY = "mjnahGS3CmaVsSfSVGxxytGTGa2vX1CPPoT7gZvIpIQiOZREJwsvfNzWooQx1BA1"
 SESSION_COOKIE_NAME = "adslite"
 SESSION_COOKIE_PATH = SERVER_BASE_URL
-
 
 SORT_OPTIONS = [
     { 'id': 'author_count', 'text': 'Authors', 'description': 'sort by number of authors' },
