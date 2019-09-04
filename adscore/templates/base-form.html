@@ -1,3 +1,8 @@
+{% if environment == 'localhost' %}
+  {% set BASEURL = 'https://dev.adsabs.harvard.edu/' %}
+{% else %}
+  {% set BASEURL = '/' %}
+{% endif %}
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -11,6 +16,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="https://ui.adsabs.harvard.edu/styles/img/favicon.ico">
   <link rel="stylesheet" href="https://ui.adsabs.harvard.edu/styles/css/styles.css">
   {% include 'partials/meta.html' %}
+  <base href="{{ BASEURL }}">
 </head>
 
 <body>
@@ -62,12 +68,6 @@
         }
 
         window.__PRERENDERED = true;
-        
-        {% if environment == "localhost" %}
-        const BASEURL = 'https://dev.adsabs.harvard.edu/';
-        {% else %}
-        const BASEURL = '/';
-        {% endif %}
 
         const addScript = function(args, cb) {
           const script = document.createElement('script');
@@ -78,17 +78,17 @@
           document.body.appendChild(script);
         }
 
+        window.require = {
+          waitSeconds: 0,
+          baseUrl: '{{ BASEURL }}'
+        };
         addScript({
-          src: BASEURL + 'libs/requirejs/require.js'
+          src: '{{ BASEURL }}libs/requirejs/require.js'
         }, () => {
-          require.config({
-            baseUrl: BASEURL
-          });
           addScript({
-            src: BASEURL + 'config/shim.js'
+            src: '{{ BASEURL }}config/shim.js'
           });
         });
-
       })();
 
     })();
