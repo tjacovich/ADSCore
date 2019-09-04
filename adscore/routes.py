@@ -25,16 +25,17 @@ if ENVIRONMENT != "localhost":
     #  - RequireJS requests the files from the right place and not /abs/
     import requests
     from flask import Response
-    @app.route('/<filename>.js', methods=['GET',])
-    @app.route('/abs/<filename>.js', methods=['GET',])
-    def proxy(filename):
+    @app.route('/config/<filename>.js', methods=['GET',])
+    @app.route('/abs/config/<filename>.js', methods=['GET',])
+    @app.route('/abs/<identifier>/config/<filename>.js', methods=['GET',])
+    def proxy(filename, identifier=None):
         params_dict = {}
         if 'v' in request.args:
             params_dict['v'] = request.args.get('v')
             params = urllib.parse.urlencode(params_dict)
-            resp = requests.get(f'https://dev.adsabs.harvard.edu/{filename}.js?{params}')
+            resp = requests.get(f'https://dev.adsabs.harvard.edu/config/{filename}.js?{params}')
         else:
-            resp = requests.get(f'https://dev.adsabs.harvard.edu/{filename}.js')
+            resp = requests.get(f'https://dev.adsabs.harvard.edu/config/{filename}.js')
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
         headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
         response = Response(resp.content, resp.status_code, headers)
