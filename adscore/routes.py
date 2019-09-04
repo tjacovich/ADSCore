@@ -1,5 +1,6 @@
 import time
 import urllib
+import functools
 from flask import render_template, session, request, redirect, g, current_app, url_for
 from adscore.app import app
 from adscore import api
@@ -176,6 +177,19 @@ def abs(identifier):
             doc['title'] = [doc['title']]
         if 'page' in doc and isinstance(doc['page'], list) and len(doc['page']) > 0:
             doc['page'] = doc['page'][0]
+        if doc.get('data'):
+            data = []
+            for data_element in doc['data']:
+                data_components = data_element.split(":")
+                if len(data_components) >= 2:
+                    try:
+                        data.append((data_components[0], int(data_components[1])))
+                    except ValueError:
+                        data.append((data_components[0], 0))
+                else:
+                    data.append((data_components[0], 0))
+            data = sorted(data, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
+            doc['data'] = data
     else:
         doc= None
         results['error'] = "Record not found."
@@ -213,7 +227,7 @@ def core_always(url=None):
 def core_never(url=None):
     target_url = _build_target_url(request, url)
     r = redirect(target_url)
-    r.delete_cookie('core')
+    r.set_cookie('core', 'never') # Keep cookie instead of deleting with r.delete_cookie('core')
     return r
 
 def _build_target_url(request, url):

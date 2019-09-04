@@ -77,7 +77,51 @@
                     <div class="col-xs-4 col-sm-4 pull-right">
                       <div class="s-results-links">
 
-
+                        <div class="letter-icon s-letter-icon">
+                          {% if "ESOURCE" in doc.property %}
+                            {% if "PUB_PDF" in doc.esources and "PUB_OPENACCESS" in doc.property %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "PUB_HTML" in doc.esources and "PUB_OPENACCESS" in doc.property %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "EPRINT_PDF" in doc.esources and "OPENACCESS" in doc.property %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "EPRINT_HTML" in doc.esources and "OPENACCESS" in doc.property %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "PUB_PDF" in doc.esources %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "PUB_HTML" in doc.esources %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "EPRINT_PDF" in doc.esources %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% elif "EPRINT_HTML" in doc.esources %}
+                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% else %}
+                              <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                            {% endif %}
+                          {% else %}
+                              <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
+                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
+                              </a>
+                          {% endif %}
+                        </div>
 
                         <div class="letter-icon s-letter-icon">
                           {% if doc.reference_count > 0 %}
@@ -93,6 +137,19 @@
                           </a>
                           {% endif %}
                         </div>
+
+                        <div class="letter-icon s-letter-icon">
+                          {% if "DATA" in doc.property %}
+                            <a href="{{ url_for('abs', identifier=doc.bibcode) }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                <i class="s-data-icon" aria-label="quick links to data associated with this article"></i>
+                            </a>
+                          {% else %}
+                            <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
+                                <i class="s-data-icon" aria-label="quick links to data associated with this article"></i>
+                            </a>
+                          {% endif %}
+                        </div>
+
                       </div>
                     </div>
 

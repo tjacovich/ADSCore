@@ -17,13 +17,13 @@ def bootstrap():
     auth = r.json()
     return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'] }
 
-def abstract(identifier):
+def abstract(identifier, retry_counter=0):
     """
     Retrieve abstract
     """
     headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
     params = urllib.parse.urlencode({
-            'fl': 'identifier,[citations],abstract,aff,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume',
+            'fl': 'identifier,[citations],abstract,aff,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data',
             'q': 'identifier:{0}'.format(identifier),
             'rows': '25',
             'sort': 'date desc, bibcode desc',
@@ -150,7 +150,7 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
         stats = 'false'
         stats_field = ''
     params = urllib.parse.urlencode({
-                    'fl': 'title,bibcode,author,citation_count,pubdate,[citations]',
+                    'fl': 'title,bibcode,author,citation_count,pubdate,[citations],property,esources',
                     'q': '{0}'.format(q),
                     'rows': '{0}'.format(rows),
                     'sort': '{0}'.format(sort),
