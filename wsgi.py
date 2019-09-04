@@ -15,10 +15,16 @@ if __name__ == "__main__":
 
     application = ProxyMiddleware(application, {
       "/v1": {
-        "target": "https://devapi.adsabs.harvard.edu/"
+        "target": "https://dev.adsabs.harvard.edu/"
+      },
+      "/static": {
+        "target": "https://dev.adsabs.harvard.edu/static"
       },
       "/styles": {
-        "target": "https://ui.adsabs.harvard.edu/styles"
+        "target": "https://dev.adsabs.harvard.edu/styles"
+      },
+      "/link_gateway": {
+        "target": "https://dev.adsabs.harvard.edu/link_gateway"
       }
     })
 

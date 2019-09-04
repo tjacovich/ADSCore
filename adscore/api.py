@@ -23,7 +23,7 @@ def abstract(identifier):
     """
     headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
     params = urllib.parse.urlencode({
-            'fl': 'identifier,[citations],abstract,aff,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,pub,pub_raw,pubdate,pubnote,read_count,title,volume',
+            'fl': 'identifier,[citations],abstract,aff,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume',
             'q': 'identifier:{0}'.format(identifier),
             'rows': '25',
             'sort': 'date desc, bibcode desc',

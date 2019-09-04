@@ -92,6 +92,42 @@
             </a>
             {% endif %}
 
+            {% if doc %}
+            <a href="{{ url_for('search', q='bibcode:'+doc.bibcode[:13]+'*', sort='score desc') }}"
+              data-widget-id="ShowToc">
+              {% if "TOC" in doc.property %}
+              <div class="abstract-nav s-nav">
+              {% else %}
+              <div class="abstract-nav s-nav s-nav-inactive">
+              {% endif %}
+                <span class="s-content">
+                  Volume Content
+                </span>
+              </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="#"
+              data-widget-id="ShowGraphics">
+                <div class="abstract-nav s-nav s-nav-inactive">
+                    <span class="s-content">
+                    Graphics
+                    </span>
+                </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="#"
+              data-widget-id="ShowMetrics">
+                <div class="abstract-nav s-nav s-nav-inactive ">
+                    <span class="s-content">
+                    Metrics
+                    </span>
+                </div>
+            </a>
+            {% endif %}
 
             {% if doc %}
             <a href="{{ url_for('export', identifier=doc.bibcode) }}" data-widget-id="ShowExportcitation__default">
@@ -240,7 +276,7 @@
                     <div class="resources__content__links">
                       <span>
                         {% if "PUB_PDF" in doc.esources %}
-                        <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener"
+                        <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener"
                           class="resources__content__link {{ pub_unlock }}">
                           <i class="fa fa-file-pdf-o" aria-hidden="true">
                           </i>
@@ -251,7 +287,7 @@
                       </span>
                       <span>
                         {% if "PUB_HTML" in doc.esources %}
-                        <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener"
+                        <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener"
                           class="resources__content__link {{ pub_unlock }}">
                           <i class="fa fa-file-text" aria-hidden="true">
                           </i>
@@ -268,7 +304,7 @@
                     <div class="resources__content__links">
                       <span>
                         {% if "EPRINT_PDF" in doc.esources %}
-                        <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener"
+                        <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener"
                           class="resources__content__link {{ unlock }}">
                           <i class="fa fa-file-pdf-o" aria-hidden="true">
                           </i>
@@ -279,7 +315,7 @@
                       </span>
                       <span>
                         {% if "EPRINT_HTML" in doc.esources %}
-                        <a href="//ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener"
+                        <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener"
                           class="resources__content__link {{ unlock }}">
                           <i class="fa fa-file-text" aria-hidden="true">
                           </i>
