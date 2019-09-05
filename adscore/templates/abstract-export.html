@@ -183,8 +183,13 @@
       <div data-widget="ShowResources">
         <div>
           <div data-reactroot="" class="s-right-col-widget-container" style="padding: 10px;">
-            {% if "ESOURCE" in doc.property %}
+
+            {% if "ESOURCE" not in doc.property %}
+            <h3 class="s-right-col-widget-title">No Sources Found</h3>
+            {% endif %}
+
             <div class="resources__container">
+            {% if "ESOURCE" in doc.property %}
               <div class="resources__full__list">
                 <div class="resources__header__row">
                   <i class="fa fa-file-text-o" aria-hidden="true">
@@ -209,7 +214,8 @@
                   <div class="resources__content__links">
                     <span>
                       {% if "PUB_PDF" in doc.esources %}
-                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="resources__content__link {{ pub_unlock }}">
+                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener"
+                        class="resources__content__link {{ pub_unlock }}">
                         <i class="fa fa-file-pdf-o" aria-hidden="true">
                         </i>
                       </a>
@@ -219,7 +225,8 @@
                     </span>
                     <span>
                       {% if "PUB_HTML" in doc.esources %}
-                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="resources__content__link {{ pub_unlock }}">
+                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener"
+                        class="resources__content__link {{ pub_unlock }}">
                         <i class="fa fa-file-text" aria-hidden="true">
                         </i>
                       </a>
@@ -235,7 +242,8 @@
                   <div class="resources__content__links">
                     <span>
                       {% if "EPRINT_PDF" in doc.esources %}
-                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="resources__content__link {{ unlock }}">
+                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener"
+                        class="resources__content__link {{ unlock }}">
                         <i class="fa fa-file-pdf-o" aria-hidden="true">
                         </i>
                       </a>
@@ -245,7 +253,8 @@
                     </span>
                     <span>
                       {% if "EPRINT_HTML" in doc.esources %}
-                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="resources__content__link {{ unlock }}">
+                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener"
+                        class="resources__content__link {{ unlock }}">
                         <i class="fa fa-file-text" aria-hidden="true">
                         </i>
                       </a>
@@ -255,11 +264,21 @@
                 </div>
                 {% endif %}
               </div>
-            </div>
-            {% else %}
-            <h3 class="s-right-col-widget-title">No Sources Found</h3>
-            <div class="resources__container"></div>
             {% endif %}
+            {% if "DATA" in doc.property %}
+            <div class="resources__data__list">
+                <div class="resources__header__row">
+                    <i class="fa fa-database"></i>
+                    <div class="resources__header__title">data products</div>
+                </div>
+                <div class="resources__content">
+                    {% for data_link in doc.data %}
+                      <a href="/link_gateway/{{ doc.bibcode }}/{{ data_link[0] }}" target="_blank" rel="noopener" class="resources__content__link">{{ data_link[0] }} ({{ data_link[1] }})</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            </div>
           </div>
         </div>
       </div>

@@ -172,7 +172,7 @@ def abs(identifier, section=None):
     else:
         return _abs(identifier)
 
-def _abs(identifier, section=None):
+def _get_abstract_doc(identifier):
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
     if len(docs) > 0:
@@ -195,27 +195,24 @@ def _abs(identifier, section=None):
             data = sorted(data, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
             doc['data'] = data
     else:
-        doc= None
+        doc = None
         results['error'] = "Record not found."
+    return results, doc
+
+def _abs(identifier, section=None):
+    results, doc = _get_abstract_doc(identifier)
     return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 def _export(identifier):
     """
     Export bibtex given an identifier
     """
-    results = api.abstract(identifier)
-    docs = results.get('response', {}).get('docs', [])
-    form = ModernForm(request.args)
-    if len(docs) > 0:
-        doc = docs[0]
-    else:
-        doc= None
-        results['error'] = "Record not found."
+    results, doc = _get_abstract_doc(identifier)
     if 'error' not in results and doc:
         data = api.export_abstract(doc.get('bibcode')).get('export')
     else:
         data = None
-    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], data=data, doc=doc, error=results.get('error'), form=form)
+    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], data=data, doc=doc, error=results.get('error'))
 
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])
