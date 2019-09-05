@@ -70,6 +70,40 @@
           </a>
           {% endif %}
           {% if doc %}
+          <a href="{{ url_for('search', q='bibcode:'+doc.bibcode[:13]+'*', sort='score desc') }}"
+            data-widget-id="ShowToc">
+            {% if "TOC" in doc.property %}
+            <div class="abstract-nav s-nav">
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-inactive">
+            {% endif %}
+              <span class="s-content">
+                Volume Content
+              </span>
+            </div>
+          </a>
+          {% endif %}
+          {% if doc %}
+          <a href="#"
+            data-widget-id="ShowGraphics">
+              <div class="abstract-nav s-nav s-nav-inactive">
+                  <span class="s-content">
+                  Graphics
+                  </span>
+              </div>
+          </a>
+          {% endif %}
+          {% if doc %}
+          <a href="#"
+            data-widget-id="ShowMetrics">
+              <div class="abstract-nav s-nav s-nav-inactive ">
+                  <span class="s-content">
+                  Metrics
+                  </span>
+              </div>
+          </a>
+          {% endif %}
+          {% if doc %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='exportcitation') }}" data-widget-id="ShowExportcitation__default">
             <div class="abstract-nav s-nav s-nav-selected">
               <span class="content">
