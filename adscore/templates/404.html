@@ -1,0 +1,39 @@
+{% set view = "results" %}
+{% extends 'base-form.html' %}
+{% block title %}Not found{% endblock title %}
+{% block content %}
+<div id="alerts-container">
+  {% if error %}
+  <div data-widget="AlertsWidget"><span class="alert-banner">
+      <div class="alert alert-info" id="page-top-alert">
+        <div>
+          {{ error }}<br /><b><a href="{{ base_url }}">Try looking at the search examples on the home page</a></b> or
+          <b><a href="https://adsabs.github.io/help/search/search-syntax" target="_blank" rel="noopener">reading our
+              help page</a>.</b>
+        </div>
+        <div>
+        </div>
+      </div>
+    </span></div>
+  {% endif %}
+</div>
+
+<div id="results-page-layout" class="s-results-page-layout">
+  <div class="row s-stable-search-bar-height s-results-control-row-container">
+    <div class="s-search-bar-full-width-container">
+      <div class="col-xs-7 col-xs-offset-2" style="padding-top: 1%;">
+        {% include 'partials/search-bar.html' %}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="max-width-wrapper" style="margin-top: 1%;">
+        <div class="row">
+          <img src="{{ base_url }}styles/img/404.jpg" class="img-responsive" style="margin:auto;" alt="incredibly cute 404 error image made by Jason Bitterman">
+          <p style="text-align: center">
+          <strong>Tip:</strong> Maybe try <a href="{{ url_for('core_never', url=request_path) }}">the same page</a> in Full ADS?</p>
+        </div>
+  </div>
+</div>
+
+{% endblock content %}

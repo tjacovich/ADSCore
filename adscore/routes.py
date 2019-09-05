@@ -23,6 +23,11 @@ def before_request():
     if 'auth' not in session or is_expired(session['auth']):
         session['auth'] = api.bootstrap()
 
+@app.errorhandler(404)
+def page_not_found(e):
+    form = ModernForm(request.args)
+    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 404
+
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
 def index():
     """
@@ -232,8 +237,6 @@ def core_never(url=None):
 
 def _build_target_url(request, url):
     full_url = request.url_root
-    if full_url[-1] != "/":
-        full_url += "/"
     params_dict = {}
     for accepted_param in ('q', 'rows', 'start', 'sort'):
         if accepted_param in request.args:
@@ -241,8 +244,8 @@ def _build_target_url(request, url):
     params = urllib.parse.urlencode(params_dict)
     if url:
         full_url += url
-    if full_url[-1] != "/":
-        full_url += "/"
     if params:
+        if full_url[-1] != "/":
+            full_url += "/"
         full_url += params
     return full_url
