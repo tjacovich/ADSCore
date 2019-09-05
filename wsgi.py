@@ -15,9 +15,6 @@ from werkzeug.middleware.http_proxy import ProxyMiddleware
 if __name__ == "__main__":
 
     application = ProxyMiddleware(application, {
-      "/v1": {
-        "target": "https://dev.adsabs.harvard.edu/"
-      },
       "/static": {
         "target": "https://dev.adsabs.harvard.edu/static"
       },

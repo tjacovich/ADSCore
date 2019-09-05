@@ -9,7 +9,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="//ui.adsabs.harvard.edu/styles/img/transparent_logo.svg" alt="ads icon">
+        <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="{{ base_url }}styles/img/transparent_logo.svg" alt="ads icon">
           <h1> <b>ads</b></h1>
         </a>
       </div>
@@ -40,7 +40,7 @@
             <i class="fa fa-comment about-page-icon"></i> Full ADS
           </a>
           {% else %}
-          <a href="https://ui.adsabs.harvard.edu/" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+          <a href="{{ base_url }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
             <i class="fa fa-comment about-page-icon"></i> Full ADS
           </a>
           {% endif %}

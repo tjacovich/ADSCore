@@ -8,8 +8,8 @@
 
 <head>
   <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="https://ui.adsabs.harvard.edu/styles/img/favicon.ico">
-  <link rel="stylesheet" href="https://ui.adsabs.harvard.edu/styles/css/styles.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ base_url }}styles/img/favicon.ico">
+  <link rel="stylesheet" href="{{ base_url }}styles/css/styles.css">
   {% include 'partials/meta.html' %}
   {% if request.endpoint == "abs" %}
     {# This is needed for BBB hydration, otherwise it requests javascript files to /abs/ #}
