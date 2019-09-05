@@ -1,0 +1,164 @@
+
+      <div class="col-sm-2 nav-container s-nav-container" id="left-column">
+        <div>
+          <nav>
+            <div class="s-nav-header s-view-nav"> <i class="icon-list"></i>
+              <h3>view </h3>
+            </div>
+
+            {% set path = request.path.split('/') %}
+
+            {% if doc %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
+              {% if path[-1] != 'exportcitation' %}
+              <div class="abstract-nav s-nav s-nav-selected">
+                <span class="s-content">
+                  Abstract
+                </span>
+              </div>
+              {% else %}
+                <div class="abstract-nav s-nav">
+                  <span class="s-content">
+                    Abstract
+                  </span>
+                </div>
+              {% endif %}
+            </a>
+
+            </a>
+            {% else %}
+            <div class="abstract-nav s-nav  s-nav-selected  s-nav-inactive">
+              <span class="s-content">
+                Abstract
+              </span>
+            </div>
+            {% endif %}
+
+
+            {% if doc %}
+            <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" aria-disabled="true"
+              data-widget-id="ShowCitations">
+              {% if doc.citation_count and doc.citation_count > 0 %}
+              <div class="abstract-nav s-nav ">
+                {% else %}
+                <div class="abstract-nav s-nav   s-nav-inactive ">
+                  {% endif %}
+                  <span class="s-content">
+                    Citations
+                    {% if doc.citation_count and doc.citation_count > 0 %}
+                    <span class="num-items">({{ doc.citation_count }})</span>
+                    {% endif %}
+                  </span>
+                </div>
+            </a>
+            {% endif %}
+
+
+            {% if doc %}
+            <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}"
+              data-widget-id="ShowReferences">
+              {% if doc.reference_count > 0 %}
+              <div class="abstract-nav s-nav ">
+                {% else %}
+                <div class="abstract-nav s-nav   s-nav-inactive ">
+                  {% endif %}
+                  <span class="s-content">
+                    References
+                    <span class="num-items">({{ doc.reference_count }})</span>
+                  </span>
+                </div>
+            </a>
+            {% endif %}
+
+
+            {% if doc %}
+            {% if doc.read_count and doc.read_count > 0 %}
+            <a href="{{ url_for('search', q='trending(bibcode:'+doc.bibcode+')', sort='score desc') }}"
+              aria-disabled="true" data-widget-id="ShowCoreads">
+              <div class="abstract-nav s-nav ">
+                {% else %}
+                <div class="abstract-nav s-nav   s-nav-inactive ">
+                  {% endif %}
+                  <span class="s-content">
+                    Co-Reads
+                  </span>
+                </div>
+            </a>
+            {% endif %}
+
+
+            {% if doc %}
+            <a href="{{ url_for('search', q='similar(bibcode:'+doc.bibcode+')', sort='score desc') }}"
+              data-widget-id="ShowSimilar">
+              <div class="abstract-nav s-nav  ">
+                <span class="s-content">
+                  Similar Papers
+                </span>
+              </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="{{ url_for('search', q='bibcode:'+doc.bibcode[:13]+'*', sort='score desc') }}"
+              data-widget-id="ShowToc">
+              {% if "TOC" in doc.property %}
+              <div class="abstract-nav s-nav">
+              {% else %}
+              <div class="abstract-nav s-nav s-nav-inactive">
+              {% endif %}
+                <span class="s-content">
+                  Volume Content
+                </span>
+              </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="#"
+              data-widget-id="ShowGraphics">
+                <div class="abstract-nav s-nav s-nav-inactive">
+                    <span class="s-content">
+                    Graphics
+                    </span>
+                </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="#"
+              data-widget-id="ShowMetrics">
+                <div class="abstract-nav s-nav s-nav-inactive ">
+                    <span class="s-content">
+                    Metrics
+                    </span>
+                </div>
+            </a>
+            {% endif %}
+
+            {% if doc %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='exportcitation') }}" data-widget-id="ShowExportcitation__default">
+              {% if path[-1] != 'exportcitation' %}
+              <div class="abstract-nav s-nav  ">
+                <span class="content">
+                  Export Citation
+                </span>
+              </div>
+              {% else %}
+              <div class="abstract-nav s-nav s-nav-selected">
+                <span class="content">
+                  Export Citation
+                </span>
+              </div>
+              {% endif %}
+            </a>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected s-nav-inactive">
+              <span class="content">
+                Export Citation
+              </span>
+            </div>
+            {% endif %}
+
+          </nav>
+        </div>
+      </div>
