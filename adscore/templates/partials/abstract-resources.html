@@ -102,14 +102,16 @@
         </div>
       </div>
       <div data-widget="ShowGraphicsSidebar">
-        {% if doc.figures and doc.figures|length > 0 and doc.figures[0].images and doc.figures[0].images|length > 0 and doc.figures[0].images[0].thumbnail %}
+        {% if doc.graphics and doc.graphics.figures and doc.graphics.figures|length > 0 and doc.graphics.figures[0].images and doc.graphics.figures[0].images|length > 0 and doc.graphics.figures[0].images[0].thumbnail %}
         <div class="s-graphics-sidebar graphics-sidebar">
           <div class="s-right-col-widget-container">
-            <div class="">
+            <div class="graphics-container s-graphics-container">
               <h4 class="s-right-col-widget-title">Graphics</h4>
               <div class="grid-cell">
-                  <img src="{{ doc.figures[0].images[0].thumbnail }}" alt="figure from paper" class="grid-cell__image">
-                <p></p>
+                <a href="{{ url_for('abs', identifier=doc.bibcode, section='graphics') }}" >
+                  <img src="{{ doc.graphics.figures[0].images[0].thumbnail }}" alt="figure from paper" class="grid-cell__image">
+                  <p><i>Click to view more</i></p>
+                </a>
               </div>
             </div>
           </div>

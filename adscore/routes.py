@@ -175,6 +175,8 @@ def abs(identifier, section=None):
     """
     if section == "exportcitation":
         return _export(identifier)
+    elif section == "graphics":
+        return _graphics(identifier)
     else:
         return _abs(identifier)
 
@@ -221,9 +223,9 @@ def _get_abstract_doc(identifier):
     try:
         graphics = api.graphics(doc['bibcode'])
         if 'error' not in graphics:
-            doc['figures'] = graphics.get('figures', [])
+            doc['graphics'] = graphics
     except:
-        doc['figures'] = []
+        doc['graphics'] = []
     return results, doc
 
 def _abs(identifier, section=None):
@@ -240,6 +242,13 @@ def _export(identifier):
     else:
         data = None
     return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], data=data, doc=doc, error=results.get('error'))
+
+def _graphics(identifier):
+    """
+    Graphics for a given identifier
+    """
+    results, doc = _get_abstract_doc(identifier)
+    return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])
