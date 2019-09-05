@@ -196,7 +196,7 @@ def resolver(identifier, resource="associated", retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return abstract(identifier, retry_counter=retry_counter+1)
+            return resolver(identifier, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -224,7 +224,7 @@ def graphics(identifier, retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return abstract(identifier, retry_counter=retry_counter+1)
+            return graphics(identifier, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -237,3 +237,33 @@ def graphics(identifier, retry_counter=0):
     session['cookies'].update(r.cookies.get_dict())
     results = r.json()
     return results
+
+def metrics(bibcode):
+    """
+    Metrics
+    """
+    headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
+    data = {
+            'bibcodes': ['{0}'.format(bibcode)],
+            }
+    try:
+        r = current_app.client.post(current_app.config['METRICS_SERVICE'], json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
+    except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        msg = str(e)
+        return {"error": "{}".format(msg)}
+    if not r.ok:
+        if r.status_code == 401 and retry_counter == 0: # Unauthorized
+            # Re-try only once bootstrapping a new token
+            session['auth'] = bootstrap()
+            return metrics(bibcode, retry_counter=retry_counter+1)
+        try:
+            msg = r.json().get('error', {})
+            if type(msg) is dict:
+                msg = msg.get('msg', msg)
+        except:
+            msg = r.content
+        return {"error": "{} (HTTP status code {})".format(msg, r.status_code)}
+    #r.raise_for_status()
+    r.cookies.clear_expired_cookies()
+    session['cookies'].update(r.cookies.get_dict())
+    return r.json()

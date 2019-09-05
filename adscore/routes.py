@@ -177,6 +177,8 @@ def abs(identifier, section=None):
         return _export(identifier)
     elif section == "graphics":
         return _graphics(identifier)
+    elif section == "metrics":
+        return _metrics(identifier)
     else:
         return _abs(identifier)
 
@@ -214,18 +216,25 @@ def _get_abstract_doc(identifier):
     else:
         doc = None
         results['error'] = "Record not found."
-    try:
-        associated = api.resolver(doc['bibcode'], resource="associated")
-        if 'error' not in associated:
-            doc['associated'] = associated.get('links', {}).get('records', [])
-    except:
+
+    associated = api.resolver(doc['bibcode'], resource="associated")
+    if 'error' not in associated:
+        doc['associated'] = associated.get('links', {}).get('records', [])
+    else:
         doc['associated'] = []
-    try:
-        graphics = api.graphics(doc['bibcode'])
-        if 'error' not in graphics:
-            doc['graphics'] = graphics
-    except:
+
+    graphics = api.graphics(doc['bibcode'])
+    if 'error' not in graphics:
+        doc['graphics'] = graphics
+    else:
         doc['graphics'] = []
+
+    metrics = api.metrics(doc['bibcode'])
+    if 'error' not in metrics:
+        doc['metrics'] = metrics
+    else:
+        doc['metrics'] = []
+
     return results, doc
 
 def _abs(identifier, section=None):
@@ -238,10 +247,10 @@ def _export(identifier):
     """
     results, doc = _get_abstract_doc(identifier)
     if 'error' not in results and doc:
-        data = api.export_abstract(doc.get('bibcode')).get('export')
+        doc['export'] = api.export_abstract(doc.get('bibcode')).get('export')
     else:
-        data = None
-    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], data=data, doc=doc, error=results.get('error'))
+        doc['export'] = None
+    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 def _graphics(identifier):
     """
@@ -249,6 +258,13 @@ def _graphics(identifier):
     """
     results, doc = _get_abstract_doc(identifier)
     return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+
+def _metrics(identifier):
+    """
+    Metrics for a given identifier
+    """
+    results, doc = _get_abstract_doc(identifier)
+    return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])

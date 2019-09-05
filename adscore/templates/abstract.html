@@ -105,7 +105,8 @@
                   {% if doc.pubnote and doc.pubnote|length > 0 %}
                   <dt>E-Print:</dt>
                   <dd>
-                    {{ doc.pubnote[0] }}
+                    {% set pubnote = doc.pubnote[0].split(';')%}
+                    {{ pubnote[0] }}
                   </dd>
                   {% endif %}
 

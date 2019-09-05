@@ -10,7 +10,7 @@
 
             {% if doc %}
             <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
-              {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' %}
+              {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' and path[-1] != 'metrics' %}
               <div class="abstract-nav s-nav s-nav-selected">
                 <span class="s-content">
                   Abstract
@@ -140,7 +140,22 @@
             </a>
             {% endif %}
 
-            {% if doc %}
+            {% if doc and doc.metrics and (doc.metrics['citation stats']['total number of citations'] > 0 or doc.metrics['basic stats']['total number of reads'] > 0) %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='metrics') }}" data-widget-id="ShowMetrics">
+              {% if path[-1] != 'metrics' %}
+                <div class="abstract-nav s-nav">
+                    <span class="s-content">
+                    Metrics
+                    </span>
+                </div>
+              {% else %}
+                <div class="abstract-nav s-nav s-nav-selected">
+                    <span class="s-content">
+                    Metrics
+                    </span>
+                </div>
+              {% endif %}
+            {% else %}
             <a href="#"
               data-widget-id="ShowMetrics">
                 <div class="abstract-nav s-nav s-nav-inactive ">

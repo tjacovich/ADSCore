@@ -1,0 +1,147 @@
+
+{% extends 'abstract-base.html' %}
+
+{% block page %}
+<div class="row s-dynamic-page-body" id="dynamic-page-body">
+    <div class="s-abstract-content">
+
+      {% include 'partials/abstract-navigation.html' %}
+
+      {% if doc.graphics and doc.graphics.figures|length > 0 %}
+        <div class="col-sm-9 col-md-7 s-middle-column" id="middle-column">
+            <!--id is for screen readers-->
+            <div class="main-content-container s-main-content-container" id="main-content" tabindex="-1">
+                <div class="print-visible"><h2 style="margin-left:6.1%;">NASA/ADS</h2> </div>
+                <div id="abstract-title-container" class="s-abstract-title-container"></div>
+                <div id="current-subview">
+
+                    <div data-widget="ShowMetrics" data-allow-redirect="false">
+                        <div>
+                            <div class="metrics-container">
+                                <div class="print-visible"><h2 style="font-weight: 800;text-align:center;">NASA/ADS Metrics Report </h2> </div>
+                                <div class="print-visible" style="text-align:center"></div>
+
+                                     <!--used by widget when it is on the abstract page-->
+                                        <div style="padding-left:4%">
+                                            <h4 class="s-list-description">Metrics for</h4>
+                                            <h2 class="s-article-title">
+                                              {% for title in doc.title %}
+                                              {{ title|safe }}{% if not loop.last %};{% endif %}
+                                              {% endfor %}
+                                            </h2>
+                                        </div>
+                                <div class="s-metrics-section" id="citations">
+                                    <div class="s-metrics-title">
+                                        <h3>Citations</h3>
+                                    </div>
+                                    {% if doc.metrics['citation stats']['total number of citations'] == 0 %}
+                                    <div class="metrics-table s-metrics-table">No citations found for this article.</div>
+                                    {% else %}
+                                    <div class="metrics-table s-metrics-table">
+                                        <table class="table table-hover s-metrics-table table-condensed">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td> Total citations </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times all papers in the list were cited." data-original-title="<b>Total Citations</b>" ></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['citation stats']['total number of citations'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Normalized citations  </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="For a list of N papers (i=1,...N), where N<sub>auth</sub><sup>i</sup> is the number of authors for publication i and C<sub>i</sub> the number of citations that this paper received, the normalized citation count for each article is C<sub>i</sub>/N<sub>auth</sub><sup>i</sup> ,and the 'normalized citations' for this list of N papers is the sum of these N numbers." data-original-title="<b>Normalized Citations</b>"></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['citation stats']['normalized number of citations'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Refereed citations  </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="Number of refereed citing papers." data-original-title="<b>Refereed Citations</b>"></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['citation stats']['total number of refereed citations'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Normalized refereed citations  </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The normalized number of citations from refereed publications to all refereed publications in the list." data-original-title="<b>Normalized Refereed Citations</b>"></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['citation stats']['normalized number of refereed citations'] }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% endif %}
+                                    <div class="metrics-graph s-metrics-graph"></div>
+                                </div>
+                                <div class="s-metrics-section" id="reads">
+                                    <div class="s-metrics-title">
+                                        <h3>Reads</h3>
+                                    </div>
+                                    {% if doc.metrics['basic stats']['total number of reads'] == 0 %}
+                                    <div class="metrics-table s-metrics-table">No reads found for this article.</div>
+                                    {% else %}
+                                    <div class="metrics-table s-metrics-table">
+                                        <table class="table table-hover s-metrics-table table-condensed">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        Total number of reads
+                                                    </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times all papers were read. For each paper, a read is counted if an ADS user runs a search in our system and then requests to either view the paper\'s full bibliographic record or download the fulltext." data-original-title="<b>Total Number of Reads</b>"></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['basic stats']['total number of reads'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Total number of downloads </td>
+                                                    <td>
+                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times full text (article or e-print) was accessed." data-original-title="<b>Total Number of Downloads</b>"></i>
+                                                    </td>
+                                                    <td>
+                                                        {{ doc.metrics['basic stats']['total number of downloads'] }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% endif %}
+                                    <div class="metrics-graph s-metrics-graph"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% include 'partials/abstract-resources.html' %}
+
+    <div class="col-lg-1"></div>
+  </div>
+</div>
+{% endblock page %}
+
