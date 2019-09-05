@@ -235,6 +235,8 @@ def core_never(url=None):
 
 def _build_target_url(request, url):
     full_url = request.url_root
+    if full_url[-1] != "/":
+        full_url += "/"
     params_dict = {}
     for accepted_param in ('q', 'rows', 'start', 'sort'):
         if accepted_param in request.args:
@@ -242,6 +244,8 @@ def _build_target_url(request, url):
     params = urllib.parse.urlencode(params_dict)
     if url:
         full_url += url
+    if full_url[-1] != "/":
+        full_url += "/"
     if params:
         full_url += params
     return full_url
