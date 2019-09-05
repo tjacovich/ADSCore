@@ -1,6 +1,7 @@
 import time
 import urllib
 import functools
+import datetime
 from flask import render_template, session, request, redirect, g, current_app, url_for
 from adscore.app import app
 from adscore import api
@@ -199,6 +200,15 @@ def _get_abstract_doc(identifier):
                     data.append((data_components[0], 0))
             data = sorted(data, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
             doc['data'] = data
+        try:
+            doc['pubdate'] = datetime.datetime.strptime(doc['pubdate'], '%Y-%m-00').strftime("%B %Y")
+        except ValueError:
+            pass
+        doc['arXiv'] = None
+        for identifier in doc['identifier']:
+            if identifier.startswith("arXiv:"):
+                doc['arXiv'] = identifier
+                break
     else:
         doc = None
         results['error'] = "Record not found."

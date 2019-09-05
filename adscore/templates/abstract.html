@@ -61,15 +61,53 @@
                   </dd>
 
                   <dt>Pub Date:</dt>
-                  <dd>{{ doc.pubdate[:-3] }}</dd>
+                  <dd>{{ doc.pubdate }}</dd>
 
+                  {% if doc.doi and doc.doi|length > 0 %}
+                  <dt>DOI:</dt>
+                  <dd>
+                    <span>
+                        <a href="/link_gateway/{{ doc.bibcode }}/{{ doc.doi[0] }}" target="_blank" rel="noopener">{{ doc.doi[0] }}</a>
+                        <i class="fa fa-external-link"></i>
+                    </span>
+                  </dd>
+                  {% endif %}
+
+                  {% if doc.arXiv %}
+                  <dt>arXiv:</dt>
+                  <dd>
+                    <span>
+                        <a href="/link_gateway/{{ doc.bibcode }}/{{ doc.arXiv }}" target="_blank" rel="noopener">{{ doc.arXiv }}</a>
+                        <i class="fa fa-external-link"></i>
+                    </span>
+                  </dd>
+                  {% endif %}
 
                   <dt>Bibcode:</dt>
                   <dd>
+                    <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}">
                     {{ doc.bibcode }}
+                    </a>
+                    <i class="icon-help" data-toggle="popover" data-content="The bibcode is assigned by the ADS as a unique identifier for the paper." data-original-title="" title=""></i>
                   </dd>
 
+                  {% if doc.keyword and doc.keyword|length > 0 %}
+                        <dt>Keywords:</dt>
+                        <dd>
+                            <ul class="list-inline">
+                            {% for keyword in doc.keyword %}
+                            <li>{{ keyword }}{% if not loop.last %};{% endif %}</li>
+                            {% endfor %}
+                            </ul>
+                        </dd>
+                  {% endif %}
 
+                  {% if doc.pubnote and doc.pubnote|length > 0 %}
+                  <dt>E-Print:</dt>
+                  <dd>
+                    {{ doc.pubnote[0] }}
+                  </dd>
+                  {% endif %}
 
 
                 </dl>
