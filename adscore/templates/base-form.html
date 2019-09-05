@@ -10,6 +10,11 @@
   <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ base_url }}styles/img/favicon.ico">
   <link rel="stylesheet" href="{{ base_url }}styles/css/styles.css">
+  <style>
+    .dropdown-toggle:hover .dropdown-menu {
+      display: block;
+    }
+  </style>
   {% include 'partials/meta.html' %}
   {% if request.endpoint == "abs" %}
     {# This is needed for BBB hydration, otherwise it requests javascript files to /abs/ #}

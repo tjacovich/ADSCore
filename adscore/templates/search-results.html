@@ -22,7 +22,7 @@
 <div id="results-page-layout" class="s-results-page-layout">
   <div class="row s-stable-search-bar-height s-results-control-row-container">
     <div class="s-search-bar-full-width-container">
-      <div class="col-xs-7 col-xs-offset-2" style="padding-top: 1%;">
+      <div class="col-sm-8 col-sm-offset-2" style="padding-top: 1%;">
         {% include 'partials/search-bar.html' %}
       </div>
     </div>
@@ -32,64 +32,12 @@
       <div class="max-width-wrapper" style="margin-top: 1%;">
         <div class="row">
             {% if results.docs | length > 0 %}
-              <div class="col-xs-12 col-md-8 col-md-offset-1">
+              <div class="col-xs-12 col-md-8 col-md-offset-2">
             {% else %}
               <div class="col-xs-12 col-md-8 col-md-offset-2">
             {% endif %}
 
             {% include 'partials/results-list.html' %}
-          </div>
-          <div class="col-xs-12 col-md-2">
-            {% if results.docs | length > 0 %}
-            <div class="results-right-column s-right-column s-results-column" id="results-right-column">
-              <h2 class="sr-only">Additional Functionality (Information about your query, and more search filters)</h2>
-
-              <div data-widget="QueryInfo">
-                <div class="query-info-widget s-query-info-widget">
-                  <div class="s-right-col-widget-container">
-                    <div>
-                      <span>
-                        <p>
-                          <div class="row">
-                            <div class="col-xs-5 col-sm-5 pull-left">
-                              <strong>Sort by</strong>
-                            </div>
-                            <div class="col-xs-4 col-sm-4 pull-right">
-                              {% if " desc" in form.sort.data %}
-                              <a href="/search/?q={{ form.q.data }}&sort={{ form.sort.data | replace(" desc", " asc")  }}&rows={{ form.rows.data }}"
-                                title="set sort direction">asc</a>
-                              {% else %}
-                              <a href="/search/?q={{ form.q.data }}&sort={{ form.sort.data | replace(" asc", " desc")  }}&rows={{ form.rows.data }}"
-                                title="set sort direction">desc</a>
-                              {% endif %}
-                            </div>
-                          </div>
-                        </p>
-                        <p>
-                          {% for opt in sort_options %}
-                          <div>
-                            {% if form.sort.data|replace(" asc", "")|replace(" desc", "") == opt.id %}
-                            <div>{{ opt.text }}</div>
-                            {% else %}
-                            {% if " desc" in form.sort.data %}
-                            <a href="/search/?q={{ form.q.data }}&sort={{ opt.id }} desc&rows={{ form.rows.data }}"
-                              title="{{ opt.description }}">{{ opt.text }}</a>
-                            {% else %}
-                            <a href="/search/?q={{ form.q.data }}&sort={{ opt.id }} asc&rows={{ form.rows.data }}"
-                              title="{{ opt.description }}">{{ opt.text }}</a>
-                            {% endif %}
-                            {% endif %}
-                          </div>
-                          {% endfor %}
-                        </p>
-                      </span>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            {% endif %}
           </div>
         </div>
       </div>
