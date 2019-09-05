@@ -56,10 +56,10 @@
                             </div>
                             <div class="col-xs-4 col-sm-4 pull-right">
                               {% if " desc" in form.sort.data %}
-                              <a href="/search?q={{ form.q.data }}&sort={{ form.sort.data | replace(" desc", " asc")  }}&rows={{ form.rows.data }}"
+                              <a href="/search/?q={{ form.q.data }}&sort={{ form.sort.data | replace(" desc", " asc")  }}&rows={{ form.rows.data }}"
                                 title="set sort direction">asc</a>
                               {% else %}
-                              <a href="/search?q={{ form.q.data }}&sort={{ form.sort.data | replace(" asc", " desc")  }}&rows={{ form.rows.data }}"
+                              <a href="/search/?q={{ form.q.data }}&sort={{ form.sort.data | replace(" asc", " desc")  }}&rows={{ form.rows.data }}"
                                 title="set sort direction">desc</a>
                               {% endif %}
                             </div>
@@ -72,10 +72,10 @@
                             <div>{{ opt.text }}</div>
                             {% else %}
                             {% if " desc" in form.sort.data %}
-                            <a href="/search?q={{ form.q.data }}&sort={{ opt.id }} desc&rows={{ form.rows.data }}"
+                            <a href="/search/?q={{ form.q.data }}&sort={{ opt.id }} desc&rows={{ form.rows.data }}"
                               title="{{ opt.description }}">{{ opt.text }}</a>
                             {% else %}
-                            <a href="/search?q={{ form.q.data }}&sort={{ opt.id }} asc&rows={{ form.rows.data }}"
+                            <a href="/search/?q={{ form.q.data }}&sort={{ opt.id }} asc&rows={{ form.rows.data }}"
                               title="{{ opt.description }}">{{ opt.text }}</a>
                             {% endif %}
                             {% endif %}

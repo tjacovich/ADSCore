@@ -13,7 +13,7 @@
 
 
             {% if doc %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode) }}" data-widget-id="ShowAbstract">
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
               <div class="abstract-nav s-nav  s-nav-selected  ">
                 <span class="s-content">
                   Abstract
@@ -130,7 +130,7 @@
             {% endif %}
 
             {% if doc %}
-            <a href="{{ url_for('export', identifier=doc.bibcode) }}" data-widget-id="ShowExportcitation__default">
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='exportcitation') }}" data-widget-id="ShowExportcitation__default">
               <div class="abstract-nav s-nav  ">
                 <span class="content">
                   Export Citation

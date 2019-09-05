@@ -60,7 +60,7 @@
                     </div>
 
                     <div class="hidden-xs hidden-sm col-md-3 s-top-row-col identifier s-identifier">
-                      <a href="{{ url_for('abs', identifier=doc.bibcode) }}" aria-label="bibcode"
+                      <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" aria-label="bibcode"
                         class="abs-redirect-link">
                         {{ doc.bibcode }}
                       </a>
@@ -140,7 +140,7 @@
 
                         <div class="letter-icon s-letter-icon">
                           {% if "DATA" in doc.property %}
-                            <a href="{{ url_for('abs', identifier=doc.bibcode) }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                            <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
                                 <i class="s-data-icon" aria-label="quick links to data associated with this article"></i>
                             </a>
                           {% else %}
@@ -157,7 +157,7 @@
                   <div class="row">
 
                     <div class="col-xs-10 col-xs-offset-1">
-                      <a href="{{ url_for('abs', identifier=doc.bibcode) }}" class="abs-redirect-link">
+                      <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" class="abs-redirect-link">
                         <h3 class="s-results-title">{{ doc.title[0]|safe }}</h3>
                       </a>
                     </div>
@@ -204,7 +204,7 @@
                     <b>{{num}}</b>
                     {% else %}
                     <a
-                      href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}">{{ num }}</a>
+                      href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}">{{ num }}</a>
                     {% endif %}
                     {% endfor %}
                   </div>
@@ -215,7 +215,7 @@
                   <ul class="pager">
                     {% if form.start.data - form.rows.data >= 0 %}
                     <li class=""><a
-                        href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}"
+                        href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}"
                         class="page-control previous-page"><i class="fa fa-chevron-circle-left"></i> prev</a></li>
                     {% else %}
                     <li class=" disabled "><a href="#" class="page-control previous-page"><i
@@ -225,7 +225,7 @@
                     {{ (results.numFound / form.rows.data) | round(0, 'ceil')| int }}
                     {% if results.numFound - (form.start.data + form.rows.data) > 0 %}
                     <li class=""><a
-                        href="/search?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
+                        href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
                         class="page-control next-page">next <i class="fa fa-chevron-circle-right"></i></a></li>
                     {% else %}
                     <li class=" disabled"><a href="#" class="page-control next-page">next <i

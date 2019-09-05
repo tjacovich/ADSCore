@@ -31,12 +31,29 @@ def index():
     form = ModernForm(request.args)
     return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
+@app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
-def search():
+def search(params=None):
     """
     Modern form if no search parameters are sent, otherwise show search results
     """
-    form = ModernForm(request.args)
+    if params:
+        # For compatibility with BBB, accept parameters that are embbeded in the
+        # URL without a question mark
+        parsed = urllib.parse.parse_qs(params)
+        # parse_qa will create a list for single strings such as {'q': ['star']},
+        # extract them if there is only one element:
+        parsed = dict( (k, v if len(v) > 1 else v[0] ) for k, v in parsed.items() )
+        # Make sure that numeric parameters are not strings:
+        for numeric_param in ('rows', 'start'):
+            if numeric_param in parsed:
+                try:
+                    parsed[numeric_param] = int(parsed[numeric_param])
+                except:
+                    del parsed[numeric_param]
+        form = ModernForm(**parsed)
+    else:
+        form = ModernForm(request.args)
     if len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
@@ -144,12 +161,18 @@ def paper_form_bibcodes():
     return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
 
-@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/abstract', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/<section>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>', methods=['GET'], strict_slashes=False)
-def abs(identifier):
+def abs(identifier, section=None):
     """
     Show abstract given an identifier
     """
+    if section == "exportcitation":
+        return _export(identifier)
+    else:
+        return _abs(identifier)
+
+def _abs(identifier, section=None):
     results = api.abstract(identifier)
     docs = results.get('response', {}).get('docs', [])
     if len(docs) > 0:
@@ -176,8 +199,7 @@ def abs(identifier):
         results['error'] = "Record not found."
     return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
-@app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/exportcitation', methods=['GET'])
-def export(identifier):
+def _export(identifier):
     """
     Export bibtex given an identifier
     """
