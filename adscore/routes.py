@@ -205,13 +205,25 @@ def _get_abstract_doc(identifier):
         except ValueError:
             pass
         doc['arXiv'] = None
-        for identifier in doc['identifier']:
-            if identifier.startswith("arXiv:"):
-                doc['arXiv'] = identifier
+        for element in doc['identifier']:
+            if element.startswith("arXiv:"):
+                doc['arXiv'] = element
                 break
     else:
         doc = None
         results['error'] = "Record not found."
+    try:
+        associated = api.resolver(doc['bibcode'], resource="associated")
+        if 'error' not in associated:
+            doc['associated'] = associated.get('links', {}).get('records', [])
+    except:
+        doc['associated'] = []
+    try:
+        graphics = api.graphics(doc['bibcode'])
+        if 'error' not in graphics:
+            doc['figures'] = graphics.get('figures', [])
+    except:
+        doc['figures'] = []
     return results, doc
 
 def _abs(identifier, section=None):

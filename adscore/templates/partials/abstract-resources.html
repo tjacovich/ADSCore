@@ -101,9 +101,42 @@
           </div>
         </div>
       </div>
+      <div data-widget="ShowGraphicsSidebar">
+        {% if doc.figures and doc.figures|length > 0 and doc.figures[0].images and doc.figures[0].images|length > 0 and doc.figures[0].images[0].thumbnail %}
+        <div class="s-graphics-sidebar graphics-sidebar">
+          <div class="s-right-col-widget-container">
+            <div class="">
+              <h4 class="s-right-col-widget-title">Graphics</h4>
+              <div class="grid-cell">
+                  <img src="{{ doc.figures[0].images[0].thumbnail }}" alt="figure from paper" class="grid-cell__image">
+                <p></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
       <div data-widget="ShowAssociated">
         <div>
-          <!-- react-empty: 1 -->
+            {% if doc.associated and doc.associated|length > 0 %}
+            <div data-reactroot="" class="s-right-col-widget-container" style="padding: 10px;">
+                <div style="font-size: 1.1em; color: rgb(51, 91, 175); text-transform: uppercase;">
+                    <i class="fa fa-folder-open" style="font-size: 1.4em; padding-right: 5px;"></i>Associated Works ({{ doc.associated|length }})
+                </div>
+                    <ul style="list-style-type: none; margin-left: -10px; padding: 0px;">
+                        {% for work in doc.associated %}
+                        <li style="font-size: 1em;">
+                            {% if work.bibcode == doc.bibcode %}
+                            {{ work.title }}
+                            {% else %}
+                            <a href="{{ url_for('abs', identifier=work.bibcode, section='abstract') }}">{{ work.title }}</a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
         </div>
       </div>
-    </div>
+

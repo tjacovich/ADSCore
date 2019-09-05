@@ -182,3 +182,58 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
         results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
     return results
 
+def resolver(identifier, resource="associated", retry_counter=0):
+    """
+    Retrieve associated works
+    """
+    headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
+    try:
+        r = current_app.client.get(current_app.config['RESOLVER_SERVICE'] + identifier + "/" + resource, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
+    except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        msg = str(e)
+        return {"error": "{}".format(msg)}
+    if not r.ok:
+        if r.status_code == 401 and retry_counter == 0: # Unauthorized
+            # Re-try only once bootstrapping a new token
+            session['auth'] = bootstrap()
+            return abstract(identifier, retry_counter=retry_counter+1)
+        try:
+            msg = r.json().get('error', {})
+            if type(msg) is dict:
+                msg = msg.get('msg', msg)
+        except:
+            msg = r.content
+        return {"error": "{} (HTTP status code {})".format(msg, r.status_code)}
+    #r.raise_for_status()
+    r.cookies.clear_expired_cookies()
+    session['cookies'].update(r.cookies.get_dict())
+    results = r.json()
+    return results
+
+def graphics(identifier, retry_counter=0):
+    """
+    Retrieve associated works
+    """
+    headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
+    try:
+        r = current_app.client.get(current_app.config['GRAPHICS_SERVICE'] + identifier, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
+    except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        msg = str(e)
+        return {"error": "{}".format(msg)}
+    if not r.ok:
+        if r.status_code == 401 and retry_counter == 0: # Unauthorized
+            # Re-try only once bootstrapping a new token
+            session['auth'] = bootstrap()
+            return abstract(identifier, retry_counter=retry_counter+1)
+        try:
+            msg = r.json().get('error', {})
+            if type(msg) is dict:
+                msg = msg.get('msg', msg)
+        except:
+            msg = r.content
+        return {"error": "{} (HTTP status code {})".format(msg, r.status_code)}
+    #r.raise_for_status()
+    r.cookies.clear_expired_cookies()
+    session['cookies'].update(r.cookies.get_dict())
+    results = r.json()
+    return results
