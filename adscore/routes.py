@@ -60,6 +60,10 @@ def search(params=None):
         form = ModernForm(**parsed)
     else:
         form = ModernForm(request.args)
+    if form.p_.data > 0:
+        computed_start = (form.p_.data - 1) * form.rows.data
+        if form.start.data != computed_start:
+            return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
     if form.q.data and len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)

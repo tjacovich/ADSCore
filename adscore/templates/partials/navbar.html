@@ -3,12 +3,6 @@
     <nav class="navbar fluid navbar-inverse">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
         <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="{{ base_url }}styles/img/transparent_logo.svg" alt="ads icon">
           <h1> <b>ads</b></h1>
         </a>
@@ -52,7 +46,8 @@
             <i class="fa fa-comment about-page-icon"></i> Full ADS
           </a>
           {% elif request.endpoint == "search" %}
-          <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+          {% set p_ = (form.start.data / form.rows.data) | int %}
+          <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data, p_=p_) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
             <i class="fa fa-comment about-page-icon"></i> Full ADS
           </a>
           {% else %}

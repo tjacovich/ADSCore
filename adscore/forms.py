@@ -7,6 +7,7 @@ class ModernForm(FlaskForm):
     sort = StringField('sort', default="date desc")
     rows = IntegerField('rows', default=25)
     start = IntegerField('start', default=0)
+    p_ = IntegerField('p_', default=0)
     submit = SubmitField('Search')
 
 class PaperForm(FlaskForm):

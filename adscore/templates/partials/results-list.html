@@ -33,7 +33,13 @@
               <div>
                 <div class="s-empty-view-msg">
                   <div class="h4">
-                    Sorry no results were found for:</p>
+                    <p>
+                    {% if results and results.numFound > 0 and form.start.data > 0 %}
+                    Sorry, there are {{ "{:,.0f}".format(results.numFound) }} results but you requested beyond that ({{ "{:,.0f}".format(form.start.data) }}) for:
+                    {% else %}
+                    Sorry, no resultswere found for:
+                    {% endif %}
+                    </p>
                   </div>
                   <p><code>{{ form.q.data }}</code></p>
                   <ul>
@@ -226,8 +232,18 @@
                     <li class=" disabled "><a href="#" class="page-control previous-page"><i
                           class="fa fa-chevron-circle-left"></i> prev</a></li>
                     {% endif %}
-                    {{ ((form.start.data / form.rows.data) + 1) | int  }} of
-                    {{ (results.numFound / form.rows.data) | round(0, 'ceil')| int }}
+
+                    <li class="">
+                      <form name="page_number" action="{{ base_url }}search/" style="display: inline;">
+                          <input name="q" type="hidden" value="{{ form.q.data }}">
+                          <input name="sort" type="hidden" value="{{ form.sort.data }}">
+                          <input name="rows" type="hidden" value="{{ form.rows.data }}">
+                          <input name="start" type="hidden" value="{{ form.start.data }}">
+                          <input name="p_" type="text" value="{{ ((form.start.data / form.rows.data) + 1) | int  }}" class="form-control page-control" style="display:inline-block;width:60px" autocomplete="off">
+                      </form>
+                      of {{ (results.numFound / form.rows.data) | round(0, 'ceil')| int }}
+                    </li>
+
                     {% if results.numFound - (form.start.data + form.rows.data) > 0 %}
                     <li class=""><a
                         href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
