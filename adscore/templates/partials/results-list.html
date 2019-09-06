@@ -83,78 +83,129 @@
                     <div class="col-xs-4 col-sm-4 pull-right">
                       <div class="s-results-links">
 
+
                         <div class="letter-icon s-letter-icon">
-                          {% if "ESOURCE" in doc.property %}
-                            {% if "PUB_PDF" in doc.esources and "PUB_OPENACCESS" in doc.property %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "PUB_HTML" in doc.esources and "PUB_OPENACCESS" in doc.property %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "EPRINT_PDF" in doc.esources and "OPENACCESS" in doc.property %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "EPRINT_HTML" in doc.esources and "OPENACCESS" in doc.property %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "PUB_PDF" in doc.esources %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "PUB_HTML" in doc.esources %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "EPRINT_PDF" in doc.esources %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% elif "EPRINT_HTML" in doc.esources %}
-                              <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                            {% else %}
+                              {% if "ESOURCE" in doc.property and ("PUB_HTML" in doc.esources or "PUB_PDF" in doc.esources or "EPRINT_HTML" in doc.esources or "EPRINT_PDF" in doc.esources) %}
+                                <div class="btn-group pull-right">
+                                  <span class="dropdown-toggle" style="min-width: 175px;">
+                                    <a href="#"  class="btn-link active-link s-active-link"><i class="s-text-icon" aria-label="quick access to full text links"></i></a>
+                                    <ul class="dropdown-menu" role="menu" style="min-width: 165px; margin-top: -2px; padding: 15px;">
+                                    {% if "PUB_HTML" in doc.esources %}
+                                      <div >
+                                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                        Publisher Article
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    {% if "PUB_PDF" in doc.esources %}
+                                      <div >
+                                      <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                        Publisher PDF
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    {% if "EPRINT_HTML" in doc.esources %}
+                                      <div >
+                                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                        arXiv Article
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    {% if "EPRINT_PDF" in doc.esources %}
+                                      <div >
+                                      <a href="/link_gateway/{{ doc.bibcode }}/EPRINT_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                        arXiv PDF
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    </ul>
+                                  </span>
+                                </div>
+                              {% else %}
                               <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
                                 <i class="s-text-icon" aria-label="quick access to full text links"></i>
                               </a>
-                            {% endif %}
-                          {% else %}
-                              <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
-                                <i class="s-text-icon" aria-label="quick access to full text links"></i>
-                              </a>
-                          {% endif %}
+                              {% endif %}
                         </div>
 
                         <div class="letter-icon s-letter-icon">
-                          {% if doc.reference_count > 0 %}
-                          <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}"
-                            class="btn-link active-link s-active-link" style="transition: none;" aria-disabled="false">
-                            <i class="s-list-icon"
-                              aria-label="quick links to lists of references, citations and more"></i>
-                          </a>
+                          {% if doc.reference_count > 0 or doc.citation_count > 0 %}
+                                <div class="btn-group pull-right">
+                                  <span class="dropdown-toggle" style="min-width: 175px;">
+                                    <a href="#"  class="btn-link active-link s-active-link"><i class="s-list-icon" aria-label="quick access to citations and references"></i></a>
+                                    <ul class="dropdown-menu" role="menu" style="min-width: 165px; margin-top: -2px; padding: 15px;">
+                                    {% if doc.citation_count > 0 %}
+                                      <div >
+                                      <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                      Citations ({{ doc.citation_count }})
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    {% if doc.reference_count > 0 %}
+                                      <div >
+                                      <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
+                                      References ({{ doc.reference_count }})
+                                      </a>
+                                      </div>
+                                    {% endif %}
+                                    </ul>
+                                  </span>
+                                </div>
                           {% else %}
-                          <a href="#" class="btn-link disabled" aria-disabled="true"
-                            aria-label="quick links to lists of references, citations etc">
-                            <i class="s-list-icon" aria-hidden="true"></i>
-                          </a>
+                              <a href="#" class="btn-link disabled" aria-disabled="true"
+                                aria-label="quick links to lists of references, citations etc">
+                                <i class="s-list-icon" aria-hidden="true"></i>
+                              </a>
                           {% endif %}
                         </div>
 
                         <div class="letter-icon s-letter-icon">
                           {% if "DATA" in doc.property %}
-                            <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                <i class="s-data-icon" aria-label="quick links to data associated with this article"></i>
-                            </a>
+                                <div class="btn-group pull-right">
+                                  <span class="dropdown-toggle" style="min-width: 175px;">
+                                    <a href="#"  class="btn-link active-link s-active-link"><i class="s-data-icon" aria-label="quick access to citations and references"></i></a>
+                                    <ul class="dropdown-menu" role="menu" style="min-width: 165px; margin-top: -2px; padding: 15px;">
+                                    {% for data_link in doc.data %}
+                                      <div >
+                                      <a href="/link_gateway/{{ doc.bibcode }}/{{ data_link[0] }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">{{ data_link[0] }} ({{ data_link[1] }})</a>
+                                      </div>
+                                    {% endfor %}
+                                    </ul>
+                                  </span>
+                                </div>
                           {% else %}
                             <a href="#" rel="noopener" class="btn-link disabled" aria-disabled="false">
                                 <i class="s-data-icon" aria-label="quick links to data associated with this article"></i>
                             </a>
                           {% endif %}
                         </div>
+
+
+
+            {% if doc.associated and doc.associated|length > 0 %}
+            <div data-reactroot="" class="s-right-col-widget-container" style="padding: 10px;">
+                <div style="font-size: 1.1em; color: rgb(51, 91, 175); text-transform: uppercase;">
+                    <i class="fa fa-folder-open" style="font-size: 1.4em; padding-right: 5px;"></i>Associated Works ({{ doc.associated|length }})
+                </div>
+                    <ul style="list-style-type: none; margin-left: -10px; padding: 0px;">
+                        {% for work in doc.associated %}
+                        <li style="font-size: 1em;">
+                            {% if work.bibcode == doc.bibcode %}
+                            {{ work.title }}
+                            {% else %}
+                            <a href="{{ url_for('abs', identifier=work.bibcode, section='abstract') }}">{{ work.title }}</a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+
+
+
+
 
                       </div>
                     </div>
@@ -205,7 +256,7 @@
                     <label for="per-page-select" class="col-xs-4 control-label" style="line-height: 32px;">Per Page</label>
                     <div class="col-xs-8 col-sm-5">
                         <div class="btn-group pull-right">
-                          <span class="btn btn-default dropdown-toggle" title="Select a sort option" style="min-width: 80px;">
+                          <span class="btn btn-default dropdown-toggle" title="Select the number of entries per page" style="min-width: 80px;">
                             {% for num in (25, 50, 100, 200, 500) %}
                               {% if form.rows.data == num %}
                                 {{ num }} <span class="caret" aria-hidden="true"></span>

@@ -1,4 +1,5 @@
 import json
+import functools
 import urllib.parse
 from flask import session, current_app
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
@@ -166,7 +167,7 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
         stats = 'false'
         stats_field = ''
     params = urllib.parse.urlencode({
-                    'fl': 'title,bibcode,author,citation_count,pubdate,[citations],property,esources',
+                    'fl': 'title,bibcode,author,citation_count,pubdate,[citations],property,esources,data',
                     'q': '{0}'.format(q),
                     'rows': '{0}'.format(rows),
                     'sort': '{0}'.format(sort),
@@ -201,6 +202,19 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
     else:
         for i in range(len(results['response']['docs'])):
             results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
+            if results['response']['docs'][i].get('data'):
+                data = []
+                for data_element in results['response']['docs'][i]['data']:
+                    data_components = data_element.split(":")
+                    if len(data_components) >= 2:
+                        try:
+                            data.append((data_components[0], int(data_components[1])))
+                        except ValueError:
+                            data.append((data_components[0], 0))
+                    else:
+                        data.append((data_components[0], 0))
+                data = sorted(data, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
+                results['response']['docs'][i]['data'] = data
     return results
 
 def resolver(identifier, resource="associated", retry_counter=0):
