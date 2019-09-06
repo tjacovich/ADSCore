@@ -1,3 +1,4 @@
+
 <div data-widget="SearchWidget">
   <div class="s-search-bar-widget">
     <div role="search">
@@ -75,11 +76,10 @@
             </dl>
           </div>
         </div>
-
       </div>
 
       {% if results %}
-      <div class="s-num-found" style="top: 70px;">
+      <div class="col-sm-8">
         <span class="s-light-font description">Your search returned</span>
         <b><span class="num-found-container">{{ "{:,.0f}".format(results.numFound) }}</span></b>
         <span class="s-light-font"> results
@@ -95,6 +95,34 @@
           {% endif %}
           &nbsp;&nbsp;<small>[{{ qtime }} | {{ g.request_time() }}]</small>
         </span>
+      </div>
+
+      {% set sort_id, sort_dir = form.sort.data.split(' ')[0], form.sort.data.split(' ')[1] %}
+      <div class="col-sm-4">
+        <div class="btn-group pull-right">
+          {% if sort_dir == 'asc' %}
+            <a type="button" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}" class="btn btn-default">
+              <i class="fa fa-sort-amount-desc"></i>
+            </a>
+          {% else %}
+            <a type="button" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}" class="btn btn-default">
+              <i class="fa fa-sort-amount-asc"></i>
+            </a>
+          {% endif %}
+
+          <span class="btn btn-default dropdown-toggle" title="Select a sort option" style="min-width: 150px;">
+            {% for opt in sort_options %}
+              {% if sort_id == opt.id %}
+                {{ opt.text }} <span class="caret" aria-hidden="true"></span>
+              {% endif %}
+            {% endfor %}
+            <ul class="dropdown-menu" role="menu">
+            {% for opt in sort_options %}
+              <li><a href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ opt.id }} {{ sort_dir }}&rows={{ form.rows.data }}" title="{{ opt.description }}">{{ opt.text }}</a></li>
+            {% endfor %}
+            </ul>
+          </span>
+        </div>
       </div>
       {% endif %}
     </div>
