@@ -28,13 +28,24 @@
             <i class="fa fa-comment about-page-icon"></i> Full ADS
           </a>
           {% elif request.endpoint == "abs" and doc %}
-          <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% elif request.endpoint == "export" %}
-          <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
+              {% set path = request.path.split('/') %}
+              {% if path[-1] == 'graphics'  %}
+              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/graphics') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+                <i class="fa fa-comment about-page-icon"></i> Full ADS
+              </a>
+              {% elif path[-1] == 'metrics'  %}
+              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/metrics') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+                <i class="fa fa-comment about-page-icon"></i> Full ADS
+              </a>
+              {% elif path[-1] == 'exportcitation'  %}
+              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+                <i class="fa fa-comment about-page-icon"></i> Full ADS
+              </a>
+              {% else %}
+              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+                <i class="fa fa-comment about-page-icon"></i> Full ADS
+              </a>
+              {% endif %}
           {% elif request.endpoint == "search" %}
           <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
             <i class="fa fa-comment about-page-icon"></i> Full ADS

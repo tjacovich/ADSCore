@@ -2,7 +2,7 @@ import time
 import urllib
 import functools
 import datetime
-from flask import render_template, session, request, redirect, g, current_app, url_for
+from flask import render_template, session, request, redirect, g, current_app, url_for, abort
 from adscore.app import app
 from adscore import api
 from adscore.forms import ModernForm, PaperForm, ClassicForm
@@ -257,14 +257,20 @@ def _graphics(identifier):
     Graphics for a given identifier
     """
     results, doc = _get_abstract_doc(identifier)
-    return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+    if len(doc.get('graphics', {}).get('figures', [])) > 0:
+        return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+    else:
+        abort(404)
 
 def _metrics(identifier):
     """
     Metrics for a given identifier
     """
     results, doc = _get_abstract_doc(identifier)
-    return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+    if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
+        return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+    else:
+        abort(404)
 
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])

@@ -7,7 +7,6 @@
 
       {% include 'partials/abstract-navigation.html' %}
 
-      {% if doc.graphics and doc.graphics.figures|length > 0 %}
         <div class="col-sm-9 col-md-7 s-middle-column" id="middle-column">
             <!--id is for screen readers-->
             <div class="main-content-container s-main-content-container" id="main-content" tabindex="-1">
@@ -16,6 +15,7 @@
                 <div id="current-subview">
 
                     <div data-widget="ShowMetrics" data-allow-redirect="false">
+                      {% if doc and doc.metrics and (doc.metrics['citation stats']['total number of citations'] > 0 or doc.metrics['basic stats']['total number of reads'] > 0) %}
                         <div>
                             <div class="metrics-container">
                                 <div class="print-visible"><h2 style="font-weight: 800;text-align:center;">NASA/ADS Metrics Report </h2> </div>
@@ -132,11 +132,11 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-        {% endif %}
 
     {% include 'partials/abstract-resources.html' %}
 
