@@ -246,6 +246,8 @@ def _get_abstract_doc(identifier):
 
 def _abs(identifier, section=None):
     results, doc = _get_abstract_doc(identifier)
+    if 'bibcode' in doc:
+        api.link_gateway(doc['bibcode'], "abstract")
     return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 def _export(identifier):
@@ -257,6 +259,8 @@ def _export(identifier):
         doc['export'] = api.export_abstract(doc.get('bibcode')).get('export')
     else:
         doc['export'] = None
+    if 'bibcode' in doc:
+        api.link_gateway(doc['bibcode'], "exportcitation")
     return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
 
 def _graphics(identifier):
@@ -265,6 +269,8 @@ def _graphics(identifier):
     """
     results, doc = _get_abstract_doc(identifier)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
+        if 'bibcode' in doc:
+            api.link_gateway(doc['bibcode'], "graphics")
         return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
     else:
         abort(404)
@@ -275,6 +281,8 @@ def _metrics(identifier):
     """
     results, doc = _get_abstract_doc(identifier)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
+        if 'bibcode' in doc:
+            api.link_gateway(doc['bibcode'], "metrics")
         return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
     else:
         abort(404)

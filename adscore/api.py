@@ -1,3 +1,4 @@
+import json
 import urllib.parse
 from flask import session, current_app
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
@@ -48,9 +49,13 @@ def abstract(identifier, retry_counter=0):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    results = r.json()
-    for i in range(len(results['response']['docs'])):
-        results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    else:
+        for i in range(len(results['response']['docs'])):
+            results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
     return results
 
 def export_abstract(bibcode):
@@ -82,7 +87,11 @@ def export_abstract(bibcode):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    return r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    return results
 
 def store_query(bibcodes, sort="date desc, bibcode desc"):
     """
@@ -99,7 +108,11 @@ def store_query(bibcodes, sort="date desc, bibcode desc"):
     r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    return r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    return results
 
 def objects_query(object_names):
     """
@@ -129,7 +142,11 @@ def objects_query(object_names):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    return r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    return results
 
 def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
     """
@@ -177,9 +194,13 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    results = r.json()
-    for i in range(len(results['response']['docs'])):
-        results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    else:
+        for i in range(len(results['response']['docs'])):
+            results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
     return results
 
 def resolver(identifier, resource="associated", retry_counter=0):
@@ -207,7 +228,10 @@ def resolver(identifier, resource="associated", retry_counter=0):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    results = r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
 def graphics(identifier, retry_counter=0):
@@ -235,7 +259,10 @@ def graphics(identifier, retry_counter=0):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    results = r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
 def metrics(bibcode):
@@ -266,4 +293,40 @@ def metrics(bibcode):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    return r.json()
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    return results
+
+def link_gateway(identifier, section, retry_counter=0):
+    """
+    Retrieve associated works
+    """
+    headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
+    try:
+        r = current_app.client.get(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
+    except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        msg = str(e)
+        return {"error": "{}".format(msg)}
+    if not r.ok:
+        if r.status_code == 401 and retry_counter == 0: # Unauthorized
+            # Re-try only once bootstrapping a new token
+            session['auth'] = bootstrap()
+            return link_gateway(identifier, retry_counter=retry_counter+1)
+        try:
+            msg = r.json().get('error', {})
+            if type(msg) is dict:
+                msg = msg.get('msg', msg)
+        except:
+            msg = r.content
+        return {"error": "{} (HTTP status code {})".format(msg, r.status_code)}
+    #r.raise_for_status()
+    r.cookies.clear_expired_cookies()
+    session['cookies'].update(r.cookies.get_dict())
+    try:
+        results = r.json()
+    except json.decoder.JSONDecodeError:
+        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+    return results
+
