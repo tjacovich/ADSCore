@@ -60,7 +60,13 @@ def search(params=None):
         form = ModernForm(**parsed)
     else:
         form = ModernForm(request.args)
-    if form.p_.data > 0:
+    try:
+        form.p_.data = int(form.p_.data)
+    except (ValueError, TypeError):
+        form.p_.data = 0
+    if form.p_.data < 0:
+        form.p_.data = 0
+    elif form.p_.data > 0:
         computed_start = (form.p_.data - 1) * form.rows.data
         if form.start.data != computed_start:
             return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
