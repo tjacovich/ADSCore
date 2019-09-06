@@ -46,6 +46,11 @@
                 <i class="fa fa-comment about-page-icon"></i> Full ADS
               </a>
               {% endif %}
+          {% elif request.endpoint == "public_libraries" %}
+          {% set path = request.path.split('/') %}
+          <a href="{{ url_for('core_never', url='public-libraries/'+path[-1]) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
+            <i class="fa fa-comment about-page-icon"></i> Full ADS
+          </a>
           {% elif request.endpoint == "search" %}
           <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
             <i class="fa fa-comment about-page-icon"></i> Full ADS

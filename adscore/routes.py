@@ -60,7 +60,7 @@ def search(params=None):
         form = ModernForm(**parsed)
     else:
         form = ModernForm(request.args)
-    if len(form.q.data) > 0:
+    if form.q.data and len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
@@ -166,6 +166,13 @@ def paper_form_bibcodes():
         return redirect(url_for('search', q=q))
     return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
+@app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
+def public_libraries(identifier):
+    """
+    Display public library
+    """
+    #return redirect(url_for('search', q=f"docs(library/{identifier})"))
+    return search(params=f"q=docs(library/{identifier})")
 
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/<section>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>', methods=['GET'], strict_slashes=False)
