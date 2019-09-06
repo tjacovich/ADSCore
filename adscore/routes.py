@@ -310,7 +310,7 @@ def core_never(url=None):
 def _build_target_url(request, url):
     full_url = request.url_root
     params_dict = {}
-    for accepted_param in ('q', 'rows', 'start', 'sort'):
+    for accepted_param in ('q', 'rows', 'start', 'sort', 'p_'):
         if accepted_param in request.args:
             params_dict[accepted_param] = request.args.get(accepted_param)
     params = urllib.parse.urlencode(params_dict)
