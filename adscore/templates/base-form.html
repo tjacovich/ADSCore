@@ -20,6 +20,46 @@
     {# This is needed for BBB hydration, otherwise it requests javascript files to /abs/ #}
     <base href="{{ base_url }}">
   {% endif %}
+
+
+<style>
+/*the container must be positioned relative:*/
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: #d7dfec !important; 
+  color: #000000; 
+}
+</style>
+
 </head>
 
 <body>
@@ -39,6 +79,173 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function autocomplete(searchBox, autoValues) {
+      // Arguments: the text field element and an array of possible autocompleted values
+      var currentFocus; // selected autocomplete option
+      // Function to be run when the user types
+      searchBox.addEventListener("input", function(e) {
+          var a, b, i, val = this.value;
+          // close any list of autocomplete values
+          closeAllLists();
+          if (!val) { return false;}
+          val = val.split(/\s+/);
+          val = val[val.length - 1];
+          if (!val) { return false;}
+          currentFocus = -1;
+          // Create a DIV element that will contain the items (values):
+          a = document.createElement("DIV");
+          a.setAttribute("id", this.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          // Append the DIV element as a child of the autocomplete container:
+          this.parentNode.appendChild(a);
+          for (i = 0; i < autoValues.length; i++) {
+            // Check if the item starts with the same letters as the text field value:
+            if (autoValues[i].match.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+              // Create a DIV element for each matching element:
+              b = document.createElement("DIV");
+              b.innerHTML = autoValues[i].label;
+              if ("desc" in autoValues[i]) {
+                b.innerHTML += " <i>" + autoValues[i].desc + "</i>";
+              }
+              if (autoValues[i].value.startsWith(autoValues[i].match) ) {
+                b.innerHTML += " | <strong>" + autoValues[i].match.substr(0, val.length) + "</strong>";
+                b.innerHTML += autoValues[i].match.substr(val.length);
+              }
+              // Insert a input field that will hold the current array item's value:
+              b.innerHTML += "<input type='hidden' value='" + autoValues[i].value + "'>";
+              // Listen to clicks on the item value (DIV element):
+              b.addEventListener("click", function(e) {
+                  var terms = searchBox.value.split(/\s+/);
+                  // Remove the current part of the input used for matching
+                  terms.pop();
+                  // Insert the value for the autocomplete text field:
+                  terms.push(this.getElementsByTagName("input")[0].value);
+                  searchBox.value = terms.join(" ");
+                  // Move cursor position inside quotes/parenthesis if needed
+                  searchBox.focus();
+                  if (searchBox.value[searchBox.value.length-1] === '"' || searchBox.value[searchBox.value.length-1] === ')') {
+                    searchBox.setSelectionRange(searchBox.value.length-1, searchBox.value.length-1);
+                  }
+                  // Close the list of autocompleted values
+                  closeAllLists();
+              });
+              a.appendChild(b);
+            }
+          }
+          if (a.children.length > 0) {
+            // By default, enter will select the first entry
+            currentFocus = 0;
+            addActive(a.children);
+          }
+      });
+      /*execute a function presses a key on the keyboard:*/
+      searchBox.addEventListener("keydown", function(e) {
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            // If the arrow DOWN key is pressed, increase the currentFocus variable:
+            currentFocus++;
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            // If the arrow UP key is pressed, decrease the currentFocus variable:
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            // If the ENTER key is pressed:
+            if (currentFocus > -1) {
+              // Prevent the form from being submitted:
+              e.preventDefault();
+              // Simulate a click on the "active" item:
+              if (x) x[currentFocus].click();
+              currentFocus = -1;
+            }
+          }
+      });
+      function addActive(x) {
+        // Classify an item as "active":
+        if (!x) return false;
+        // Remove the "active" class on all items:
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        // Add class "autocomplete-active":
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        // Remove the "active" class from all autocomplete items:
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(elmnt) {
+        // Close all autocomplete lists in the document, except the one passed as an argument:
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt != x[i] && elmnt != searchBox) {
+            x[i].parentNode.removeChild(x[i]);
+          }
+        }
+      }
+      // Any other clicks in the document:
+      document.addEventListener("click", function (e) {
+          closeAllLists(e.target);
+      });
+    }
+
+    var autoList = [
+        { value: 'author:""', label: 'Author', match: 'author:"' },
+        { value: 'author:"^"', label: 'First Author', match: 'first author' },
+        { value: 'author:"^"', label: 'First Author', match: 'author:"^' },
+        { value: 'bibcode:""', label: 'Bibcode', desc: 'e.g. bibcode:1989ApJ...342L..71R', match: 'bibcode:"' },
+        { value: 'bibstem:""', label: 'Publication', desc: 'e.g. bibstem:ApJ', match: 'bibstem:"' },
+        { value: 'bibstem:""', label: 'Publication', desc: 'e.g. bibstem:ApJ', match: 'publication (bibstem)' },
+        { value: 'arXiv:', label: 'arXiv ID', match: 'arxiv:' },
+        { value: 'doi:', label: 'DOI', match: 'doi:' },
+        { value: 'full:""', label: 'Full text search', desc: 'title, abstract, and body', match: 'full:' },
+        { value: 'full:""', label: 'Full text search', desc: 'title, abstract, and body', match: 'fulltext' },
+        { value: 'full:""', label: 'Full text search', desc: 'title, abstract, and body', match: 'text' },
+        { value: 'year:', label: 'Year', match: 'year' },
+        { value: 'year:1999-2005', label: 'Year Range', desc: 'e.g. 1999-2005', match: 'year range' },
+        { value: 'aff:""', label: 'Affiliation', match: 'aff:' },
+        { value: 'abs:""', label: 'Search abstract + title + keywords', match: 'abs:' },
+        { value: 'database:astronomy', label: 'Limit to papers in the astronomy database', match: 'database:astronomy' },
+        { value: 'database:physics', label: 'Limit to papers in the physics database', match: 'database:physics' },
+        { value: 'title:""', label: 'Title', match: 'title:"' },
+        { value: 'orcid:', label: 'ORCiD identifier', match: 'orcid:' },
+        { value: 'object:', label: 'SIMBAD object (e.g. object:LMC)', match: 'object:' },
+        { value: 'property:refereed', label: 'Limit to refereed', desc: '(property:refereed)', match: 'refereed' },
+        { value: 'property:refereed', label: 'Limit to refereed', desc: '(property:refereed)', match: 'property:refereed' },
+        { value: 'property:notrefereed', label: 'Limit to non-refereed', desc: '(property:notrefereed)', match: 'property:notrefereed' },
+        { value: 'property:notrefereed', label: 'Limit to non-refereed', desc: '(property:notrefereed)', match: 'notrefereed' },
+        { value: 'property:eprint', label: 'Limit to eprints', desc: '(property:eprint)', match: 'eprint' },
+        { value: 'property:eprint', label: 'Limit to eprints', desc: '(property:eprint)', match: 'property:eprint' },
+        { value: 'property:openaccess', label: 'Limit to open access', desc: '(property:openaccess)', match: 'property:openaccess' },
+        { value: 'property:openaccess', label: 'Limit to open access', desc: '(property:openaccess)', match: 'openaccess' },
+        { value: 'property:software', label: 'Limit to software', desc: '(property:software)', match: 'software' },
+        { value: 'property:software', label: 'Limit to software', desc: '(property:software)', match: 'property:software' },
+        { value: 'property:inproceedings', label: 'Limit to papers in conference proceedings', desc: '(property:inproceedings)', match: 'proceedings' },
+        { value: 'property:inproceedings', label: 'Limit to papers in conference proceedings', desc: '(property:inproceedings)', match: 'property:inproceedings' },
+        { value: 'citations()', label: 'Citations', desc: 'Get papers citing your search result set', match: 'citations(' },
+        { value: 'references()', label: 'References', desc: 'Get papers referenced by your search result set', match: 'references(' },
+        { value: 'trending()', label: 'Trending', desc: 'Get papers most read by users who recently read your search result set', match: 'trending(' },
+        { value: 'reviews()', label: 'Review Articles', desc: 'Get most relevant papers that cite your search result set', match: 'reviews(' },
+        { value: 'useful()', label: 'Useful', desc: 'Get papers most frequently cited by your search result set', match: 'useful(' },
+        { value: 'similar()', label: 'Similar', desc: 'Get papers that have similar full text to your search result set', match: 'similar(' },
+      ];
+
+    // initiate the autocomplete function on the "q" element, and pass along the operators array as possible autocomplete values:
+    inputBox = document.getElementById("q")
+    if (inputBox) {
+      inputBox.focus() // autofucs
+      inputBox.setSelectionRange(inputBox.value.length, inputBox.value.length); // bring cursor to the end
+      autocomplete(inputBox, autoList);
+    }
+  </script>
+
+
   <script>
     (function() {
       // turn off no-js if we have javascript
