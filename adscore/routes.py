@@ -237,10 +237,10 @@ def _get_abstract_doc(identifier):
         doc['graphics'] = []
 
     metrics = api.metrics(doc['bibcode'])
-    if 'error' not in metrics:
+    if 'error' not in metrics and 'Error' not in metrics:
         doc['metrics'] = metrics
     else:
-        doc['metrics'] = []
+        doc['metrics'] = {}
 
     return results, doc
 
