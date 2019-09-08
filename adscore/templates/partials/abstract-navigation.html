@@ -36,7 +36,7 @@
 
 
             {% if doc %}
-            <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" aria-disabled="true"
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true"
               data-widget-id="ShowCitations">
               {% if doc.citation_count and doc.citation_count > 0 %}
               <div class="abstract-nav s-nav ">
@@ -55,7 +55,7 @@
 
 
             {% if doc %}
-            <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}"
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true"
               data-widget-id="ShowReferences">
               {% if doc.reference_count > 0 %}
               <div class="abstract-nav s-nav ">
@@ -73,7 +73,7 @@
 
             {% if doc %}
             {% if doc.read_count and doc.read_count > 0 %}
-            <a href="{{ url_for('search', q='trending(bibcode:'+doc.bibcode+')', sort='score desc') }}"
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='coreads') }}" aria-disabled="true"
               aria-disabled="true" data-widget-id="ShowCoreads">
               <div class="abstract-nav s-nav ">
                 {% else %}
@@ -88,7 +88,7 @@
 
 
             {% if doc %}
-            <a href="{{ url_for('search', q='similar(bibcode:'+doc.bibcode+')', sort='score desc') }}"
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='similar') }}" aria-disabled="true"
               data-widget-id="ShowSimilar">
               <div class="abstract-nav s-nav  ">
                 <span class="s-content">
@@ -99,7 +99,7 @@
             {% endif %}
 
             {% if doc %}
-            <a href="{{ url_for('search', q='bibcode:'+doc.bibcode[:13]+'*', sort='score desc') }}"
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true"
               data-widget-id="ShowToc">
               {% if "TOC" in doc.property %}
               <div class="abstract-nav s-nav">

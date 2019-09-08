@@ -190,14 +190,26 @@ def abs(identifier, section=None):
     """
     Show abstract given an identifier
     """
-    if section == "exportcitation":
+    if section in (None, "abstract"):
+        return _abs(identifier)
+    elif section == "citations":
+        return _operation("citations", identifier)
+    elif section == "references":
+        return _operation("references", identifier)
+    elif section == "coreads":
+        return _operation("trending", identifier)
+    elif section == "similar":
+        return _operation("similar", identifier)
+    elif section == "toc":
+        return _toc(identifier)
+    elif section == "exportcitation":
         return _export(identifier)
     elif section == "graphics":
         return _graphics(identifier)
     elif section == "metrics":
         return _metrics(identifier)
     else:
-        return _abs(identifier)
+        abort(404)
 
 def _get_abstract_doc(identifier):
     results = api.abstract(identifier)
@@ -231,7 +243,7 @@ def _get_abstract_doc(identifier):
                 doc['arXiv'] = element
                 break
     else:
-        doc = None
+        doc = {}
         results['error'] = "Record not found."
 
     associated = api.resolver(doc['bibcode'], resource="associated")
@@ -258,7 +270,27 @@ def _abs(identifier, section=None):
     results, doc = _get_abstract_doc(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "abstract")
-    return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+        return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+    else:
+        abort(404)
+
+def _operation(operation, identifier):
+    results, doc = _get_abstract_doc(identifier)
+    if 'bibcode' in doc:
+        api.link_gateway(doc['bibcode'], operation)
+        target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})')
+        return redirect(target_url)
+    else:
+        abort(404)
+
+def _toc(identifier):
+    results, doc = _get_abstract_doc(identifier)
+    if 'bibcode' in doc:
+        api.link_gateway(doc['bibcode'], "toc")
+        target_url = url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
+        return redirect(target_url)
+    else:
+        abort(404)
 
 def _export(identifier):
     """
