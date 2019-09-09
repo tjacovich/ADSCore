@@ -82,6 +82,34 @@
                   </div>
                 </div>
                 {% endif %}
+                {% if "ADS_PDF" in doc.esources or "ADS_SCAN" in doc.esources %}
+                <div class="resources__content">
+                  <div class="resources__content__title">
+                    ADS</div>
+                  <div class="resources__content__links">
+                    <span>
+                      {% if "ADS_PDF" in doc.esources %}
+                      <a href="/link_gateway/{{ doc.bibcode }}/ADS_PDF" rel="noopener"
+                        class="resources__content__link {{ unlock }}">
+                        <i class="fa fa-file-pdf-o" aria-hidden="true">
+                        </i>
+                      </a>
+                      {% endif %}
+                      <div class="resources__content__link__separator">
+                        |</div>
+                    </span>
+                    <span>
+                      {% if "ADS_SCAN" in doc.esources %}
+                      <a href="/link_gateway/{{ doc.bibcode }}/ADS_SCAN" rel="noopener"
+                        class="resources__content__link {{ unlock }}">
+                        <i class="fa fa-file-image-o" aria-hidden="true">
+                        </i>
+                      </a>
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+                {% endif %}
               </div>
             {% endif %}
             {% if "DATA" in doc.property %}
