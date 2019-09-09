@@ -61,7 +61,7 @@
                                                         <i class="icon-help" data-toggle="popover" title="" data-content="For a list of N papers (i=1,...N), where N<sub>auth</sub><sup>i</sup> is the number of authors for publication i and C<sub>i</sub> the number of citations that this paper received, the normalized citation count for each article is C<sub>i</sub>/N<sub>auth</sub><sup>i</sup> ,and the 'normalized citations' for this list of N papers is the sum of these N numbers." data-original-title="<b>Normalized Citations</b>"></i>
                                                     </td>
                                                     <td>
-                                                        {{ doc.metrics['citation stats']['normalized number of citations'] }}
+                                                        {{ "%.1f"|format(doc.metrics['citation stats']['normalized number of citations']) }}
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -79,7 +79,7 @@
                                                         <i class="icon-help" data-toggle="popover" title="" data-content="The normalized number of citations from refereed publications to all refereed publications in the list." data-original-title="<b>Normalized Refereed Citations</b>"></i>
                                                     </td>
                                                     <td>
-                                                        {{ doc.metrics['citation stats']['normalized number of refereed citations'] }}
+                                                        {{ "%.1f"|format(doc.metrics['citation stats']['normalized number of refereed citations']) }}
                                                     </td>
                                                 </tr>
                                             </tbody>
