@@ -1,5 +1,5 @@
 import time
-import urllib
+import urllib.parse
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
 from adscore.app import app
 from adscore import api
@@ -49,7 +49,7 @@ def search(params=None):
         if form.start.data != computed_start:
             return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
     elif form.q.data and len(form.q.data) > 0:
-        results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
+        results = api.Search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     else:
@@ -167,7 +167,7 @@ def _graphics(identifier):
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "graphics")
-        return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+        return render_template('abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
 
@@ -179,7 +179,7 @@ def _metrics(identifier):
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "metrics")
-        return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+        return render_template('abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
 
