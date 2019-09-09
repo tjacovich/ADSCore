@@ -37,44 +37,25 @@ def index():
     form = ModernForm(request.args)
     return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
+
 @app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
 def search(params=None):
     """
     Modern form if no search parameters are sent, otherwise show search results
     """
-    if params:
-        # For compatibility with BBB, accept parameters that are embbeded in the
-        # URL without a question mark
-        parsed = urllib.parse.parse_qs(params)
-        # parse_qa will create a list for single strings such as {'q': ['star']},
-        # extract them if there is only one element:
-        parsed = dict( (k, v if len(v) > 1 else v[0] ) for k, v in parsed.items() )
-        # Make sure that numeric parameters are not strings:
-        for numeric_param in ('rows', 'start'):
-            if numeric_param in parsed:
-                try:
-                    parsed[numeric_param] = int(parsed[numeric_param])
-                except:
-                    del parsed[numeric_param]
-        form = ModernForm(**parsed)
-    else:
-        form = ModernForm(request.args)
-    try:
-        form.p_.data = int(form.p_.data)
-    except (ValueError, TypeError):
-        form.p_.data = 0
-    if form.p_.data < 0:
-        form.p_.data = 0
-    elif form.p_.data > 0:
+    form = ModernForm.parse(params or request.args)
+    if form.p_.data > 0:
+        # Redirect to correct the start parameter to match the requested page
         computed_start = (form.p_.data - 1) * form.rows.data
         if form.start.data != computed_start:
             return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
-    if form.q.data and len(form.q.data) > 0:
+    elif form.q.data and len(form.q.data) > 0:
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
-    return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
 
 @app.route(app.config['SERVER_BASE_URL']+'classic-form', methods=['GET'], strict_slashes=False)
 def classic_form():
@@ -83,98 +64,29 @@ def classic_form():
     and redirect to the search results of a built query based on the parameters
     """
     form = ClassicForm(request.args)
-    query = []
-    if form.astronomy.data:
-        query.append("database:astronomy")
-    if form.physics.data:
-        query.append("database:physics")
+    query = form.build_query()
     if query:
-        query = [" OR ".join(query)]
-    if form.refereed.data:
-        query.append("property:refereed")
-    if form.article.data:
-        query.append("property:article")
-    if form.author_names.data:
-        authors = form.author_names.data.split()
-        if form.author_logic.data == "OR":
-            query.append("author:({})".format(" OR ".join(["\"{}\"".format(a) for a in authors])))
-        elif form.author_logic.data == "AND":
-            query.append("author:({})".format(" ".join(["\"{}\"".format(a) for a in authors])))
-        else:
-            query.append("author:({})".format(" ".join(authors)))
-    if form.object_names.data:
-        # TODO: form.object_logic.data is not used (not even in BBB)
-        objects = form.object_names.data.split()
-        results = api.objects_query(objects)
-        transformed_objects_query = results.get('query')
-        if transformed_objects_query:
-            query.append(transformed_objects_query)
-    year_from = min(max(form.year_from.data, 0), 9999) if form.year_from.data else 0
-    year_to = min(max(form.year_to.data, 0), 9999) if form.year_to.data else 9999
-    month_from = min(max(form.month_from.data, 1), 12) if form.month_from.data else 1
-    month_to = min(max(form.month_to.data, 1), 12) if form.month_to.data else 12
-    pubdate = "pubdate:[{:04}-{:02} TO {:04}-{:02}]".format(year_from, month_from, year_to, month_to)
-    if pubdate != "pubdate:[0000-01 TO 9999-12]":
-        query.append(pubdate)
-    if form.title.data:
-        titles = form.title.data.split()
-        if form.title_logic.data == "OR":
-            query.append(" OR ".join(["title:({})".format(a) for a in titles]))
-        elif form.title_logic.data == "AND":
-            query.append(" ".join(["title:({})".format(a) for a in titles]))
-        else:
-            query.append("title:({})".format(" ".join(titles)))
-    if form.abstract.data:
-        abstracts = form.abstract.data.split()
-        if form.abstract_logic.data == "OR":
-            query.append(" OR ".join(["abstract:({})".format(a) for a in abstracts]))
-        elif form.abstract_logic.data == "AND":
-            query.append(" ".join(["abstract:({})".format(a) for a in abstracts]))
-        else:
-            query.append("abs:({})".format(" ".join(abstracts)))
-
-    if form.bibstem.data:
-        bibstems = form.bibstem.data.split(",")
-        query.append(" OR ".join(["bibstem:({})".format(b) for b in bibstems]))
-
-    if query:
-        return redirect(url_for('search', q=" ".join(query)))
+        return redirect(url_for('search', q=query))
     else:
         return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
-@app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['GET'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['GET', 'POST'], strict_slashes=False)
 def paper_form():
     """
-    Paper form (left form) if no search parameters are sent, otherwise process the parameters
+    Paper form x if no search parameters are sent, otherwise process the parameters
     and redirect to the search results of a built query based on the parameters
     """
-    form = PaperForm(request.args)
-    query = []
-    if form.bibstem.data:
-        query.append("bibstem:({})".format(form.bibstem.data))
-    if form.year.data:
-        query.append("year:{}".format(form.year.data))
-    if form.volume.data:
-        query.append("volume:{}".format(form.volume.data))
-    if form.page.data:
-        query.append("page:{}".format(form.page.data))
+    if request.method == 'POST':
+        # Right form with bibcode list
+        form = PaperForm(request.form)
+    else: # GET
+        # Left form with fields
+        form = PaperForm(request.args)
+    query = form.build_query()
     if query:
-        return redirect(url_for('search', q=" ".join(query)))
+        return redirect(url_for('search', q=query))
     else:
         return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
-
-@app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['POST'], strict_slashes=False)
-def paper_form_bibcodes():
-    """
-    Paper form (right form) if no search parameters are sent, otherwise process the parameters
-    and redirect to the search results of a built query based on the parameters
-    """
-    form = PaperForm()
-    if form.bibcodes.data and len(form.bibcodes.data.split()) > 0:
-        results = api.store_query(form.bibcodes.data.split()) # Split will get rid of \r\n
-        q = "docs({})".format(results['qid'])
-        return redirect(url_for('search', q=q))
-    return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
 @app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
 def public_libraries(identifier):
