@@ -1,6 +1,8 @@
 import json
+import datetime
 import functools
 import urllib.parse
+from collections.abc import Mapping
 from flask import session, current_app
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 
@@ -18,7 +20,7 @@ def bootstrap():
     auth = r.json()
     return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'] }
 
-def abstract(identifier, retry_counter=0):
+def _abstract(identifier, retry_counter=0):
     """
     Retrieve abstract
     """
@@ -39,7 +41,7 @@ def abstract(identifier, retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return abstract(identifier, retry_counter=retry_counter+1)
+            return _abstract(identifier, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -59,7 +61,7 @@ def abstract(identifier, retry_counter=0):
             results['response']['docs'][i]['reference_count'] = results['response']['docs'][i]['[citations]']['num_references']
     return results
 
-def export_abstract(bibcode):
+def _export(bibcode, retry_counter=0):
     """
     Export bibtex
     """
@@ -77,7 +79,7 @@ def export_abstract(bibcode):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return export_abstract(bibcode, retry_counter=retry_counter+1)
+            return _export(bibcode, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -115,7 +117,7 @@ def store_query(bibcodes, sort="date desc, bibcode desc"):
         results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
-def objects_query(object_names):
+def objects_query(object_names, retry_counter=0):
     """
     Transform object into ID
     """
@@ -217,7 +219,7 @@ def search(q, rows=25, start=0, sort="date desc", retry_counter=0):
                 results['response']['docs'][i]['data'] = data
     return results
 
-def resolver(identifier, resource="associated", retry_counter=0):
+def _resolver(identifier, resource="associated", retry_counter=0):
     """
     Retrieve associated works
     """
@@ -231,7 +233,7 @@ def resolver(identifier, resource="associated", retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return resolver(identifier, retry_counter=retry_counter+1)
+            return _resolver(identifier, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -248,7 +250,7 @@ def resolver(identifier, resource="associated", retry_counter=0):
         results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
-def graphics(identifier, retry_counter=0):
+def _graphics(identifier, retry_counter=0):
     """
     Retrieve associated works
     """
@@ -262,7 +264,7 @@ def graphics(identifier, retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return graphics(identifier, retry_counter=retry_counter+1)
+            return _graphics(identifier, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -279,7 +281,7 @@ def graphics(identifier, retry_counter=0):
         results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
-def metrics(bibcode):
+def _metrics(bibcode):
     """
     Metrics
     """
@@ -296,7 +298,7 @@ def metrics(bibcode):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return metrics(bibcode, retry_counter=retry_counter+1)
+            return _metrics(bibcode, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -327,7 +329,7 @@ def link_gateway(identifier, section, retry_counter=0):
         if r.status_code == 401 and retry_counter == 0: # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            return link_gateway(identifier, retry_counter=retry_counter+1)
+            return link_gateway(identifier, section, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
@@ -343,4 +345,94 @@ def link_gateway(identifier, section, retry_counter=0):
     except json.decoder.JSONDecodeError:
         results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
+
+
+class Abstract(Mapping):
+    def __init__(self, identifier):
+        self._storage = {}
+        results = _abstract(identifier)
+        docs = results.get('response', {}).get('docs', [])
+        if not docs or len(docs) == 0:
+            self._storage['error'] = "Record not found."
+        else:
+            self._storage.update(self._process(docs[0]))
+
+    def __getitem__(self, key):
+        return self._storage[key]
+
+    def __iter__(self):
+        return iter(self._storage)
+
+    def __len__(self):
+        return len(self._storage)
+
+    def _process_data(self, data):
+        # Data is reported as LABEL:NUMBER, split and sort by number in decreasing mode
+        data_list = []
+        for data_element in data:
+            data_components = data_element.split(":")
+            if len(data_components) >= 2:
+                try:
+                    data_list.append((data_components[0], int(data_components[1])))
+                except ValueError:
+                    data_list.append((data_components[0], 0))
+            else:
+                data_list.append((data_components[0], 0))
+        sorted_data_list = sorted(data_list, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
+        return sorted_data_list
+
+    def _process(self, doc):
+        """
+        Sanitize and retreive complementary data
+        """
+        # Ensure title is a list
+        if not isinstance(doc['title'], list):
+            doc['title'] = [doc['title']]
+
+        # Extract page from list
+        if 'page' in doc and isinstance(doc['page'], list) and len(doc['page']) > 0:
+            doc['page'] = doc['page'][0]
+
+        if doc.get('data'):
+            doc['data'] = self._process_data(doc['data'])
+
+        # Parse publication date and store it as Month Year (e.g., September 2019)
+        try:
+            doc['pubdate'] = datetime.datetime.strptime(doc['pubdate'], '%Y-%m-00').strftime("%B %Y")
+        except ValueError:
+            pass
+
+        # Find arXiv ID
+        doc['arXiv'] = None
+        for element in doc['identifier']:
+            if element.startswith("arXiv:"):
+                doc['arXiv'] = element
+                break
+
+        # Retrieve extra information
+        associated = _resolver(doc['bibcode'], resource="associated")
+        if 'error' not in associated:
+            doc['associated'] = associated.get('links', {}).get('records', [])
+        else:
+            doc['associated'] = []
+
+        graphics = _graphics(doc['bibcode'])
+        if 'error' not in graphics:
+            doc['graphics'] = graphics
+        else:
+            doc['graphics'] = []
+
+        metrics = _metrics(doc['bibcode'])
+        if 'error' not in metrics and 'Error' not in metrics:
+            doc['metrics'] = metrics
+        else:
+            doc['metrics'] = {}
+
+        export = _export(doc['bibcode'])
+        if 'error' not in export:
+            doc['export'] = export.get('export')
+        else:
+            doc['export'] = None
+
+        return doc
 

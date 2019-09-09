@@ -1,7 +1,5 @@
 import time
 import urllib
-import functools
-import datetime
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
 from adscore.app import app
 from adscore import api
@@ -103,7 +101,7 @@ def abs(identifier, section=None):
     Show abstract given an identifier
     """
     if section in (None, "abstract"):
-        return _abs(identifier)
+        return _abstract(identifier)
     elif section == "citations":
         return _operation("citations", identifier)
     elif section == "references":
@@ -123,71 +121,16 @@ def abs(identifier, section=None):
     else:
         abort(404)
 
-def _get_abstract_doc(identifier):
-    results = api.abstract(identifier)
-    docs = results.get('response', {}).get('docs', [])
-    if len(docs) > 0:
-        doc = docs[0]
-        if not isinstance(doc['title'], list):
-            doc['title'] = [doc['title']]
-        if 'page' in doc and isinstance(doc['page'], list) and len(doc['page']) > 0:
-            doc['page'] = doc['page'][0]
-        if doc.get('data'):
-            data = []
-            for data_element in doc['data']:
-                data_components = data_element.split(":")
-                if len(data_components) >= 2:
-                    try:
-                        data.append((data_components[0], int(data_components[1])))
-                    except ValueError:
-                        data.append((data_components[0], 0))
-                else:
-                    data.append((data_components[0], 0))
-            data = sorted(data, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
-            doc['data'] = data
-        try:
-            doc['pubdate'] = datetime.datetime.strptime(doc['pubdate'], '%Y-%m-00').strftime("%B %Y")
-        except ValueError:
-            pass
-        doc['arXiv'] = None
-        for element in doc['identifier']:
-            if element.startswith("arXiv:"):
-                doc['arXiv'] = element
-                break
-    else:
-        doc = {}
-        results['error'] = "Record not found."
-
-    associated = api.resolver(doc['bibcode'], resource="associated")
-    if 'error' not in associated:
-        doc['associated'] = associated.get('links', {}).get('records', [])
-    else:
-        doc['associated'] = []
-
-    graphics = api.graphics(doc['bibcode'])
-    if 'error' not in graphics:
-        doc['graphics'] = graphics
-    else:
-        doc['graphics'] = []
-
-    metrics = api.metrics(doc['bibcode'])
-    if 'error' not in metrics and 'Error' not in metrics:
-        doc['metrics'] = metrics
-    else:
-        doc['metrics'] = {}
-
-    return results, doc
-
-def _abs(identifier, section=None):
-    results, doc = _get_abstract_doc(identifier)
+def _abstract(identifier, section=None):
+    doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "abstract")
-        return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+        return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
 
 def _operation(operation, identifier):
-    results, doc = _get_abstract_doc(identifier)
+    doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], operation)
         target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})')
@@ -196,7 +139,7 @@ def _operation(operation, identifier):
         abort(404)
 
 def _toc(identifier):
-    results, doc = _get_abstract_doc(identifier)
+    doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "toc")
         target_url = url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
@@ -208,20 +151,19 @@ def _export(identifier):
     """
     Export bibtex given an identifier
     """
-    results, doc = _get_abstract_doc(identifier)
-    if 'error' not in results and doc:
-        doc['export'] = api.export_abstract(doc.get('bibcode')).get('export')
+    doc = api.Abstract(identifier)
+    if doc.get('export'):
+        if 'bibcode' in doc:
+            api.link_gateway(doc['bibcode'], "exportcitation")
+        return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
-        doc['export'] = None
-    if 'bibcode' in doc:
-        api.link_gateway(doc['bibcode'], "exportcitation")
-    return render_template('abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc, error=results.get('error'))
+        abort(404)
 
 def _graphics(identifier):
     """
     Graphics for a given identifier
     """
-    results, doc = _get_abstract_doc(identifier)
+    doc = api.Abstract(identifier)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "graphics")
@@ -233,7 +175,7 @@ def _metrics(identifier):
     """
     Metrics for a given identifier
     """
-    results, doc = _get_abstract_doc(identifier)
+    doc = api.Abstract(identifier)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "metrics")
@@ -244,7 +186,7 @@ def _metrics(identifier):
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])
 def core_always(url=None):
-    target_url = _build_target_url(request, url)
+    target_url = _build_full_ads_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'always')
     return r
@@ -252,12 +194,15 @@ def core_always(url=None):
 @app.route(app.config['SERVER_BASE_URL']+'core/never', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/never/<path:url>', methods=['GET'])
 def core_never(url=None):
-    target_url = _build_target_url(request, url)
+    target_url = _build_full_ads_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'never') # Keep cookie instead of deleting with r.delete_cookie('core')
     return r
 
-def _build_target_url(request, url):
+def _build_full_ads_url(request, url):
+    """
+    Build full ADS url from a core request
+    """
     full_url = request.url_root
     params_dict = {}
     for accepted_param in ('q', 'rows', 'start', 'sort', 'p_'):
