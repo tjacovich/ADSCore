@@ -6,7 +6,6 @@ from collections.abc import Mapping
 from flask import session, current_app
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 
-
 def bootstrap():
     """
     Get an anonymous token, if the user already has a session, the same token
@@ -47,31 +46,50 @@ def link_gateway(identifier, section, retry_counter=0):
 
 class Search(Mapping):
     def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,pubdate,[citations],property,esources,data"):
-        self._storage = {}
-        if "bibcode desc" not in sort:
-            # Add secondary sort criteria
-            sort += ", bibcode desc"
-        # Add statistics if citation counts is the sorting criteria
-        if "citation_count_norm" in sort:
-            stats = 'true'
-            stats_field = 'citation_count_norm'
-        elif "citation_count" in sort:
-            stats = 'true'
-            stats_field = 'citation_count'
+        try:
+            cache = list(current_app.extensions['cache'].keys())[0]
+            storage = cache.get(":".join((q, str(rows), str(start), sort, fields)))
+        except Exception:
+            # Do not affect users if connection to Redis is lost in production
+            if current_app.debug:
+                raise
+            storage = None
+            cache = None
+        if storage:
+            self._storage = storage
         else:
-            stats = 'false'
-            stats_field = ''
-        params = {
-                    'fl': fields,
-                    'q': q,
-                    'rows': rows,
-                    'sort': sort,
-                    'start': start,
-                    'stats': stats,
-                    'stats.field': stats_field
-                    }
-        results = _search(params)
-        self._storage.update(self._process(results))
+            self._storage = {}
+            if "bibcode desc" not in sort:
+                # Add secondary sort criteria
+                sort += ", bibcode desc"
+            # Add statistics if citation counts is the sorting criteria
+            if "citation_count_norm" in sort:
+                stats = 'true'
+                stats_field = 'citation_count_norm'
+            elif "citation_count" in sort:
+                stats = 'true'
+                stats_field = 'citation_count'
+            else:
+                stats = 'false'
+                stats_field = ''
+            params = {
+                        'fl': fields,
+                        'q': q,
+                        'rows': rows,
+                        'sort': sort,
+                        'start': start,
+                        'stats': stats,
+                        'stats.field': stats_field
+                        }
+            results = _search(params)
+            self._storage.update(self._process(results))
+            try:
+                if cache:
+                    cache.set(":".join((q, str(rows), str(start), sort, fields)), self._storage)
+            except Exception:
+                # Do not affect users if connection to Redis is lost in production
+                if current_app.debug:
+                    raise
 
     def __getitem__(self, key):
         return self._storage[key]
@@ -135,12 +153,31 @@ class Search(Mapping):
 
 class Abstract(Mapping):
     def __init__(self, identifier):
-        self._storage = {}
-        docs = _abstract(identifier)
-        if docs and len(docs) > 0:
-            self._storage.update(self._augment(docs[0]))
+        try:
+            cache = list(current_app.extensions['cache'].keys())[0]
+            storage = cache.get(identifier)
+        except Exception:
+            # Do not affect users if connection to Redis is lost in production
+            if current_app.debug:
+                raise
+            storage = None
+            cache = None
+        if storage:
+            self._storage = storage
         else:
-            self._storage['error'] = "Record not found."
+            self._storage = {}
+            docs = _abstract(identifier)
+            if docs and len(docs) > 0:
+                self._storage.update(self._augment(docs[0]))
+            else:
+                self._storage['error'] = "Record not found."
+            try:
+                if cache:
+                    cache.set(identifier, self._storage)
+            except Exception:
+                # Do not affect users if connection to Redis is lost in production
+                if current_app.debug:
+                    raise
 
     def __getitem__(self, key):
         return self._storage[key]

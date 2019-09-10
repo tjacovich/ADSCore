@@ -1,6 +1,6 @@
 LOGGING_LEVEL = "INFO"
 LOG_STDOUT = True
-ADS_URL = "https://dev.adsabs.harvard.edu/"
+ADS_URL = "https://prod.adsabs.harvard.edu/"
 API_URL = ADS_URL+"v1/"
 ENVIRONMENT = "localhost"
 SERVER_BASE_URL = "/"
@@ -17,6 +17,13 @@ API_TIMEOUT = 90
 SECRET_KEY = "mjnahGS3CmaVsSfSVGxxytGTGa2vX1CPPoT7gZvIpIQiOZREJwsvfNzWooQx1BA1"
 SESSION_COOKIE_NAME = "session-core"
 SESSION_COOKIE_PATH = SERVER_BASE_URL
+CACHE_TYPE = "simple" # redis
+CACHE_DEFAULT_TIMEOUT = 300 # seconds (expire in N seconds)
+CACHE_THRESHOLD = 100 # only for SimpleCache and FileSystemCache
+CACHE_IGNORE_ERRORS = True # only for SimpleCache and FileSystemCache
+CACHE_KEY_PREFIX = "CORE/"
+CACHE_REDIS_URL = "redis://redis-backend:6379"
+
 
 SORT_OPTIONS = [
     { 'id': 'author_count', 'text': 'Authors', 'description': 'sort by number of authors' },

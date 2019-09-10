@@ -3,6 +3,7 @@ import sys
 import requests
 from flask import Flask
 from flask_minify import minify
+from flask_caching import Cache
 from adsmutils import ADSFlask
 
 def create_app(**config):
@@ -23,3 +24,4 @@ def create_app(**config):
     return app
 
 app = create_app()
+cache = Cache(app)
