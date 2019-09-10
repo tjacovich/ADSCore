@@ -94,36 +94,47 @@ def public_libraries(identifier):
     #return redirect(url_for('search', q=f"docs(library/{identifier})"))
     return search(params=f"q=docs(library/{identifier})")
 
+@app.route(app.config['SERVER_BASE_URL']+'abs/<path:alt_identifier>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/<section>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>', methods=['GET'], strict_slashes=False)
-def abs(identifier, section=None):
+def abs(identifier=None, section=None, alt_identifier=None):
     """
     Show abstract given an identifier
     """
-    if section in (None, "abstract"):
-        return _abstract(identifier)
-    elif section == "citations":
-        return _operation("citations", identifier)
-    elif section == "references":
-        return _operation("references", identifier)
-    elif section == "coreads":
-        return _operation("trending", identifier)
-    elif section == "similar":
-        return _operation("similar", identifier)
-    elif section == "toc":
-        return _toc(identifier)
-    elif section == "exportcitation":
-        return _export(identifier)
-    elif section == "graphics":
-        return _graphics(identifier)
-    elif section == "metrics":
-        return _metrics(identifier)
+    if identifier:
+        if section in (None, "abstract"):
+            return _abstract(identifier)
+        elif section == "citations":
+            return _operation("citations", identifier)
+        elif section == "references":
+            return _operation("references", identifier)
+        elif section == "coreads":
+            return _operation("trending", identifier)
+        elif section == "similar":
+            return _operation("similar", identifier)
+        elif section == "toc":
+            return _toc(identifier)
+        elif section == "exportcitation":
+            return _export(identifier)
+        elif section == "graphics":
+            return _graphics(identifier)
+        elif section == "metrics":
+            return _metrics(identifier)
+        else:
+            # An alternative identifier mistaken by a composition of id + section
+            return _abstract(identifier+'/'+section)
+    elif alt_identifier:
+        # Alternative identifiers such as DOIs (e.g., /abs/10.1051/0004-6361/201423945)
+        return _abstract(alt_identifier)
     else:
         abort(404)
 
 def _abstract(identifier, section=None):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
+        if doc['bibcode'] != identifier:
+            target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
+            return redirect(target_url)
         api.link_gateway(doc['bibcode'], "abstract")
         return render_template('abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
