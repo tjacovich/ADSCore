@@ -93,7 +93,9 @@
               class="num-found-container">{{ "{:,.0f}".format(stats.stats_fields.citation_count_norm.sum) }}</span></b>
           total normalized citations
           {% endif %}
+          {% if environment != "localhost" %}
           &nbsp;&nbsp;<small>[{{ qtime }} | {{ g.request_time() }}]</small>
+          {% endif %}
         </span>
       </div>
 
