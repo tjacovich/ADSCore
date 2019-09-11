@@ -35,9 +35,14 @@ def before_request():
     if 'auth' not in session or is_expired(session['auth']):
         session['auth'] = api.bootstrap()
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    form = ModernForm()
+    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 429
+
 @app.errorhandler(404)
 def page_not_found(e):
-    form = ModernForm(request.args)
+    form = ModernForm()
     return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 404
 
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
