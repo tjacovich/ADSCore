@@ -1,10 +1,23 @@
 import time
 import urllib.parse
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
-from adscore.app import app, cache
+from adscore.app import app, cache, limiter
 from adscore import api
 from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.tools import is_expired
+
+@limiter.request_filter
+def header_whitelist():
+    """
+    If the request has an access token stored in the session, it means that the
+    request sent a session cookie in the headers stored as requested by a previous
+    request that was answered by ADS Core. The client is well behaving, storing
+    cookies set by ADS Core and thus, we do not want to rate limit them.
+
+    Rate limits are only to protect us from bootstrapping thousands of access
+    tokens in the database.
+    """
+    return 'auth' in session
 
 @app.before_request
 def before_request():
@@ -163,7 +176,7 @@ def _abstract(identifier, section=None):
             target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
             return redirect(target_url)
         api.link_gateway(doc['bibcode'], "abstract")
-        key = ":".join((identifier, 'abstract'))
+        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'abstract'))
         return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -194,7 +207,7 @@ def _export(identifier):
     if doc.get('export'):
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "exportcitation")
-        key = ":".join((identifier, 'export'))
+        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'export'))
         return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -207,7 +220,7 @@ def _graphics(identifier):
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "graphics")
-        key = ":".join((identifier, 'graphics'))
+        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'graphics'))
         return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -220,7 +233,7 @@ def _metrics(identifier):
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "metrics")
-        key = ":".join((identifier, 'metrics'))
+        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'metrics'))
         return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)

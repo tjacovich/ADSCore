@@ -48,7 +48,7 @@ class Search(Mapping):
     def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,pubdate,[citations],property,esources,data"):
         try:
             cache = list(current_app.extensions['cache'].keys())[0]
-            storage = cache.get(":".join((q, str(rows), str(start), sort, fields)))
+            storage = cache.get("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
         except Exception:
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
@@ -85,7 +85,7 @@ class Search(Mapping):
             self._storage.update(self._process(results))
             try:
                 if cache:
-                    cache.set(":".join((q, str(rows), str(start), sort, fields)), self._storage)
+                    cache.set("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)), self._storage)
             except Exception:
                 # Do not affect users if connection to Redis is lost in production
                 if current_app.debug:

@@ -4,7 +4,10 @@ import requests
 from flask import Flask
 from flask_minify import minify
 from flask_caching import Cache
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from adsmutils import ADSFlask
+
 
 def create_app(**config):
     opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -25,3 +28,4 @@ def create_app(**config):
 
 app = create_app()
 cache = Cache(app)
+limiter = Limiter(app, key_func=get_remote_address)
