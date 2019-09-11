@@ -21,7 +21,7 @@ CACHE_TYPE = "simple" # redis
 CACHE_DEFAULT_TIMEOUT = 300 # seconds (expire in N seconds)
 CACHE_THRESHOLD = 100 # only for SimpleCache and FileSystemCache
 CACHE_IGNORE_ERRORS = True # only for SimpleCache and FileSystemCache
-CACHE_KEY_PREFIX = "CORE/CACHE"
+CACHE_KEY_PREFIX = "CACHE/core"
 CACHE_MANUAL_KEY_PREFIX = "/DATA" # In addition to CACHE_KEY_PREFIX for manually storing in the cache
 CACHE_REDIS_URL = "redis://redis-backend:6379"
 RATELIMIT_DEFAULT = None # individual per route
@@ -31,7 +31,7 @@ RATELIMIT_STRATEGY = "fixed-window"
 RATELIMIT_HEADERS_ENABLED = True
 RATELIMIT_ENABLED = True
 RATELIMIT_SWALLOW_ERRORS = True
-RATELIMIT_KEY_PREFIX = "CORE/LIMITER"
+RATELIMIT_KEY_PREFIX = "core" # The final prefix will be LIMITER/core
 
 
 SORT_OPTIONS = [

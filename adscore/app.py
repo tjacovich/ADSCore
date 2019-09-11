@@ -1,13 +1,15 @@
 import os
 import sys
 import requests
-from flask import Flask
+from flask import Flask, request
 from flask_minify import minify
 from flask_caching import Cache
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+import flask_limiter.util
 from adsmutils import ADSFlask
 
+def get_remote_address():
+    return request.headers.get('X-Original-Forwarded-For', flask_limiter.util.get_remote_address())
 
 def create_app(**config):
     opath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
