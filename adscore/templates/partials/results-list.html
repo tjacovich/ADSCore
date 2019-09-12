@@ -37,7 +37,7 @@
                     {% if results and results.numFound > 0 and form.start.data > 0 %}
                     Sorry, there are {{ "{:,.0f}".format(results.numFound) }} results but you requested beyond that ({{ "{:,.0f}".format(form.start.data) }}) for:
                     {% else %}
-                    Sorry, no resultswere found for:
+                    Sorry, no results were found for:
                     {% endif %}
                     </p>
                   </div>
