@@ -14,7 +14,7 @@ def bootstrap():
     """
     params = None
     auth = _request(current_app.config['BOOTSTRAP_SERVICE'], params, method="GET", retry_counter=0)
-    return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'] }
+    return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'], 'bot': False }
 
 def store_query(bibcodes, sort="date desc, bibcode desc"):
     """
@@ -244,7 +244,7 @@ def _request(endpoint, params, method="GET", retry_counter=0):
         msg = str(e)
         return {"error": "{}".format(msg)}
     if not r.ok:
-        if r.status_code == 401 and retry_counter == 0: # Unauthorized
+        if r.status_code == 401 and retry_counter == 0 and not session['auth'].get('bot', False): # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
             return _request(endpoint, params, method=method, retry_counter=retry_counter+1)

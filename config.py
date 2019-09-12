@@ -23,6 +23,7 @@ CACHE_THRESHOLD = 100 # only for SimpleCache and FileSystemCache
 CACHE_IGNORE_ERRORS = True # only for SimpleCache and FileSystemCache
 CACHE_KEY_PREFIX = "CACHE/core"
 CACHE_MANUAL_KEY_PREFIX = "/DATA" # In addition to CACHE_KEY_PREFIX for manually storing in the cache
+CACHE_BOT_KEY_PREFIX = "/BOT" # In addition to CACHE_KEY_PREFIX for manually storing bot info in the cache
 CACHE_REDIS_URL = "redis://redis-backend:6379"
 RATELIMIT_DEFAULT = None # individual per route
 RATELIMIT_APPLICATION = "400 per day" # shared by all routes; same value as in https://github.com/adsabs/adsws/blob/9ec9087d2baa4bbf754a8fb5cf915fa1032725ae/adsws/accounts/views.py#L853
@@ -32,6 +33,9 @@ RATELIMIT_HEADERS_ENABLED = True
 RATELIMIT_ENABLED = True
 RATELIMIT_SWALLOW_ERRORS = True
 RATELIMIT_KEY_PREFIX = "core" # The final prefix will be LIMITER/core
+VERIFIED_BOTS_ACCESS_TOKEN = ""
+UNVERIFIABLE_BOTS_ACCESS_TOKEN = ""
+MALICIOUS_BOTS_ACCESS_TOKEN = ""
 
 
 SORT_OPTIONS = [

@@ -1,8 +1,9 @@
 import time
 import urllib.parse
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
-from adscore.app import app, cache, limiter
+from adscore.app import app, cache, limiter, get_remote_address
 from adscore import api
+from adscore import crawlers
 from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.tools import is_expired
 
@@ -17,7 +18,24 @@ def header_whitelist():
     Rate limits are only to protect us from bootstrapping thousands of access
     tokens in the database.
     """
-    return 'auth' in session
+    if 'auth' in session and False:
+        return True
+    else:
+        user_agent = request.headers.get('User-Agent')
+        remote_ip = get_remote_address()
+        #### For testing purposes:
+        #user_agent = "Googlebot"
+        #remote_ip = "66.249.66.1" # crawl-66-249-66-1.googlebot.com.
+        #user_agent = "DuckDuckBot"
+        #remote_ip = "50.16.241.117"
+        #remote_ip = "127.0.0.1"
+        evaluation = crawlers.evaluate(remote_ip, user_agent)
+
+        if evaluation in (crawlers.VERIFIED_BOT, crawlers.UNVERIFIABLE_BOT, crawlers.POTENTIAL_USER):
+            return True
+    return False
+
+
 
 @app.before_request
 def before_request():
@@ -33,7 +51,26 @@ def before_request():
         # thus if the user was authenticated, it will use the user token
         session['cookies']['session'] = request.cookies.get('session')
     if 'auth' not in session or is_expired(session['auth']):
-        session['auth'] = api.bootstrap()
+        user_agent = request.headers.get('User-Agent')
+        remote_ip = get_remote_address()
+        #### For testing purposes:
+        #user_agent = "Googlebot"
+        #remote_ip = "66.249.66.1" # crawl-66-249-66-1.googlebot.com.
+        #user_agent = "DuckDuckBot"
+        #remote_ip = "50.16.241.117"
+        #remote_ip = "127.0.0.1"
+        evaluation = crawlers.evaluate(remote_ip, user_agent)
+        if evaluation == crawlers.VERIFIED_BOT:
+            # Extremely high rate limit
+            session['auth'] = { 'access_token': app.config['VERIFIED_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+        elif evaluation == crawlers.UNVERIFIABLE_BOT:
+            # Slightly higher rate limit
+            session['auth'] = { 'access_token': app.config['UNVERIFIABLE_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+        elif evaluation == crawlers.POTENTIAL_MALICIOUS_BOT:
+            # Rate limits as a regular user with the advantage that there is no bootstrap
+            session['auth'] = { 'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+        else:
+            session['auth'] = api.bootstrap()
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
