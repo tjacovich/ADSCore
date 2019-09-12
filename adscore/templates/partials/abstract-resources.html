@@ -120,7 +120,9 @@
                 </div>
                 <div class="resources__content">
                     {% for data_link in doc.data %}
+                      {% if data_link|length >= 2 %}
                       <a href="/link_gateway/{{ doc.bibcode }}/{{ data_link[0] }}" rel="noopener" class="resources__content__link">{{ data_link[0] }} ({{ data_link[1] }})</a>
+                      {% endif %}
                     {% endfor %}
                 </div>
             </div>

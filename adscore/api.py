@@ -110,7 +110,7 @@ class Search(Mapping):
                     data_list.append((data_components[0], int(data_components[1])))
                 except ValueError:
                     data_list.append((data_components[0], 0))
-            else:
+            elif len(data_components) == 1:
                 data_list.append((data_components[0], 0))
         sorted_data_list = sorted(data_list, key=functools.cmp_to_key(lambda x, y: 1 if x[1] < y[1] else -1))
         return sorted_data_list

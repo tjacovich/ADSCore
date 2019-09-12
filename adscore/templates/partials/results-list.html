@@ -166,9 +166,11 @@
                                     <a href="#"  class="btn-link active-link s-active-link"><i class="s-data-icon" aria-label="quick access to citations and references"></i></a>
                                     <ul class="dropdown-menu" role="menu" style="min-width: 165px; margin-top: -2px; padding: 15px;">
                                     {% for data_link in doc.data %}
+                                      {% if data_link|length >= 2 %}
                                       <div >
                                       <a href="/link_gateway/{{ doc.bibcode }}/{{ data_link[0] }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">{{ data_link[0] }} ({{ data_link[1] }})</a>
                                       </div>
+                                      {% endif %}
                                     {% endfor %}
                                     </ul>
                                   </span>
@@ -215,7 +217,9 @@
 
                     <div class="col-xs-10 col-xs-offset-1">
                       <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" class="abs-redirect-link">
+                        {% if doc.title and doc.title|length >= 1 %}
                         <h3 class="s-results-title">{{ doc.title[0]|safe }}</h3>
+                        {% endif %}
                       </a>
                     </div>
                   </div>

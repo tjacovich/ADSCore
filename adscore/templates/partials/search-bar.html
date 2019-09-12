@@ -99,7 +99,18 @@
         </span>
       </div>
 
-      {% set sort_id, sort_dir = form.sort.data.split(' ')[0], form.sort.data.split(' ')[1] %}
+      {% set sort_data = form.sort.data.split(' ') %}
+      {% if sort_data|length >= 1 %}
+        {% set sort_id = form.sort.data.split(' ')[0] %}
+        {% if sort_data|length >= 2 %}
+          {% set sort_dir = form.sort.data.split(' ')[1] %}
+        {% else %}
+          {% set sort_dir = 'desc' %}
+        {% endif %}
+      {% else %}
+        {% set sort_id = 'date' %}
+        {% set sort_dir = 'desc' %}
+      {% endif %}
       <div class="col-sm-4">
         <div class="btn-group pull-right">
           {% if sort_dir == 'asc' %}
