@@ -1,3 +1,4 @@
+import re
 import werkzeug
 import urllib.parse
 from flask_wtf import FlaskForm
@@ -12,6 +13,53 @@ class ModernForm(FlaskForm):
     start = IntegerField('start', default=0)
     p_ = IntegerField('p_', default=0)
     submit = SubmitField('Search')
+    known_param_name = re.compile(r"([q|sort|rows|start])=(.*)")
+    unknown_param_name = re.compile(r"([\w|\s]*\w)=(.*)")
+
+    @classmethod
+    def _parse_qs(cls, params):
+        """
+        Parse query string when received as a URL (without the question mark).
+        This method was implemented to replace:
+
+            parsed = urllib.parse.parse_qs(params)
+            # parse_qa will create a list for single strings such as {'q': ['star']},
+            # extract them if there is only one element:
+            parsed = dict( (k, v if len(v) > 1 else v[0] ) for k, v in parsed.items() )
+
+        Because flask receives the URL completely decoded and we cannot distinguish
+        between '&' that separate parameters from '&' included in the values of the
+        parameters (e.g. q=bibcode:2019A&A...629L...7C).
+
+        This method handles correctly cases such as:
+
+        params = 'q=bibcode:2019A&A...629L...7C OR bibcode:2019A&A...625A.137S OR citations(=author:"blanco")&sort=date desc&whatever=True'
+
+        Identifying the known parameters, ignoring the unknown and conserving
+        the values.
+        """
+        vparams = params.split("&")
+        vparams.reverse() # Reverse to find first those pieces splitted by mistake due to an extra & (i.e., q=bibcode:2019A&A...629L...7C => ['q=bibcode:2019A', 'A...629L...7C'])
+        concat = "" # String pending concatenation to the next main parameter value
+        parsed = {} # result
+        for param in vparams:
+            name_match = cls.known_param_name.match(param)
+            if name_match and len(name_match.groups()) >= 1:
+                name = name_match.groups()[0]
+                if len(name_match.groups()) == 2:
+                    parsed[name] = name_match.groups()[1]
+                else:
+                    parsed[name] = ""
+                if concat:
+                    parsed[name] += concat
+                    concat = ""
+            else:
+                name_match = cls.unknown_param_name.match(param)
+                if name_match and len(name_match.groups()) >= 1:
+                    concat = "" # ignore unknown parameter (e.g., whatever=true)
+                else:
+                    concat = "&" + param + concat
+        return parsed
 
     @classmethod
     def parse(cls, params):
@@ -23,10 +71,7 @@ class ModernForm(FlaskForm):
         if type(params) is str:
             # For compatibility with BBB, accept parameters that are embbeded in the
             # URL without a question mark
-            parsed = urllib.parse.parse_qs(params)
-            # parse_qa will create a list for single strings such as {'q': ['star']},
-            # extract them if there is only one element:
-            parsed = dict( (k, v if len(v) > 1 else v[0] ) for k, v in parsed.items() )
+            parsed = cls._parse_qs(params)
             form = cls(**parsed) # ModernForm
         elif type(params) is werkzeug.datastructures.ImmutableMultiDict:
             form = cls(params) # ModernForm
