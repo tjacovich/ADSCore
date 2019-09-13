@@ -129,19 +129,19 @@
                         </div>
 
                         <div class="letter-icon s-letter-icon">
-                          {% if doc.reference_count > 0 or doc.citation_count > 0 %}
+                          {% if (doc.reference_count and doc.reference_count > 0) or (doc.citation_count and doc.citation_count > 0) %}
                                 <div class="btn-group pull-right">
                                   <span class="dropdown-toggle" style="min-width: 175px;">
                                     <a href="#"  class="btn-link active-link s-active-link"><i class="s-list-icon" aria-label="quick access to citations and references"></i></a>
                                     <ul class="dropdown-menu" role="menu" style="min-width: 165px; margin-top: -2px; padding: 15px;">
-                                    {% if doc.citation_count > 0 %}
+                                    {% if doc.citation_count and doc.citation_count > 0 %}
                                       <div >
                                       <a href="{{ url_for('search', q='citations(bibcode:'+doc.bibcode+')') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
                                       Citations ({{ doc.citation_count }})
                                       </a>
                                       </div>
                                     {% endif %}
-                                    {% if doc.reference_count > 0 %}
+                                    {% if doc.reference_count and doc.reference_count > 0 %}
                                       <div >
                                       <a href="{{ url_for('search', q='references(bibcode:'+doc.bibcode+')', sort='first_author asc') }}" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
                                       References ({{ doc.reference_count }})
