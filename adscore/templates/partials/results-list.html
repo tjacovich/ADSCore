@@ -268,7 +268,7 @@
                             {% endfor %}
                             <ul class="dropdown-menu" role="menu" style="min-width: 90px;">
                             {% for num in (25, 50, 100, 200, 500) %}
-                              <li><a href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}">{{ num }}</a></li>
+                              <li><a href="/search/?q={{ form.q.data|urlencode }}&sort={{ form.sort.data }}&start={{ form.start.data }}&rows={{ num }}">{{ num }}</a></li>
                             {% endfor %}
                             </ul>
                           </span>
@@ -281,7 +281,7 @@
                   <ul class="pager">
                     {% if form.start.data - form.rows.data >= 0 %}
                     <li class=""><a
-                        href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}"
+                        href="/search/?q={{ form.q.data|urlencode }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data - form.rows.data }}"
                         class="page-control previous-page"><i class="fa fa-chevron-circle-left"></i> prev</a></li>
                     {% else %}
                     <li class=" disabled "><a href="#" class="page-control previous-page"><i
@@ -301,7 +301,7 @@
 
                     {% if results.numFound - (form.start.data + form.rows.data) > 0 %}
                     <li class=""><a
-                        href="/search/?q={{ form.q.data }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
+                        href="/search/?q={{ form.q.data|urlencode }}&sort={{ form.sort.data }}&rows={{ form.rows.data }}&start={{ form.start.data + form.rows.data }}"
                         class="page-control next-page">next <i class="fa fa-chevron-circle-right"></i></a></li>
                     {% else %}
                     <li class=" disabled"><a href="#" class="page-control next-page">next <i
