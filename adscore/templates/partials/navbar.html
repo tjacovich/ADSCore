@@ -1,60 +1,75 @@
 <div id="navbar-container">
   <div data-widget="NavbarWidget">
-    <nav class="navbar fluid navbar-inverse">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <a class="navbar-brand s-navbar-brand" href="{{ base_url }}"><img class="s-ads-icon" src="{{ base_url }}styles/img/transparent_logo.svg" alt="ads icon">
-          <h1> <b>ads</b></h1>
-        </a>
-      </div>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="">
+          <ul class="nav navbar-nav navbar-left">
+            <li>
+              <a class="navbar-brand" href="{{ base_url }}">
+                    <img class="s-ads-icon" src="{{ base_url }}styles/img/transparent_logo.svg" alt="ads icon"/>
+                    <h1> <b>ads</b></h1>
+                </a>
+            </li>
+          </ul>
+        </div>
 
-      <div class="nav navbar-nav navbar-form navbar-right" style="margin-right: 1rem;">
-          {% if request.endpoint == "classic_form" %}
-          <a href="{{ url_for('core_never', url='classic-form') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% elif request.endpoint == "paper_form" %}
-          <a href="{{ url_for('core_never', url='paper-form') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% elif request.endpoint == "index" %}
-          <a href="{{ url_for('core_never') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% elif request.endpoint == "abs" and doc %}
-              {% set path = request.path.split('/') %}
-              {% if path[-1] == 'graphics'  %}
-              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/graphics') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-                <i class="fa fa-comment about-page-icon"></i> Full ADS
-              </a>
-              {% elif path[-1] == 'metrics'  %}
-              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/metrics') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-                <i class="fa fa-comment about-page-icon"></i> Full ADS
-              </a>
-              {% elif path[-1] == 'exportcitation'  %}
-              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-                <i class="fa fa-comment about-page-icon"></i> Full ADS
-              </a>
-              {% else %}
-              <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-                <i class="fa fa-comment about-page-icon"></i> Full ADS
-              </a>
-              {% endif %}
-          {% elif request.endpoint == "public_libraries" %}
-          {% set path = request.path.split('/') %}
-          <a href="{{ url_for('core_never', url='public-libraries/'+path[-1]) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% elif request.endpoint == "search" %}
-          {% set p_ = (form.start.data / form.rows.data) | int %}
-          <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data, p_=p_) }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% else %}
-          <a href="{{ url_for('core_never') }}" style="color: #FFFFFF" class="btn btn-primary-faded feedback-button">
-            <i class="fa fa-comment about-page-icon"></i> Full ADS
-          </a>
-          {% endif %}
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="">
+        <!--<div class="nav navbar-nav navbar-right">-->
+          <ul class="nav navbar-nav navbar-right">
+            <li data-match-route="/">
+
+
+            {% if request.endpoint == "classic_form" %}
+            <a href="{{ url_for('core_never', url='classic-form') }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% elif request.endpoint == "paper_form" %}
+            <a href="{{ url_for('core_never', url='paper-form') }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% elif request.endpoint == "index" %}
+            <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% elif request.endpoint == "abs" and doc %}
+                {% set path = request.path.split('/') %}
+                {% if path[-1] == 'graphics'  %}
+                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/graphics') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% elif path[-1] == 'metrics'  %}
+                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/metrics') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% elif path[-1] == 'exportcitation'  %}
+                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% else %}
+                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% endif %}
+            {% elif request.endpoint == "public_libraries" %}
+            {% set path = request.path.split('/') %}
+            <a href="{{ url_for('core_never', url='public-libraries/'+path[-1]) }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% elif request.endpoint == "search" %}
+            {% set p_ = (form.start.data / form.rows.data) | int %}
+            <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data, p_=p_) }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% else %}
+            <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
+              <i class="fa fa-refresh"></i> Enable full ADS
+            </a>
+            {% endif %}
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   </div>
