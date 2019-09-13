@@ -283,7 +283,7 @@ def _metrics(identifier):
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/always/<path:url>', methods=['GET'])
 def core_always(url=None):
-    target_url = _build_full_ads_url(request, url)
+    target_url = request.url_root + _build_full_ads_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'always')
     return r
@@ -291,16 +291,22 @@ def core_always(url=None):
 @app.route(app.config['SERVER_BASE_URL']+'core/never', methods=['GET'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'core/never/<path:url>', methods=['GET'])
 def core_never(url=None):
-    target_url = _build_full_ads_url(request, url)
+    target_url = request.url_root + _build_full_ads_url(request, url)
     r = redirect(target_url)
     r.set_cookie('core', 'never') # Keep cookie instead of deleting with r.delete_cookie('core')
     return r
+
+@app.route(app.config['SERVER_BASE_URL']+'core/<path:url>', methods=['GET'])
+@app.route(app.config['SERVER_BASE_URL']+'core/', methods=['GET'], strict_slashes=False)
+def core(url=None):
+    target_url = _build_full_ads_url(request, url)
+    return render_template('index.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], target_url=target_url)
 
 def _build_full_ads_url(request, url):
     """
     Build full ADS url from a core request
     """
-    full_url = request.url_root
+    full_url = ""
     params_dict = {}
     for accepted_param in ('q', 'rows', 'start', 'sort', 'p_'):
         if accepted_param in request.args:
@@ -309,7 +315,7 @@ def _build_full_ads_url(request, url):
     if url:
         full_url += url
     if params:
-        if full_url[-1] != "/":
+        if len(full_url) >=1 and full_url[-1] != "/":
             full_url += "/"
         full_url += params
     return full_url
