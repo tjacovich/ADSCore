@@ -1,26 +1,25 @@
 {% set view = "results" %}
 {% extends 'base-form.html' %}
-{% block title %}Do you really want to use the view of ADS for slower connections?{% endblock title %}
+{% block title %}Do you really want to use ADS for slower connections?{% endblock title %}
 {% block content %}
 
 <div id="results-page-layout" class="s-results-page-layout">
   <div class="row">
       <div class="max-width-wrapper">
         <div class="col-xs-10 col-xs-offset-1" style="padding: 5%">
-          <h2>Do you really want to use the view of ADS for slower connections?</h2>
+          <h2>Do you really want to use ADS for slower connections?</h2>
           <p>
-          You are about to use a view of ADS designed for slower connections, devices with low resources and browsers without modern javascript support.
-          To get all ADS's features, including data exploration tools, accounts, libraries, institutional links to papers and others, please use the full ADS (recommended).<br/>
+          You are about to use a version of ADS designed for slower connections, devices with low resources/screen resolution (such as mobile devices), and browsers without modern JavaScript support. To get access to all of ADS's features, including access to your user account, libraries, institutional links to paywalled papers, data exploration tools, and other features, please use the full ADS (recommended).<br/>
           </p>
           <p>
               <a class="btn btn-primary-faded" style="transition: none;" href="{{ url_for('core_never', url=target_url) }}" role="button">Take me to the full ADS</a>
               <a class="btn btn-default" style="transition: none;" href="{{ url_for('core_always', url=target_url) }}" role="button">I'd like to use ADS for slower connections</a>
           </p>
           <p>
-          To remember your selection, a cookie will be stored in your browser. Every time you change the view, it is recommended that you close any other browser tabs/windows where you had previously loaded ADS. You can always go back to full ADS by clicking the link in the upper right corner.
+          To remember your selection, a cookie will be stored in your browser. If you switch between the full ADS and ADS for slower connections, we recommend that you close any open ADS browser tabs/windows. You can return to the full ADS by clicking the link in the upper right corner.
           </p>
           <p>
-          If you have questions or feedback, please, contact us by email at <a href="mailto:adshelp@cfa.harvard.edu">adshelp@cfa.harvard.edu</a>.<br/>
+          If you have questions or feedback, please email us at <a href="mailto:adshelp@cfa.harvard.edu">adshelp@cfa.harvard.edu</a>.<br/>
           </p>
         </div>
       </div>
