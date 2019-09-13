@@ -300,7 +300,7 @@ def core_never(url=None):
 @app.route(app.config['SERVER_BASE_URL']+'core/', methods=['GET'], strict_slashes=False)
 def core(url=None):
     target_url = _build_full_ads_url(request, url)
-    return render_template('index.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], target_url=target_url)
+    return render_template('switch.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], target_url=target_url)
 
 def _build_full_ads_url(request, url):
     """
