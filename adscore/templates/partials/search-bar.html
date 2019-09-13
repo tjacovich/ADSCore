@@ -114,11 +114,11 @@
       <div class="col-sm-4">
         <div class="btn-group pull-right">
           {% if sort_dir == 'asc' %}
-            <a type="button" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}" class="btn btn-default">
+            <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}" class="btn btn-default">
               <i class="fa fa-sort-amount-desc"></i>
             </a>
           {% else %}
-            <a type="button" href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}" class="btn btn-default">
+            <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}" class="btn btn-default">
               <i class="fa fa-sort-amount-asc"></i>
             </a>
           {% endif %}
@@ -131,7 +131,7 @@
             {% endfor %}
             <ul class="dropdown-menu" role="menu">
             {% for opt in sort_options %}
-              <li><a href="{{ base_url }}search/?q={{ form.q.data }}&sort={{ opt.id }} {{ sort_dir }}&rows={{ form.rows.data }}" title="{{ opt.description }}">{{ opt.text }}</a></li>
+              <li><a href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ opt.id }} {{ sort_dir }}&rows={{ form.rows.data }}" title="{{ opt.description }}">{{ opt.text }}</a></li>
             {% endfor %}
             </ul>
           </span>
