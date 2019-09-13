@@ -187,7 +187,7 @@ class ClassicForm(FlaskForm):
         else:
             return "abs:({})".format(" ".join(abstracts))
 
-    def _bistem(self):
+    def _bibstem(self):
         bibstems = self.bibstem.data.split(",")
         return " OR ".join(["bibstem:({})".format(b) for b in bibstems])
 
