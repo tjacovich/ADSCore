@@ -49,7 +49,7 @@
                                                 <tr>
                                                     <td> Total citations </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times all papers in the list were cited." data-original-title="<b>Total Citations</b>" ></i>
+                                                        <i class="icon-help" title="The total number of times all papers in the list were cited."></i>
                                                     </td>
                                                     <td>
                                                         {{ doc.metrics['citation stats']['total number of citations'] }}
@@ -58,7 +58,7 @@
                                                 <tr>
                                                     <td> Normalized citations  </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="For a list of N papers (i=1,...N), where N<sub>auth</sub><sup>i</sup> is the number of authors for publication i and C<sub>i</sub> the number of citations that this paper received, the normalized citation count for each article is C<sub>i</sub>/N<sub>auth</sub><sup>i</sup> ,and the 'normalized citations' for this list of N papers is the sum of these N numbers." data-original-title="<b>Normalized Citations</b>"></i>
+                                                        <i class="icon-help" title="For a list of N papers (i=1,...N), where Ni is the number of authors for publication i and Ci the number of citations that this paper received, the normalized citation count for each article is Ci/Ni, and the 'normalized citations' for this list of N papers is the sum of these N numbers."></i>
                                                     </td>
                                                     <td>
                                                         {{ "%.1f"|format(doc.metrics['citation stats']['normalized number of citations']) }}
@@ -67,7 +67,7 @@
                                                 <tr>
                                                     <td> Refereed citations  </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="Number of refereed citing papers." data-original-title="<b>Refereed Citations</b>"></i>
+                                                        <i class="icon-help" title="Number of refereed citing papers."></i>
                                                     </td>
                                                     <td>
                                                         {{ doc.metrics['citation stats']['total number of refereed citations'] }}
@@ -76,7 +76,7 @@
                                                 <tr>
                                                     <td> Normalized refereed citations  </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The normalized number of citations from refereed publications to all refereed publications in the list." data-original-title="<b>Normalized Refereed Citations</b>"></i>
+                                                        <i class="icon-help" title="The normalized number of citations from refereed publications to all refereed publications in the list."></i>
                                                     </td>
                                                     <td>
                                                         {{ "%.1f"|format(doc.metrics['citation stats']['normalized number of refereed citations']) }}
@@ -109,7 +109,7 @@
                                                         Total number of reads
                                                     </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times all papers were read. For each paper, a read is counted if an ADS user runs a search in our system and then requests to either view the paper\'s full bibliographic record or download the fulltext." data-original-title="<b>Total Number of Reads</b>"></i>
+                                                        <i class="icon-help" title="The total number of times all papers were read. For each paper, a read is counted if an ADS user runs a search in our system and then requests to either view the paper's full bibliographic record or download the fulltext."></i>
                                                     </td>
                                                     <td>
                                                         {{ doc.metrics['basic stats']['total number of reads'] }}
@@ -118,7 +118,7 @@
                                                 <tr>
                                                     <td> Total number of downloads </td>
                                                     <td>
-                                                        <i class="icon-help" data-toggle="popover" title="" data-content="The total number of times full text (article or e-print) was accessed." data-original-title="<b>Total Number of Downloads</b>"></i>
+                                                        <i class="icon-help" title="The total number of times full text (article or e-print) was accessed."></i>
                                                     </td>
                                                     <td>
                                                         {{ doc.metrics['basic stats']['total number of downloads'] }}
