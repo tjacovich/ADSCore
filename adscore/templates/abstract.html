@@ -2,7 +2,7 @@
 
 {% block page %}
 <div class="row s-dynamic-page-body" id="dynamic-page-body">
-    <div class="s-abstract-content">
+  <div class="s-abstract-content">
 
       {% include 'partials/abstract-navigation.html' %}
 
@@ -13,8 +13,7 @@
             <h2 style="margin-left:6.1%;">NASA/ADS</h2>
           </div>
 
-          <div id="abstract-title-container" class="s-abstract-title-container"></div>
-          <div id="current-subview">
+          <div id="abstract-title-container" class="s-abstract-title-container">
             <div data-widget="ShowAbstract">
               <article class="s-abstract-metadata">
                 <!--<div id="article-navigation">|</div>-->
@@ -140,15 +139,11 @@
             <div data-widget="ShowGraphics"></div>
             <div data-widget="ShowExportcitation" data-origin="abstract"></div>
             <div data-widget="ShowMetrics" data-allow-redirect="false"></div>
-            <div data-widget="MetaTagsWidget">
-              <div></div>
-            </div>
+            <div data-widget="MetaTagsWidget"></div>
           </div>
         </div>
       </div>
-
-    {% include 'partials/abstract-resources.html' %}
-
+      {% include 'partials/abstract-resources.html' %}
   </div>
 </div>
 {% endblock page %}

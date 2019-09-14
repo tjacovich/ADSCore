@@ -1,204 +1,202 @@
 
     <div class="col-xs-12 col-sm-3 col-md-2" style="" id="left-column">
       <div class="nav-container s-nav-container" style="transform: none; width: 100%; position: relative" id="left-column">
-        <div>
-          <nav>
-            <div class="s-nav-header s-view-nav"> <i class="icon-list"></i>
-              <h3>view </h3>
-            </div>
+        <nav>
+          <div class="s-nav-header s-view-nav"> <i class="icon-list"></i>
+            <h3>view </h3>
+          </div>
 
-            {% set path = request.path.split('/') %}
+          {% set path = request.path.split('/') %}
 
-            {% if doc %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
-              {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' and path[-1] != 'metrics' %}
-              <div class="abstract-nav s-nav s-nav-selected">
-                <span class="s-content">
-                  Abstract
-                </span>
-              </div>
-              {% else %}
-                <div class="abstract-nav s-nav">
-                  <span class="s-content">
-                    Abstract
-                  </span>
-                </div>
-              {% endif %}
-            </a>
-
-            </a>
-            {% else %}
-            <div class="abstract-nav s-nav  s-nav-selected  s-nav-inactive">
+          {% if doc %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
+            {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' and path[-1] != 'metrics' %}
+            <div class="abstract-nav s-nav s-nav-selected">
               <span class="s-content">
                 Abstract
               </span>
             </div>
-            {% endif %}
-
-
-            {% if doc and doc.citation_count and doc.citation_count > 0 %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true" data-widget-id="ShowCitations">
-              <div class="abstract-nav s-nav ">
-                <span class="s-content">
-                  Citations
-                  <span class="num-items">({{ doc.citation_count }})</span>
-                </span>
-              </div>
-            </a>
             {% else %}
-            <div aria-disabled="true" data-widget-id="ShowCitations">
-              <div class="abstract-nav s-nav   s-nav-inactive ">
-                <span class="s-content">
-                  Citations
-                </span>
-              </div>
-            </div>
-            {% endif %}
-
-
-            {% if doc and doc.reference_count and doc.reference_count > 0 %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true" data-widget-id="ShowReferences">
-              <div class="abstract-nav s-nav ">
-                <span class="s-content">
-                  References
-                  <span class="num-items">({{ doc.reference_count }})</span>
-                </span>
-              </div>
-            </a>
-            {% else %}
-            <div aria-disabled="true" data-widget-id="ShowReferences">
-              <div class="abstract-nav s-nav   s-nav-inactive ">
-                <span class="s-content">
-                  References
-                </span>
-              </div>
-            </div>
-            {% endif %}
-
-
-            {% if doc and doc.read_count and doc.read_count > 0 %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='coreads') }}" aria-disabled="true"
-              aria-disabled="true" data-widget-id="ShowCoreads">
-              <div class="abstract-nav s-nav ">
-                <span class="s-content">
-                  Co-Reads
-                </span>
-              </div>
-            </a>
-            {% else %}
-              <div class="abstract-nav s-nav   s-nav-inactive ">
-                <span class="s-content">
-                  Co-Reads
-                </span>
-              </div>
-            {% endif %}
-
-
-            {% if doc %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='similar') }}" aria-disabled="true"
-              data-widget-id="ShowSimilar">
-              <div class="abstract-nav s-nav  ">
-                <span class="s-content">
-                  Similar Papers
-                </span>
-              </div>
-            </a>
-            {% endif %}
-
-            {% if doc and "TOC" in doc.property %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true" data-widget-id="ShowToc">
               <div class="abstract-nav s-nav">
                 <span class="s-content">
-                  Volume Content
+                  Abstract
                 </span>
               </div>
-            </a>
-            {% else %}
-            <div aria-disabled="true" data-widget-id="ShowToc">
-              <div class="abstract-nav s-nav s-nav-inactive">
-                <span class="s-content">
-                  Volume Content
-                </span>
+            {% endif %}
+          </a>
+
+          </a>
+          {% else %}
+          <div class="abstract-nav s-nav  s-nav-selected  s-nav-inactive">
+            <span class="s-content">
+              Abstract
+            </span>
+          </div>
+          {% endif %}
+
+
+          {% if doc and doc.citation_count and doc.citation_count > 0 %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true" data-widget-id="ShowCitations">
+            <div class="abstract-nav s-nav ">
+              <span class="s-content">
+                Citations
+                <span class="num-items">({{ doc.citation_count }})</span>
+              </span>
+            </div>
+          </a>
+          {% else %}
+          <div aria-disabled="true" data-widget-id="ShowCitations">
+            <div class="abstract-nav s-nav   s-nav-inactive ">
+              <span class="s-content">
+                Citations
+              </span>
+            </div>
+          </div>
+          {% endif %}
+
+
+          {% if doc and doc.reference_count and doc.reference_count > 0 %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true" data-widget-id="ShowReferences">
+            <div class="abstract-nav s-nav ">
+              <span class="s-content">
+                References
+                <span class="num-items">({{ doc.reference_count }})</span>
+              </span>
+            </div>
+          </a>
+          {% else %}
+          <div aria-disabled="true" data-widget-id="ShowReferences">
+            <div class="abstract-nav s-nav   s-nav-inactive ">
+              <span class="s-content">
+                References
+              </span>
+            </div>
+          </div>
+          {% endif %}
+
+
+          {% if doc and doc.read_count and doc.read_count > 0 %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='coreads') }}" aria-disabled="true"
+            aria-disabled="true" data-widget-id="ShowCoreads">
+            <div class="abstract-nav s-nav ">
+              <span class="s-content">
+                Co-Reads
+              </span>
+            </div>
+          </a>
+          {% else %}
+            <div class="abstract-nav s-nav   s-nav-inactive ">
+              <span class="s-content">
+                Co-Reads
+              </span>
+            </div>
+          {% endif %}
+
+
+          {% if doc %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='similar') }}" aria-disabled="true"
+            data-widget-id="ShowSimilar">
+            <div class="abstract-nav s-nav  ">
+              <span class="s-content">
+                Similar Papers
+              </span>
+            </div>
+          </a>
+          {% endif %}
+
+          {% if doc and "TOC" in doc.property %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true" data-widget-id="ShowToc">
+            <div class="abstract-nav s-nav">
+              <span class="s-content">
+                Volume Content
+              </span>
+            </div>
+          </a>
+          {% else %}
+          <div aria-disabled="true" data-widget-id="ShowToc">
+            <div class="abstract-nav s-nav s-nav-inactive">
+              <span class="s-content">
+                Volume Content
+              </span>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if doc and doc.graphics and doc.graphics.figures|length > 0 %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='graphics') }}" data-widget-id="ShowGraphics">
+            {% if path[-1] != 'graphics' %}
+              <div class="abstract-nav s-nav">
+                  <span class="s-content">
+                  Graphics
+                  </span>
               </div>
-            </div>
-            {% endif %}
-
-            {% if doc and doc.graphics and doc.graphics.figures|length > 0 %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='graphics') }}" data-widget-id="ShowGraphics">
-              {% if path[-1] != 'graphics' %}
-                <div class="abstract-nav s-nav">
-                    <span class="s-content">
-                    Graphics
-                    </span>
-                </div>
-              {% else %}
-                <div class="abstract-nav s-nav s-nav-selected">
-                    <span class="s-content">
-                    Graphics
-                    </span>
-                </div>
-              {% endif %}
-            </a>
             {% else %}
-            <div href="#" data-widget-id="ShowGraphics">
-                <div class="abstract-nav s-nav s-nav-inactive">
-                    <span class="s-content">
-                    Graphics
-                    </span>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if doc and doc.metrics and (doc.metrics['citation stats']['total number of citations'] > 0 or doc.metrics['basic stats']['total number of reads'] > 0) %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='metrics') }}" data-widget-id="ShowMetrics">
-              {% if path[-1] != 'metrics' %}
-                <div class="abstract-nav s-nav">
-                    <span class="s-content">
-                    Metrics
-                    </span>
-                </div>
-              {% else %}
-                <div class="abstract-nav s-nav s-nav-selected">
-                    <span class="s-content">
-                    Metrics
-                    </span>
-                </div>
-              {% endif %}
-            {% else %}
-            <div data-widget-id="ShowMetrics">
-                <div class="abstract-nav s-nav s-nav-inactive ">
-                    <span class="s-content">
-                    Metrics
-                    </span>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if doc %}
-            <a href="{{ url_for('abs', identifier=doc.bibcode, section='exportcitation') }}" data-widget-id="ShowExportcitation__default">
-              {% if path[-1] != 'exportcitation' %}
-              <div class="abstract-nav s-nav  ">
-                <span class="content">
-                  Export Citation
-                </span>
-              </div>
-              {% else %}
               <div class="abstract-nav s-nav s-nav-selected">
-                <span class="content">
-                  Export Citation
-                </span>
+                  <span class="s-content">
+                  Graphics
+                  </span>
               </div>
-              {% endif %}
-            </a>
+            {% endif %}
+          </a>
+          {% else %}
+          <div href="#" data-widget-id="ShowGraphics">
+              <div class="abstract-nav s-nav s-nav-inactive">
+                  <span class="s-content">
+                  Graphics
+                  </span>
+              </div>
+          </div>
+          {% endif %}
+
+          {% if doc and doc.metrics and (doc.metrics['citation stats']['total number of citations'] > 0 or doc.metrics['basic stats']['total number of reads'] > 0) %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='metrics') }}" data-widget-id="ShowMetrics">
+            {% if path[-1] != 'metrics' %}
+              <div class="abstract-nav s-nav">
+                  <span class="s-content">
+                  Metrics
+                  </span>
+              </div>
             {% else %}
-            <div class="abstract-nav s-nav s-nav-selected s-nav-inactive">
+              <div class="abstract-nav s-nav s-nav-selected">
+                  <span class="s-content">
+                  Metrics
+                  </span>
+              </div>
+            {% endif %}
+          {% else %}
+          <div data-widget-id="ShowMetrics">
+              <div class="abstract-nav s-nav s-nav-inactive ">
+                  <span class="s-content">
+                  Metrics
+                  </span>
+              </div>
+          </div>
+          {% endif %}
+
+          {% if doc %}
+          <a href="{{ url_for('abs', identifier=doc.bibcode, section='exportcitation') }}" data-widget-id="ShowExportcitation__default">
+            {% if path[-1] != 'exportcitation' %}
+            <div class="abstract-nav s-nav  ">
+              <span class="content">
+                Export Citation
+              </span>
+            </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
               <span class="content">
                 Export Citation
               </span>
             </div>
             {% endif %}
+          </a>
+          {% else %}
+          <div class="abstract-nav s-nav s-nav-selected s-nav-inactive">
+            <span class="content">
+              Export Citation
+            </span>
+          </div>
+          {% endif %}
 
-          </nav>
-        </div>
+        </nav>
       </div>
     </div>
