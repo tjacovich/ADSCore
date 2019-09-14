@@ -1,5 +1,6 @@
 
-      <div class="col-sm-2 nav-container s-nav-container" id="left-column">
+    <div class="col-xs-12 col-sm-3 col-md-2" style="" id="left-column">
+      <div class="nav-container s-nav-container" style="transform: none; width: 100%; position: relative" id="left-column">
         <div>
           <nav>
             <div class="s-nav-header s-view-nav"> <i class="icon-list"></i>
@@ -35,63 +36,61 @@
             {% endif %}
 
 
-            {% if doc %}
-              {% if doc.citation_count and doc.citation_count > 0 %}
-              <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true" data-widget-id="ShowCitations">
+            {% if doc and doc.citation_count and doc.citation_count > 0 %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true" data-widget-id="ShowCitations">
               <div class="abstract-nav s-nav ">
-                  <span class="s-content">
-                    Citations
-                    <span class="num-items">({{ doc.citation_count }})</span>
-                  </span>
-                </div>
-              </a>
-              {% else %}
-              <div aria-disabled="true" data-widget-id="ShowCitations">
-                <div class="abstract-nav s-nav   s-nav-inactive ">
-                  <span class="s-content">
-                    Citations
-                  </span>
-                </div>
+                <span class="s-content">
+                  Citations
+                  <span class="num-items">({{ doc.citation_count }})</span>
+                </span>
               </div>
-              {% endif %}
+            </a>
+            {% else %}
+            <div aria-disabled="true" data-widget-id="ShowCitations">
+              <div class="abstract-nav s-nav   s-nav-inactive ">
+                <span class="s-content">
+                  Citations
+                </span>
+              </div>
+            </div>
             {% endif %}
 
 
-            {% if doc %}
-              {% if doc.reference_count and doc.reference_count > 0 %}
-              <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true" data-widget-id="ShowReferences">
-                <div class="abstract-nav s-nav ">
-                  <span class="s-content">
-                    References
-                    <span class="num-items">({{ doc.reference_count }})</span>
-                  </span>
-                </div>
-              </a>
-              {% else %}
-              <div aria-disabled="true" data-widget-id="ShowReferences">
-                <div class="abstract-nav s-nav   s-nav-inactive ">
-                  <span class="s-content">
-                    References
-                  </span>
-                </div>
+            {% if doc and doc.reference_count and doc.reference_count > 0 %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true" data-widget-id="ShowReferences">
+              <div class="abstract-nav s-nav ">
+                <span class="s-content">
+                  References
+                  <span class="num-items">({{ doc.reference_count }})</span>
+                </span>
               </div>
-              {% endif %}
+            </a>
+            {% else %}
+            <div aria-disabled="true" data-widget-id="ShowReferences">
+              <div class="abstract-nav s-nav   s-nav-inactive ">
+                <span class="s-content">
+                  References
+                </span>
+              </div>
+            </div>
             {% endif %}
 
 
-            {% if doc %}
-            {% if doc.read_count and doc.read_count > 0 %}
+            {% if doc and doc.read_count and doc.read_count > 0 %}
             <a href="{{ url_for('abs', identifier=doc.bibcode, section='coreads') }}" aria-disabled="true"
               aria-disabled="true" data-widget-id="ShowCoreads">
               <div class="abstract-nav s-nav ">
-                {% else %}
-                <div class="abstract-nav s-nav   s-nav-inactive ">
-                  {% endif %}
-                  <span class="s-content">
-                    Co-Reads
-                  </span>
-                </div>
+                <span class="s-content">
+                  Co-Reads
+                </span>
+              </div>
             </a>
+            {% else %}
+              <div class="abstract-nav s-nav   s-nav-inactive ">
+                <span class="s-content">
+                  Co-Reads
+                </span>
+              </div>
             {% endif %}
 
 
@@ -106,24 +105,22 @@
             </a>
             {% endif %}
 
-            {% if doc %}
-              {% if "TOC" in doc.property %}
-              <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true" data-widget-id="ShowToc">
-                <div class="abstract-nav s-nav">
-                  <span class="s-content">
-                    Volume Content
-                  </span>
-                </div>
-              </a>
-              {% else %}
-              <div aria-disabled="true" data-widget-id="ShowToc">
-                <div class="abstract-nav s-nav s-nav-inactive">
-                  <span class="s-content">
-                    Volume Content
-                  </span>
-                </div>
+            {% if doc and "TOC" in doc.property %}
+            <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true" data-widget-id="ShowToc">
+              <div class="abstract-nav s-nav">
+                <span class="s-content">
+                  Volume Content
+                </span>
               </div>
-              {% endif %}
+            </a>
+            {% else %}
+            <div aria-disabled="true" data-widget-id="ShowToc">
+              <div class="abstract-nav s-nav s-nav-inactive">
+                <span class="s-content">
+                  Volume Content
+                </span>
+              </div>
+            </div>
             {% endif %}
 
             {% if doc and doc.graphics and doc.graphics.figures|length > 0 %}
@@ -204,3 +201,4 @@
           </nav>
         </div>
       </div>
+    </div>
