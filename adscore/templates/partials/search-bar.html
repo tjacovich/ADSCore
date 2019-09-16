@@ -108,11 +108,11 @@
         <div class="btn-group pull-right">
           {% if sort_dir == 'asc' %}
             <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}" class="btn btn-default">
-              <i class="fa fa-sort-amount-desc"></i>
+              <i class="fa fa-sort-amount-asc"></i>
             </a>
           {% else %}
             <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}" class="btn btn-default">
-              <i class="fa fa-sort-amount-asc"></i>
+              <i class="fa fa-sort-amount-desc"></i>
             </a>
           {% endif %}
 
