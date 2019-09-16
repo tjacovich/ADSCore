@@ -136,12 +136,12 @@ def _classify(remote_ip, user_agent):
         if bot_verification_data.get('type') == 'Unverifiable':
             check_results = UNVERIFIABLE_BOT
         elif _verify_bot(remote_ip, bot_verification_data):
-            check_result = VERIFIED_BOT
+            check_results = VERIFIED_BOT
         else:
-            check_result = POTENTIAL_MALICIOUS_BOT
+            check_results = POTENTIAL_MALICIOUS_BOT
     else:
-        check_result = POTENTIAL_USER
-    return check_result
+        check_results = POTENTIAL_USER
+    return check_results
 
 def _find_bot(user_agent):
     user_agent = user_agent.lower()

@@ -18,7 +18,7 @@ def header_whitelist():
     Rate limits are only to protect us from bootstrapping thousands of access
     tokens in the database.
     """
-    if 'auth' in session and False:
+    if 'auth' in session:
         return True
     else:
         user_agent = request.headers.get('User-Agent')
