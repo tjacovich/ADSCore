@@ -39,14 +39,14 @@ MALICIOUS_BOTS_ACCESS_TOKEN = ""
 
 
 SORT_OPTIONS = [
-    { 'id': 'author_count', 'text': 'Authors', 'description': 'sort by number of authors' },
+    { 'id': 'author_count', 'text': 'Author Count', 'description': 'sort by number of authors' },
     { 'id': 'bibcode', 'text': 'Bibcode', 'description': 'sort by bibcode' },
-    { 'id': 'citation_count', 'text': 'Citations', 'description': 'sort by number of citations' },
-    { 'id': 'citation_count_norm', 'text': 'Norm. Citations', 'description': 'sort by number of normalized citations' },
+    { 'id': 'citation_count', 'text': 'Citation Count', 'description': 'sort by number of citations' },
+    { 'id': 'citation_count_norm', 'text': 'Normalized Citation Count', 'description': 'sort by number of normalized citations' },
     { 'id': 'classic_factor', 'text': 'Classic Factor', 'description': 'sort using classical score' },
     { 'id': 'first_author', 'text': 'First Author', 'description': 'sort by first author' },
     { 'id': 'date', 'text': 'Date', 'description': 'sort by publication date' },
     { 'id': 'entry_date', 'text': 'Entry Date', 'description': 'sort by date work entered the database' },
-    { 'id': 'read_count', 'text': 'Reads', 'description': 'sort by number of reads' },
+    { 'id': 'read_count', 'text': 'Read Count', 'description': 'sort by number of reads' },
     { 'id': 'score', 'text': 'Score', 'description': 'sort by the relative score' }
 ]
