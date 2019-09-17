@@ -74,6 +74,20 @@ def before_request():
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
+    user_agent = request.headers.get('User-Agent')
+    remote_ip = get_remote_address()
+    evaluation = crawlers.evaluate(remote_ip, user_agent)
+    if evaluation == crawlers.VERIFIED_BOT:
+        app.logger.info("Rate limited a request classified as 'VERIFIED_BOT'")
+    elif evaluation == crawlers.UNVERIFIABLE_BOT:
+        app.logger.info("Rate limited a request classified as 'UNVERIFIABLE_BOT'")
+    elif evaluation == crawlers.POTENTIAL_MALICIOUS_BOT:
+        app.logger.info("Rate limited a request classified as 'POTENTIAL_MALICIOUS_BOT'")
+    elif evaluation == crawlers.POTENTIAL_USER:
+        app.logger.info("Rate limited a request classified as 'POTENTIAL_USER'")
+    else:
+        # None
+        app.logger.info("Rate limited a request not classified")
     form = ModernForm()
     return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 429
 
