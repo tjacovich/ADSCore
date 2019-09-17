@@ -158,7 +158,10 @@ def _verify_bot(remote_ip, bot_verification_data):
     if bot_type == "DNS":
         search_engine_bot_domains = bot_verification_data.get('DNS')
         if search_engine_bot_domains:
-            return _verify_dns(remote_ip, search_engine_bot_domains)
+            try:
+                return _verify_dns(remote_ip, search_engine_bot_domains)
+            except dns.resolver.NXDOMAIN:
+                return False
     elif bot_type == "IPs":
         search_engine_bot_ips = bot_verification_data.get('IPs')
         if search_engine_bot_ips:
