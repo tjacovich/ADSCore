@@ -116,6 +116,8 @@ def evaluate(remote_ip, user_agent):
         cache = list(current_app.extensions['cache'].keys())[0]
         result = cache.get("/".join((current_app.config['CACHE_BOT_KEY_PREFIX'], remote_ip, user_agent)))
     except Exception:
+        current_app.logger.exception("Recovering bot results from cache")
+        result = None
         # Do not affect users if connection to Redis is lost in production
         if current_app.debug:
             raise
@@ -125,6 +127,7 @@ def evaluate(remote_ip, user_agent):
             if cache:
                 cache.set("/".join((current_app.config['CACHE_BOT_KEY_PREFIX'], remote_ip, user_agent)), result)
         except Exception:
+            current_app.logger.exception("Storing bot results to cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise

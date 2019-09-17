@@ -14,6 +14,7 @@ def bootstrap():
     """
     params = None
     auth = _request(current_app.config['BOOTSTRAP_SERVICE'], params, method="GET", retry_counter=0)
+    current_app.logger.info("Bootstrapped access token '%s'", auth['access_token'])
     return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'], 'bot': False }
 
 def store_query(bibcodes, sort="date desc, bibcode desc"):
@@ -50,6 +51,7 @@ class Search(Mapping):
             cache = list(current_app.extensions['cache'].keys())[0]
             storage = cache.get("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
         except Exception:
+            current_app.logger.exception("Recovering search results from cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise
@@ -87,6 +89,7 @@ class Search(Mapping):
                 if cache:
                     cache.set("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)), self._storage)
             except Exception:
+                current_app.logger.exception("Storing search results to cache")
                 # Do not affect users if connection to Redis is lost in production
                 if current_app.debug:
                     raise
@@ -157,6 +160,7 @@ class Abstract(Mapping):
             cache = list(current_app.extensions['cache'].keys())[0]
             storage = cache.get(identifier)
         except Exception:
+            current_app.logger.exception("Restoring abstract results from cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise
@@ -175,6 +179,7 @@ class Abstract(Mapping):
                 if cache:
                     cache.set(identifier, self._storage)
             except Exception:
+                current_app.logger.exception("Storing abstract results to cache")
                 # Do not affect users if connection to Redis is lost in production
                 if current_app.debug:
                     raise
@@ -241,12 +246,14 @@ def _request(endpoint, params, method="GET", retry_counter=0):
     try:
         r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
+        current_app.logger.exception("Connecting to microservice")
         msg = str(e)
         return {"error": "{}".format(msg)}
     if not r.ok:
         if r.status_code == 401 and retry_counter == 0 and not session['auth'].get('bot', False): # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
+            current_app.logger.info("Re-trying connection to microservice")
             return _request(endpoint, params, method=method, retry_counter=retry_counter+1)
         try:
             msg = r.json().get('error', {})
@@ -261,6 +268,7 @@ def _request(endpoint, params, method="GET", retry_counter=0):
     try:
         results = r.json()
     except json.decoder.JSONDecodeError:
+        current_app.logger.exception("Interpreting microservice JSON response")
         results = {"error": "Response is not JSON compatible: {}".format(r.content)}
     return results
 
