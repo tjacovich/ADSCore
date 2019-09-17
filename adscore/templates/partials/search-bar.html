@@ -83,7 +83,7 @@
           {% endif %}
           {% if stats and stats.stats_fields.citation_count_norm %}
           with <b><span
-              class="num-found-container">{{ "{:,.0f}".format(stats.stats_fields.citation_count_norm.sum) }}</span></b>
+              class="num-found-container">{{ "{:,.1f}".format(stats.stats_fields.citation_count_norm.sum) }}</span></b>
           total normalized citations
           {% endif %}
           {% if environment == "localhost" %}

@@ -46,7 +46,7 @@ def link_gateway(identifier, section, retry_counter=0):
     return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", retry_counter=0)
 
 class Search(Mapping):
-    def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,pubdate,[citations],property,esources,data"):
+    def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,citation_count_norm,pubdate,[citations],property,esources,data"):
         try:
             cache = list(current_app.extensions['cache'].keys())[0]
             storage = cache.get("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
