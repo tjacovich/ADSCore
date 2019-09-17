@@ -112,6 +112,8 @@ def evaluate(remote_ip, user_agent):
     - A potentially malicious bot
     - A potential legitivate user
     """
+    if user_agent is None:
+        user_agent = ""
     try:
         cache = list(current_app.extensions['cache'].keys())[0]
         result = cache.get("/".join((current_app.config['CACHE_BOT_KEY_PREFIX'], remote_ip, user_agent)))
@@ -147,10 +149,11 @@ def _classify(remote_ip, user_agent):
     return check_results
 
 def _find_bot(user_agent):
-    user_agent = user_agent.lower()
-    for k, v in SEARCH_ENGINE_BOTS.items():
-        if k in user_agent:
-            return k, v
+    if isinstance(user_agent, str):
+        user_agent = user_agent.lower()
+        for k, v in SEARCH_ENGINE_BOTS.items():
+            if k in user_agent:
+                return k, v
     return None, None
 
 def _verify_bot(remote_ip, bot_verification_data):
