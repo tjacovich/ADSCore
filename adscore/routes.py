@@ -75,17 +75,17 @@ def before_request():
 @app.errorhandler(429)
 def ratelimit_handler(e):
     form = ModernForm()
-    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 429
+    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 429
 
 @app.errorhandler(404)
 def page_not_found(e):
     form = ModernForm()
-    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 404
+    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 404
 
 @app.errorhandler(500)
 def internal_error(e):
     form = ModernForm()
-    return render_template('500.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], form=form), 500
+    return render_template('500.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 500
 
 
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
