@@ -2,6 +2,7 @@ from flask import current_app
 import dns.name
 import dns.reversename
 import dns.resolver
+import dns.exception
 
 GOOGLE = dns.name.from_text('google.com')
 GOOGLEBOT = dns.name.from_text('googlebot.com')
@@ -167,8 +168,9 @@ def _verify_bot(remote_ip, bot_verification_data):
             try:
                 return _verify_dns(remote_ip, search_engine_bot_domains)
             except dns.resolver.NXDOMAIN:
+                # No domain name associated to IP
                 return False
-            except dns.resolver.NoNameservers:
+            except (dns.resolver.NoNameservers, dns.exception.Timeout):
                 current_app.logger.exception("Reverse resolving IP")
                 return False
     elif bot_type == "IPs":
