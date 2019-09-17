@@ -168,6 +168,9 @@ def _verify_bot(remote_ip, bot_verification_data):
                 return _verify_dns(remote_ip, search_engine_bot_domains)
             except dns.resolver.NXDOMAIN:
                 return False
+            except dns.resolver.NoNameservers:
+                current_app.logger.exception("Reverse resolving IP")
+                return False
     elif bot_type == "IPs":
         search_engine_bot_ips = bot_verification_data.get('IPs')
         if search_engine_bot_ips:
