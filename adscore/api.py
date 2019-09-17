@@ -83,6 +83,13 @@ class Search(Mapping):
                         'stats': stats,
                         'stats.field': stats_field
                         }
+            if "object:" in q:
+                # object: operator needs to be translated into the proper IDs
+                # For instance, object:M67 translates into:
+                #   ((=abs:M67 OR simbid:1136125 OR nedid:MESSIER_067)
+                #    database:astronomy)
+                r = _request(current_app.config['OBJECTS_SERVICE'], {'query': [q]}, method="POST", retry_counter=0)
+                params['q'] = r.get('query', q)
             results = _search(params)
             self._storage.update(self._process(results))
             try:
