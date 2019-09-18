@@ -1,19 +1,16 @@
 from flask import current_app
-import dns.name
-import dns.reversename
-import dns.resolver
-import dns.exception
+import socket
 
-GOOGLE = dns.name.from_text('google.com')
-GOOGLEBOT = dns.name.from_text('googlebot.com')
-BING = dns.name.from_text('search.msn.com')
-YAHOO = dns.name.from_text('crawl.yahoo.net')
-BAIDU_COM = dns.name.from_text('crawl.baidu.com')
-BAIDU_JP = dns.name.from_text('crawl.baidu.jp')
-YANDEX_RU = dns.name.from_text('yandex.ru')
-YANDEX_NET = dns.name.from_text('yandex.net')
-YANDEX_COM = dns.name.from_text('yandex.com')
-ALEXA = dns.name.from_text('alexa.com')
+GOOGLE = 'google.com'
+GOOGLEBOT = 'googlebot.com'
+BING = 'search.msn.com'
+YAHOO = 'crawl.yahoo.net'
+BAIDU_COM = 'crawl.baidu.com'
+BAIDU_JP = 'crawl.baidu.jp'
+YANDEX_RU = 'yandex.ru'
+YANDEX_NET = 'yandex.net'
+YANDEX_COM = 'yandex.com'
+ALEXA = 'alexa.com'
 
 SEARCH_ENGINE_BOTS = {
                         "googlebot": {
@@ -171,11 +168,8 @@ def _verify_bot(remote_ip, bot_verification_data):
         if search_engine_bot_domains:
             try:
                 return _verify_dns(remote_ip, search_engine_bot_domains)
-            except dns.resolver.NXDOMAIN:
-                # No domain name associated to IP
-                return False
-            except (dns.resolver.NoNameservers, dns.exception.Timeout):
-                current_app.logger.exception("Reverse resolving IP")
+            except Exception:
+                current_app.logger.exception("Reverse/forward resolving IP")
                 return False
     elif bot_type == "IPs":
         search_engine_bot_ips = bot_verification_data.get('IPs')
@@ -198,12 +192,14 @@ def _verify_dns(remote_ip, search_engine_bot_domains):
     engine bot and verify that when the domain is resolved forward into an IP
     it coincides with the original IP.
     """
-    for ptr_record in dns.resolver.query(dns.reversename.from_address(remote_ip), "PTR"):
+    name, aliaslist, _addresslist = socket.gethostbyaddr(remote_ip)
+    for hostname in [name] + aliaslist:
         for search_engine_bot_domain in search_engine_bot_domains:
-            if dns.name.from_text(ptr_record.to_text()).is_subdomain(search_engine_bot_domain):
-                for remote_ip_check in dns.resolver.query(ptr_record.to_text(), "A"):
-                    remote_ip_coincides = remote_ip_check.to_text() == remote_ip
-                    if remote_ip_coincides:
-                        return True
+            ndots = search_engine_bot_domain.count('.') # 'googlebot.com' => 1 dot => 2 levels
+            hostname_domain = ".".join(name.split('.')[-ndots-1:]) # 'crawl-66-249-66-1.googlebot.com' => 'googlebot.com'
+            if hostname_domain == search_engine_bot_domain:
+                _name, _aliaslist, addresslist = socket.gethostbyname_ex(hostname)
+                if remote_ip in addresslist:
+                    return True
     return False
 
