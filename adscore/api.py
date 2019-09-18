@@ -286,7 +286,9 @@ def _abstract(identifier):
     q = 'identifier:{0}'.format(identifier)
     fields = 'identifier,[citations],abstract,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data'
     search = Search(q, rows=1, start=0, sort="date desc", fields=fields)
-    return search.get('response', {}).get('docs', [])
+    results = search.get('response', {}).get('docs', [])
+    del search
+    return results
 
 def _export(bibcode, retry_counter=0):
     """

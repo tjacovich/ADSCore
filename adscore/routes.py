@@ -126,8 +126,12 @@ def search(params=None):
             return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
     elif form.q.data and len(form.q.data) > 0:
         results = api.Search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
+        response = results.get('response')
+        stats = results.get('stats')
+        error = results.get('error')
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
-        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
+        del results
+        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=response, stats=stats, error=error, qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     else:
         return redirect(url_for('index'))
 
@@ -239,8 +243,11 @@ def _abstract(identifier, section=None):
             return redirect(target_url)
         api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'abstract'))
-        return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        rendered_response = _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        del doc
+        return rendered_response
     else:
+        del doc
         abort(404)
 
 def _operation(operation, identifier):
@@ -248,8 +255,10 @@ def _operation(operation, identifier):
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], operation)
         target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})')
+        del doc
         return redirect(target_url)
     else:
+        del doc
         abort(404)
 
 def _toc(identifier):
@@ -257,8 +266,10 @@ def _toc(identifier):
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "toc")
         target_url = url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
+        del doc
         return redirect(target_url)
     else:
+        del doc
         abort(404)
 
 def _export(identifier):
@@ -270,8 +281,11 @@ def _export(identifier):
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "exportcitation")
         key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'export'))
-        return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        rendered_template = _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        del doc
+        return rendered_template
     else:
+        del doc
         abort(404)
 
 def _graphics(identifier):
@@ -283,8 +297,11 @@ def _graphics(identifier):
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "graphics")
         key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'graphics'))
-        return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        rendered_template = _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        del doc
+        return rendered_template
     else:
+        del doc
         abort(404)
 
 def _metrics(identifier):
@@ -296,8 +313,11 @@ def _metrics(identifier):
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "metrics")
         key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'metrics'))
-        return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        rendered_template = _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        del doc
+        return rendered_template
     else:
+        del doc
         abort(404)
 
 @app.route(app.config['SERVER_BASE_URL']+'core/always', methods=['GET'], strict_slashes=False)
