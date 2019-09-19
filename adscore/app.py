@@ -23,7 +23,7 @@ def create_app(**config):
 
     app.url_map.strict_slashes = False
 
-    if app.config['ENVIRONMENT'] != "localhost":
+    if app.config['MINIFY']:
         minify(app=app, html=True, js=True, cssless=True, cache=False, fail_safe=True, bypass=[])
 
     return app
