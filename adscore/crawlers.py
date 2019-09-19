@@ -171,12 +171,10 @@ def _verify_bot(remote_ip, bot_verification_data):
         search_engine_bot_domains = bot_verification_data.get('DNS')
         if search_engine_bot_domains:
             try:
-                return _verify_dns(remote_ip, search_engine_bot_domains)
-            except dns.resolver.NXDOMAIN:
-                # No domain name associated to IP
-                return False
-            except (dns.resolver.NoNameservers, dns.exception.Timeout):
+                return _verify_dns(remote_ip, search_engine_bot_domains, retry_counter=0)
+            except:
                 current_app.logger.exception("Exception while reverse/forward resolving IP")
+            else:
                 return False
     elif bot_type == "IPs":
         search_engine_bot_ips = bot_verification_data.get('IPs')
@@ -193,16 +191,35 @@ def _verify_ip(remote_ip, search_engine_bot_ips):
             return True
     return False
 
-def _verify_dns(remote_ip, search_engine_bot_domains):
+def _verify_dns(remote_ip, search_engine_bot_domains, retry_counter=0):
+    try:
+        return _resolve(remote_ip, search_engine_bot_domains)
+    except dns.resolver.NXDOMAIN:
+        # No domain name associated to IP
+        return False
+    except (dns.resolver.NoNameservers, dns.exception.Timeout):
+        if retry_counter == 0:
+            # Retry once
+            return _verify_dns(remote_ip, search_engine_bot_domains, retry_counter=retry_counter+1)
+        else:
+            current_app.logger.exception("Exception while reverse/forward resolving IP")
+            return False
+
+def _resolve(remote_ip, search_engine_bot_domains):
     """
     Reverse resolve IP into its domain, check if it is a subdomain of a search
     engine bot and verify that when the domain is resolved forward into an IP
     it coincides with the original IP.
     """
-    for ptr_record in dns.resolver.query(dns.reversename.from_address(remote_ip), "PTR"):
+    resolver = dns.resolver.Resolver()
+    # The total number of seconds to spend trying to get an answer to the question:
+    resolver.lifetime = current_app.config['DNS_LIFETIME']
+    # The number of seconds to wait for a response from a server, before timing out:
+    resolver.timeout = current_app.config['DNS_TIMEOUT']
+    for ptr_record in resolver.query(dns.reversename.from_address(remote_ip), "PTR"):
         for search_engine_bot_domain in search_engine_bot_domains:
             if dns.name.from_text(ptr_record.to_text()).is_subdomain(search_engine_bot_domain):
-                for remote_ip_check in dns.resolver.query(ptr_record.to_text(), "A"):
+                for remote_ip_check in resolver.query(ptr_record.to_text(), "A"):
                     remote_ip_coincides = remote_ip_check.to_text() == remote_ip
                     if remote_ip_coincides:
                         return True
