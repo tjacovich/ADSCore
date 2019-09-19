@@ -40,23 +40,25 @@ def objects_query(object_names, retry_counter=0):
 
 def link_gateway(identifier, section, retry_counter=0):
     """
-    Retrieve associated works
+    Log click
     """
     params = None
-    return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", retry_counter=0)
+    return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", retry_counter=0, json_format=False)
 
 class Search(Mapping):
     def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,citation_count_norm,pubdate,[citations],property,esources,data"):
         try:
-            cache = list(current_app.extensions['cache'].keys())[0]
-            storage = cache.get("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
+            redis_client = current_app.extensions['redis']
+            storage = redis_client.get("/".join((current_app.config['REDIS_DATA_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
+            if storage:
+                storage = json.loads(storage)
         except Exception:
-            current_app.logger.exception("Recovering search results from cache")
+            current_app.logger.exception("Exception while recovering search results from cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise
             storage = None
-            cache = None
+            redis_client = None
         if storage:
             self._storage = storage
         else:
@@ -93,10 +95,10 @@ class Search(Mapping):
             results = _search(params)
             self._storage.update(self._process(results))
             try:
-                if cache:
-                    cache.set("/".join((current_app.config['CACHE_MANUAL_KEY_PREFIX'], q, str(rows), str(start), sort, fields)), self._storage)
+                if redis_client:
+                    redis_client.set("/".join((current_app.config['REDIS_DATA_KEY_PREFIX'], q, str(rows), str(start), sort, fields)), json.dumps(self._storage), ex=current_app.config['REDIS_EXPIRATION_TIME'])
             except Exception:
-                current_app.logger.exception("Storing search results to cache")
+                current_app.logger.exception("Exception while storing search results to cache")
                 # Do not affect users if connection to Redis is lost in production
                 if current_app.debug:
                     raise
@@ -164,15 +166,17 @@ class Search(Mapping):
 class Abstract(Mapping):
     def __init__(self, identifier):
         try:
-            cache = list(current_app.extensions['cache'].keys())[0]
-            storage = cache.get(identifier)
+            redis_client = current_app.extensions['redis']
+            storage = redis_client.get(identifier)
+            if storage:
+                storage = json.loads(storage)
         except Exception:
-            current_app.logger.exception("Restoring abstract results from cache")
+            current_app.logger.exception("Exception while restoring abstract results from cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise
             storage = None
-            cache = None
+            redis_client = None
         if storage:
             self._storage = storage
         else:
@@ -183,10 +187,10 @@ class Abstract(Mapping):
             else:
                 self._storage['error'] = "Record not found."
             try:
-                if cache:
-                    cache.set(identifier, self._storage)
+                if redis_client:
+                    redis_client.set(identifier, json.dumps(self._storage), ex=current_app.config['REDIS_EXPIRATION_TIME'])
             except Exception:
-                current_app.logger.exception("Storing abstract results to cache")
+                current_app.logger.exception("Exception while storing abstract results to cache")
                 # Do not affect users if connection to Redis is lost in production
                 if current_app.debug:
                     raise
@@ -232,7 +236,7 @@ class Abstract(Mapping):
         return doc
 
 
-def _request(endpoint, params, method="GET", retry_counter=0):
+def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
     """
     Execute query
     """
@@ -253,7 +257,7 @@ def _request(endpoint, params, method="GET", retry_counter=0):
     try:
         r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
-        current_app.logger.exception("Connecting to microservice")
+        current_app.logger.exception("Exception while connecting to microservice")
         msg = str(e)
         return {"error": "{}".format(msg)}
     if not r.ok:
@@ -272,12 +276,15 @@ def _request(endpoint, params, method="GET", retry_counter=0):
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
     session['cookies'].update(r.cookies.get_dict())
-    try:
-        results = r.json()
-    except json.decoder.JSONDecodeError:
-        current_app.logger.exception("Interpreting microservice JSON response")
-        results = {"error": "Response is not JSON compatible: {}".format(r.content)}
-    return results
+    if json_format:
+        try:
+            results = r.json()
+        except json.decoder.JSONDecodeError:
+            current_app.logger.exception("Exception while interpreting microservice JSON response for '%s'", url)
+            results = {"error": "Response is not JSON compatible: {}".format(r.content)}
+        return results
+    else:
+        return {}
 
 def _abstract(identifier):
     """
@@ -310,7 +317,7 @@ def _resolver(identifier, resource="associated", retry_counter=0):
 
 def _graphics(identifier, retry_counter=0):
     """
-    Retrieve associated works
+    Retrieve graphics
     """
     params = None
     return _request(current_app.config['GRAPHICS_SERVICE'] + identifier, params, method="GET", retry_counter=0)

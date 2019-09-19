@@ -3,10 +3,10 @@ import sys
 import requests
 from flask import Flask, request
 from flask_minify import minify
-from flask_caching import Cache
 from flask_limiter import Limiter
 import flask_limiter.util
 from adsmutils import ADSFlask
+from flask_redis import FlaskRedis
 
 def get_remote_address():
     return request.headers.get('X-Original-Forwarded-For', flask_limiter.util.get_remote_address())
@@ -29,5 +29,5 @@ def create_app(**config):
     return app
 
 app = create_app()
-cache = Cache(app)
 limiter = Limiter(app, key_func=get_remote_address)
+redis_client = FlaskRedis(app)

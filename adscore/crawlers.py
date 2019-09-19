@@ -116,21 +116,22 @@ def evaluate(remote_ip, user_agent):
     if user_agent is None:
         user_agent = ""
     try:
-        cache = list(current_app.extensions['cache'].keys())[0]
-        result = cache.get("/".join((current_app.config['CACHE_BOT_KEY_PREFIX'], remote_ip, user_agent)))
+        redis_client = current_app.extensions['redis']
+        result = redis_client.get("/".join((current_app.config['REDIS_REQUESTS_KEY_PREFIX'], remote_ip, user_agent)))
     except Exception:
-        current_app.logger.exception("Recovering bot results from cache")
+        current_app.logger.exception("Exception while recovering bot results from cache")
         result = None
+        redis_client = None
         # Do not affect users if connection to Redis is lost in production
         if current_app.debug:
             raise
     if result is None:
         result = _classify(remote_ip, user_agent)
         try:
-            if cache:
-                cache.set("/".join((current_app.config['CACHE_BOT_KEY_PREFIX'], remote_ip, user_agent)), result)
+            if redis_client:
+                redis_client.set("/".join((current_app.config['REDIS_REQUESTS_KEY_PREFIX'], remote_ip, user_agent)), result, ex=current_app.config['REDIS_EXPIRATION_TIME'])
         except Exception:
-            current_app.logger.exception("Storing bot results to cache")
+            current_app.logger.exception("Exception while storing bot results to cache")
             # Do not affect users if connection to Redis is lost in production
             if current_app.debug:
                 raise
@@ -175,7 +176,7 @@ def _verify_bot(remote_ip, bot_verification_data):
                 # No domain name associated to IP
                 return False
             except (dns.resolver.NoNameservers, dns.exception.Timeout):
-                current_app.logger.exception("Reverse resolving IP")
+                current_app.logger.exception("Exception while reverse/forward resolving IP")
                 return False
     elif bot_type == "IPs":
         search_engine_bot_ips = bot_verification_data.get('IPs')

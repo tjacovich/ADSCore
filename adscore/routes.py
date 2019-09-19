@@ -1,7 +1,7 @@
 import time
 import urllib.parse
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
-from adscore.app import app, cache, limiter, get_remote_address
+from adscore.app import app, limiter, redis_client, get_remote_address
 from adscore import api
 from adscore import crawlers
 from adscore.forms import ModernForm, PaperForm, ClassicForm
@@ -113,7 +113,6 @@ def index():
 
 @app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
-@cache.cached(query_string=True)
 def search(params=None):
     """
     Modern form if no search parameters are sent, otherwise show search results
@@ -163,7 +162,6 @@ def paper_form():
         return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
 @app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
-@cache.cached()
 def public_libraries(identifier):
     """
     Display public library
@@ -174,7 +172,6 @@ def public_libraries(identifier):
 @app.route(app.config['SERVER_BASE_URL']+'abs/<path:alt_identifier>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>/<section>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'abs/<identifier>', methods=['GET'], strict_slashes=False)
-#@cache.cached()
 def abs(identifier=None, section=None, alt_identifier=None):
     """
     Show abstract given an identifier
@@ -213,7 +210,7 @@ def _cached_render_template(key, *args, **kwargs):
     such as connecting to link_gateway to register clicks
     """
     try:
-        rendered_template = cache.get(key)
+        rendered_template = redis_client.get(key).decode('utf-8')
     except Exception:
         # Do not affect users if connection to Redis is lost in production
         if app.debug:
@@ -224,7 +221,7 @@ def _cached_render_template(key, *args, **kwargs):
         rendered_template = render_template(*args, **kwargs)
 
     try:
-        cache.set(key, rendered_template)
+        redis_client.set(key, rendered_template, ex=app.config['REDIS_EXPIRATION_TIME'])
     except Exception:
         # Do not affect users if connection to Redis is lost in production
         if app.debug:
@@ -238,7 +235,7 @@ def _abstract(identifier, section=None):
             target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
             return redirect(target_url)
         api.link_gateway(doc['bibcode'], "abstract")
-        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'abstract'))
+        key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
         return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -269,7 +266,7 @@ def _export(identifier):
     if doc.get('export'):
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "exportcitation")
-        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'export'))
+        key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'export'))
         return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -282,7 +279,7 @@ def _graphics(identifier):
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "graphics")
-        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'graphics'))
+        key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'graphics'))
         return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
@@ -295,7 +292,7 @@ def _metrics(identifier):
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc:
             api.link_gateway(doc['bibcode'], "metrics")
-        key = "/".join((app.config['CACHE_MANUAL_KEY_PREFIX'], identifier, 'metrics'))
+        key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'metrics'))
         return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
