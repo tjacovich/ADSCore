@@ -8,6 +8,13 @@ from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.tools import is_expired
 
 @limiter.request_filter
+def probes():
+    """
+    If the request is related to the readiness/liveness probe, do not rate limit.
+    """
+    return request.path in ('/ready', '/alive')
+
+@limiter.request_filter
 def header_whitelist():
     """
     If the request has an access token stored in the session, it means that the
@@ -35,13 +42,14 @@ def header_whitelist():
             return True
     return False
 
-
-
 @app.before_request
 def before_request():
     """
     Store API anonymous cookie in session or if it exists, check if it has expired
     """
+    if request.path in ('/ready', '/alive'):
+        # Do not bootstrap readiness/liveness probes
+        return
     g.request_start_time = time.time()
     g.request_time = lambda: "{:.3f}s".format((time.time() - g.request_start_time))
     if 'cookies' not in session:
