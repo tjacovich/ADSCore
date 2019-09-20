@@ -38,7 +38,7 @@ def header_whitelist():
         #remote_ip = "127.0.0.1"
         evaluation = crawlers.evaluate(remote_ip, user_agent)
 
-        if evaluation in (crawlers.VERIFIED_BOT, crawlers.UNVERIFIABLE_BOT, crawlers.POTENTIAL_USER):
+        if evaluation in (crawlers.VERIFIED_BOT, crawlers.UNVERIFIABLE_BOT, crawlers.POTENTIAL_MALICIOUS_BOT):
             return True
     return False
 
