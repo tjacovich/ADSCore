@@ -3,3 +3,4 @@ from adscore import api
 from adscore import crawlers
 from adscore.app import app
 from adscore import tools
+from adscore import flask_redis
