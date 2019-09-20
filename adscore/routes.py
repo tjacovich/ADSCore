@@ -95,7 +95,7 @@ def ratelimit_handler(e):
         app.logger.info("Rate limited a request classified as 'POTENTIAL_USER'")
     else:
         # None
-        app.logger.info("Rate limited a request not classified")
+        app.logger.info("Rate limited a request not classified: '%s' - '%s'", remote_ip, user_agent)
     form = ModernForm()
     return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 429
 
