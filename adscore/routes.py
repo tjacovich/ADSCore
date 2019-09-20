@@ -218,7 +218,9 @@ def _cached_render_template(key, *args, **kwargs):
     such as connecting to link_gateway to register clicks
     """
     try:
-        rendered_template = redis_client.get(key).decode('utf-8')
+        rendered_template = redis_client.get(key)
+        if rendered_template:
+            rendered_template = rendered_template.decode('utf-8')
     except Exception:
         # Do not affect users if connection to Redis is lost in production
         if app.debug:

@@ -51,7 +51,7 @@ class Search(Mapping):
             redis_client = current_app.extensions['redis']
             storage = redis_client.get("/".join((current_app.config['REDIS_DATA_KEY_PREFIX'], q, str(rows), str(start), sort, fields)))
             if storage:
-                storage = json.loads(storage)
+                storage = json.loads(storage.decode('utf-8'))
         except Exception:
             current_app.logger.exception("Exception while recovering search results from cache")
             # Do not affect users if connection to Redis is lost in production
@@ -169,7 +169,7 @@ class Abstract(Mapping):
             redis_client = current_app.extensions['redis']
             storage = redis_client.get(identifier)
             if storage:
-                storage = json.loads(storage)
+                storage = json.loads(storage.decode('utf-8'))
         except Exception:
             current_app.logger.exception("Exception while restoring abstract results from cache")
             # Do not affect users if connection to Redis is lost in production

@@ -118,6 +118,8 @@ def evaluate(remote_ip, user_agent):
     try:
         redis_client = current_app.extensions['redis']
         result = redis_client.get("/".join((current_app.config['REDIS_REQUESTS_KEY_PREFIX'], remote_ip, user_agent)))
+        if result:
+            result = int(result.decode('utf-8'))
     except Exception:
         current_app.logger.exception("Exception while recovering bot results from cache")
         result = None
@@ -125,7 +127,7 @@ def evaluate(remote_ip, user_agent):
         # Do not affect users if connection to Redis is lost in production
         if current_app.debug:
             raise
-    if result is None:
+    if result is None or result not in (VERIFIED_BOT, UNVERIFIABLE_BOT, POTENTIAL_MALICIOUS_BOT, POTENTIAL_USER):
         result = _classify(remote_ip, user_agent)
         try:
             if redis_client:
