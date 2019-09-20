@@ -29,3 +29,11 @@ python wsgi.py
 ```
 
 Access: [http://127.0.0.1:4000/](http://127.0.0.1:4000/)
+
+## Redis
+
+If instead of a fake redis (i.e., `REDIS_URL` with `fakeredis://:@localhost:6379/0` in `config.py`), a real one needs to be used ((i.e., `REDIS_URL` with `redis://:@localhost:6379/0`)), it is possible to easily install one in localhost with docker:
+
+```
+docker run --name redis -p 6379:6379 -d redis
+```
