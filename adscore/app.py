@@ -6,7 +6,8 @@ from flask_minify import minify
 from flask_limiter import Limiter
 import flask_limiter.util
 from adsmutils import ADSFlask
-from flask_redis import FlaskRedis
+from adscore.flask_redis import FlaskRedisPool
+import redis
 
 def get_remote_address():
     return request.headers.get('X-Original-Forwarded-For', flask_limiter.util.get_remote_address())
@@ -30,4 +31,4 @@ def create_app(**config):
 
 app = create_app()
 limiter = Limiter(app, key_func=get_remote_address)
-redis_client = FlaskRedis(app)
+redis_client = FlaskRedisPool(app)
