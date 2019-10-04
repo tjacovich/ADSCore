@@ -10,7 +10,7 @@
 
           {% if doc %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='abstract') }}" data-widget-id="ShowAbstract">
-            {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' and path[-1] != 'metrics' %}
+            {% if path[-1] != 'exportcitation' and path[-1] != 'graphics' and path[-1] != 'metrics' and path[-1] != 'citations' and path[-1] != 'references' and path[-1] != 'coreads' and path[-1] != 'similar' and path[-1] != 'toc' %}
             <div class="abstract-nav s-nav s-nav-selected">
               <span class="s-content">
                 Abstract
@@ -37,12 +37,21 @@
 
           {% if doc and doc.citation_count and doc.citation_count > 0 %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='citations') }}" aria-disabled="true" data-widget-id="ShowCitations">
+            {% if path[-1] != 'citations' %}
             <div class="abstract-nav s-nav ">
               <span class="s-content">
                 Citations
                 <span class="num-items">({{ doc.citation_count }})</span>
               </span>
             </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
+              <span class="s-content">
+                Citations
+                <span class="num-items">({{ doc.citation_count }})</span>
+              </span>
+            </div>
+            {% endif %}
           </a>
           {% else %}
           <div aria-disabled="true" data-widget-id="ShowCitations">
@@ -57,12 +66,21 @@
 
           {% if doc and doc.reference_count and doc.reference_count > 0 %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='references') }}" aria-disabled="true" data-widget-id="ShowReferences">
+            {% if path[-1] != 'references' %}
             <div class="abstract-nav s-nav ">
               <span class="s-content">
                 References
                 <span class="num-items">({{ doc.reference_count }})</span>
               </span>
             </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
+              <span class="s-content">
+                References
+                <span class="num-items">({{ doc.reference_count }})</span>
+              </span>
+            </div>
+            {% endif %}
           </a>
           {% else %}
           <div aria-disabled="true" data-widget-id="ShowReferences">
@@ -78,11 +96,19 @@
           {% if doc and doc.read_count and doc.read_count > 0 %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='coreads') }}" aria-disabled="true"
             aria-disabled="true" data-widget-id="ShowCoreads">
+            {% if path[-1] != 'coreads' %}
             <div class="abstract-nav s-nav ">
               <span class="s-content">
                 Co-Reads
               </span>
             </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
+              <span class="s-content">
+                Co-Reads
+              </span>
+            </div>
+            {% endif %}
           </a>
           {% else %}
             <div class="abstract-nav s-nav   s-nav-inactive ">
@@ -96,21 +122,37 @@
           {% if doc %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='similar') }}" aria-disabled="true"
             data-widget-id="ShowSimilar">
+            {% if path[-1] != 'similar' %}
             <div class="abstract-nav s-nav  ">
               <span class="s-content">
                 Similar Papers
               </span>
             </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
+              <span class="s-content">
+                Similar Papers
+              </span>
+            </div>
+            {% endif %}
           </a>
           {% endif %}
 
           {% if doc and "TOC" in doc.property %}
           <a href="{{ url_for('abs', identifier=doc.bibcode, section='toc') }}" aria-disabled="true" data-widget-id="ShowToc">
+            {% if path[-1] != 'toc' %}
             <div class="abstract-nav s-nav">
               <span class="s-content">
                 Volume Content
               </span>
             </div>
+            {% else %}
+            <div class="abstract-nav s-nav s-nav-selected">
+              <span class="s-content">
+                Volume Content
+              </span>
+            </div>
+            {% endif %}
           </a>
           {% else %}
           <div aria-disabled="true" data-widget-id="ShowToc">

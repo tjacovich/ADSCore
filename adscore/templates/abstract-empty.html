@@ -1,0 +1,37 @@
+{% extends "abstract-base.html" %}
+{% block page %}
+<div class="row s-dynamic-page-body" id="dynamic-page-body">
+  <div class="s-abstract-content">
+
+    {% include 'partials/abstract-navigation.html' %}
+
+    <div class="col-xs-12 col-sm-8 col-md-7 col-lg-7 s-middle-column" id="middle-column" style="padding-bottom: 0%">
+      <!--id is for screen readers-->
+      <div class="main-content-container s-main-content-container" id="main-content" tabindex="-1" style="margin-bottom: 5px">
+        <div class="print-visible">
+          <h2 style="margin-left:6.1%;">NASA/ADS</h2>
+        </div>
+        <div id="abstract-title-container" class="s-abstract-title-container"></div>
+        <div id="current-subview">
+          <div data-widget="ShowAbstract"></div>
+          <div data-widget="ShowCitations"></div>
+          <div data-widget="ShowReferences"></div>
+          <div data-widget="ShowCoreads"></div>
+          <div data-widget="ShowSimilar"></div>
+          <div data-widget="ShowTableofcontents"></div>
+          <div data-widget="ShowGraphics"></div>
+          <div data-widget="ShowExportcitation" data-origin="abstract"></div>
+          <div data-widget="ShowMetrics" data-allow-redirect="false"></div>
+          <div data-widget="MetaTagsWidget">
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'partials/abstract-resources.html' %}
+
+    <div class="col-lg-1"></div>
+  </div>
+</div>
+{% endblock page %}

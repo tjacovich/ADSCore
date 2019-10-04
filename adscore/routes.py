@@ -255,7 +255,11 @@ def _operation(operation, identifier):
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], operation)
         target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})')
-        return redirect(target_url)
+        if request.cookies.get('core', 'never') == 'always':
+            return redirect(target_url)
+        else:
+            key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, operation))
+            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
 
@@ -264,7 +268,11 @@ def _toc(identifier):
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "toc")
         target_url = url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
-        return redirect(target_url)
+        if request.cookies.get('core', 'never') == 'always':
+            return redirect(target_url)
+        else:
+            key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'toc'))
+            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
         abort(404)
 
