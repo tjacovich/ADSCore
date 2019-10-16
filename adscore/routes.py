@@ -254,7 +254,13 @@ def _operation(operation, identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], operation)
-        target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})')
+        if operation in ("trending", "similar"):
+            sort = "score desc"
+        elif operation == "references":
+            sort = "first_author asc"
+        else:
+            sort = "date desc"
+        target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})', sort=sort)
         if request.cookies.get('core', 'never') == 'always':
             return redirect(target_url)
         else:
