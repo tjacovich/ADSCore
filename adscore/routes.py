@@ -132,6 +132,12 @@ def search(params=None):
         if form.start.data != computed_start:
             return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
     elif form.q.data and len(form.q.data) > 0:
+        if not form.sort.raw_data:
+            # There was not previous sorting specified
+            if "similar(" in form.q.data or "trending(" in form.q.data:
+                form.sort.data = "score desc"
+            elif "references(" in form.q.data:
+                form.sort.data = "first_author asc"
         results = api.Search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
