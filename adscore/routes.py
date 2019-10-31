@@ -97,17 +97,17 @@ def ratelimit_handler(e):
         # None
         app.logger.info("Rate limited a request not classified: '%s' - '%s'", remote_ip, user_agent)
     form = ModernForm()
-    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 429
+    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=429), 429
 
 @app.errorhandler(404)
 def page_not_found(e):
     form = ModernForm()
-    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 404
+    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=404), 404
 
 @app.errorhandler(500)
 def internal_error(e):
     form = ModernForm()
-    return render_template('500.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form), 500
+    return render_template('500.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=500), 500
 
 
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])

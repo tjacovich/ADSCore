@@ -276,6 +276,8 @@
   </script>
 
 
+  {% if not code or (code and code == 200) %}
+  {# - Do not include javascript in error messages such as 404 to avoid BBB taking the control #}
   <script>
     (function() {
       // turn off no-js if we have javascript
@@ -333,5 +335,6 @@
 
     })();
   </script>
+  {% endif %}
 </body>
 </html>
