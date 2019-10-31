@@ -248,8 +248,11 @@ def _abstract(identifier, section=None):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         if doc['bibcode'] != identifier:
-            target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
-            return redirect(target_url)
+            if current_app.config['ENVIRONMENT'] == "localhost":
+                target_url = url_for('abs', identifier=doc['bibcode'], section='abstract', _external=True, _scheme='https')
+            else:
+                target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
+            return redirect(target_url, code=301)
         api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
         return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
