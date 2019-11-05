@@ -93,11 +93,21 @@
                     id="classic-bibstem" type="text" class="form-control" name="bibstem"
                     placeholder="Comma-separated bibstems of journal titles">
             </div>
-
-            <!--<div class="pull-right">
-            <button class="btn btn-primary" type="submit" style="transition: none;"><i class="fa fa-search"></i> Search</button>
-        </div>-->
-
+            <div>
+                <label for="sort">Sort</label>
+                <select class="form-control" name="sort" id="sort">
+                    <optgroup label="Descending">
+                        {% for opt in sort_options %}
+                        <option title="{{opt.text}} descending" value="{{opt.id}} desc" {% if opt.text == 'Date'%}selected{% endif %}>&#9660; {{opt.text}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="Ascending">
+                        {% for opt in sort_options %}
+                        <option title="{{opt.text}} ascending" value="{{opt.id}} asc">&#9650; {{opt.text}}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
         </form>
     </div>
 </div>

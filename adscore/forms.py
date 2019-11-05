@@ -138,6 +138,7 @@ class ClassicForm(FlaskForm):
     abstract_logic = StringField('abstract_logic', default="AND")
     abstract = StringField('abstract')
     bibstem = StringField('bibstem')
+    sort = StringField('sort', default="date desc")
 
     def _authors(self):
         authors = self.author_names.data.split()
