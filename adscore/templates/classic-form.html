@@ -9,15 +9,15 @@
             </div>
 
             <div data-field="database">
-                Collections to query : <label> <input type="checkbox" checked="true" name="astronomy"> Astronomy
+                Limit query to: <label> <input type="checkbox" checked="true" name="astronomy"> Astronomy
                 </label>&nbsp;&nbsp; <label> <input type="checkbox" name="physics"> Physics </label>
+                </label>&nbsp;&nbsp; <label> <input type="checkbox" name="general"> General </label>
             </div>
             <div class="clearfix">
                 <div class="col-sm-6" data-field="author" data-textinput="true">
                     <div class="classic-form__logic-group logic-group">
                         <label> <input type="radio" name="author_logic" value="AND" checked="true"> and </label>
                         <label> <input type="radio" name="author_logic" value="OR"> or </label>
-                        <label> <input type="radio" name="author_logic" value="BOOLEAN"> boolean </label>
                     </div>
                     <div>
                         <label class="classic-author-label" for="#classic-author">Author</label>
@@ -30,7 +30,6 @@
                         <div class="classic-form__logic-group logic-group">
                             <label> <input type="radio" name="object_logic" value="AND" checked="true"> and </label>
                             <label> <input type="radio" name="object_logic" value="OR"> or </label>
-                            <label> <input type="radio" name="object_logic" value="BOOLEAN"> boolean </label>
                         </div>
                         <div>
                             <label class="classic-object-label" for="#classic-object">Object</label>

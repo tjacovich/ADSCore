@@ -123,6 +123,7 @@ class PaperForm(FlaskForm):
 class ClassicForm(FlaskForm):
     astronomy = BooleanField('astronomy', default=True)
     physics = BooleanField('physics', default=False)
+    general = BooleanField('general', default=False)
     refereed = BooleanField('refereed', default=False)
     article = BooleanField('article', default=False)
     author_logic = StringField('author_logic', default="AND")
@@ -201,6 +202,8 @@ class ClassicForm(FlaskForm):
             query.append("database:astronomy")
         if self.physics.data:
             query.append("database:physics")
+        if self.general.data:
+            query.append("database:general")
         if query:
             query = [" OR ".join(query)]
         if self.refereed.data:
