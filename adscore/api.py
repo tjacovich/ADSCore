@@ -45,6 +45,14 @@ def link_gateway(identifier, section, retry_counter=0):
     params = None
     return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", retry_counter=0, json_format=False)
 
+def resolve_reference(text):
+    """
+    Resolve a text reference into a bibcode
+    """
+    params = None
+    text = urllib.parse.quote(text)
+    return _request(current_app.config['REFERENCE_SERVICE']+"/"+text, params, method="GET", retry_counter=0)
+
 class Search(Mapping):
     def __init__(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,citation_count_norm,pubdate,[citations],property,esources,data"):
         try:
@@ -243,7 +251,8 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
     if session.get('auth', {}).get('access_token'):
         headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
     else:
-        headers = None
+        headers = {}
+    headers['Accept'] = 'application/json; charset=utf-8'
 
     if method == "GET":
         if params:

@@ -3,48 +3,98 @@
 <div data-widget="PaperSearchForm">
   <div class="paper-search-form">
     <div class="row">
-      <form class="paper-form s-paper-form col-md-6 clearfix" action="{{ base_url }}paper-form">
-        <div class="form-group">
-          <label for="pub-input">Publication </label>
-          <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
-          <input type="text" name="bibstem" class="form-control" id="pub-input" data-term="bibstem"
-            placeholder="e.g ApJ">
-        </div>
-        <div class="form-group">
-          <label for="year-input">Year</label>
-          <input type="text" name="year" class="form-control" id="year-input" data-term="year">
-        </div>
-        <div class="form-group">
-          <label for="volume-input">Volume</label>
-          <input type="text" name="volume" class="form-control" id="volume-input" data-term="volume">
-        </div>
-        <div class="form-group">
-          <label for="page-input">Page</label>
-          <input type="text" name="page" class="form-control" id="page-input" data-term="page">
-        </div>
-        <div class="form-group">
-          <div class="button-div pull-right">
-            <button class="btn btn-primary author-submit" style="transition: none;" type="submit"><i
-                class="fa fa-search"></i> Search</button>
-          </div>
-        </div>
-      </form>
+        <div data-widget="PaperSearchForm">
+            <div class="paper-search-form">
+                <div class="row" style="margin-bottom: 15px">
+                  <div class="col-sm-12 well well-default">
+                    <form class="form-horizontal" action="{{ base_url }}paper-form">
+                      <legend>Journal Search</legend>
+                      <div class="col-sm-12">
+                        <div class="form-group help-block">
+                          A bibstem is an abbreviation that the ADS uses to identify a journal.
+                          <a href="http://adsabs.harvard.edu/abs_doc/journals1.html#" tabindex="-1">A full list is available here.</a>
+                          The input field
+                          below will autocomplete on the 1,000 most popular journal names, allowing you to type "Astrophysical Journal",
+                          for instance, to find the bibstem "ApJ".
+                        </div>
+                      </div>
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label for="bibstem">Publication</label>
+                          <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+                          <input type="text" name="bibstem" class="form-control" id="pub-input" data-term="bibstem" placeholder="e.g ApJ">
+                        </div>
+                      </div>
+                      <div class="col-sm-2 col-sm-offset-1">
+                        <div class="form-group">
+                          <label for="year">Year</label>
+                          <input type="text" name="year" id="year" class="form-control" maxlength="4">
+                        </div>
+                      </div>
+                      <div class="col-sm-2 col-sm-offset-1">
+                        <div class="form-group">
+                          <label for="volume">Volume</label>
+                          <input type="text" name="volume" id="volume" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-sm-2 col-sm-offset-1">
+                        <div class="form-group">
+                          <label for="page">Page/ID</label>
+                          <input type="text" name="page" id="page" class="form-control">
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary" style="transition: none;">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                      </button>
+                    </form>
+                  </div>
+                </div>
 
-      <form class="bibcode-form col-md-6 clearfix" action="{{ base_url }}paper-form" method="post">
-        <div class="form-group">
-          <label for="#bibcode-textarea">List of Bibcodes</label>
-          <div class="s-light-font">
-            Enter Bibcodes (e.g. 1989ApJ...342L..71R), one per line.
-          </div>
-          <textarea class="form-control" name="bibcodes" id="bibcode-textarea" cols="30" rows="12"></textarea>
-        </div>
-        <div class="form-group">
-          <div class="button-div pull-right" style="padding-top: 7px;">
-            <button class="btn btn-primary author-submit" style="transition: none;" type="submit"><i
-                class="fa fa-search"></i> Search</button>
-          </div>
-        </div>
-      </form>
+                <div class="row" style="margin-bottom: 15px">
+                  <div class="well well-default col-sm-12">
+                    <form class="form-horizontal" role="form" data-form-type="reference">
+                      <legend>Reference Query</legend>
+                      <div class="col-sm-12">
+                        <div class="form-group">
+                          <label for="reference">Reference</label>
+                          <input type="text" name="reference" id="reference" class="form-control" aria-describedby="reference_helper" required="">
+                          <span id="reference_helper" class="help-block">Enter a full reference string (eg Smith et al 2000, A&amp;A 362,
+                            pp. 333-341)</span>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                      </button>
+                    </form>
+                  </div>
+                </div>
+                {% if reference_error %}
+                <div class="alert alert-danger" id="error-message">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  <strong>{{ reference_error }}</strong>
+                </div>
+                {% endif %}
+
+                <div class="row" style="margin-bottom: 15px">
+                  <div class="well well-default col-sm-12">
+                    <form class="form-horizontal" role="form" data-form-type="bibcodes" action="{{ base_url }}paper-form" method="post">
+                      <legend>Bibliographic Code Query</legend>
+                      <div class="col-sm-12">
+                        <div class="form-group">
+                          <label for="bibcodes">List of Bibcodes</label>
+                          <textarea name="bibcodes" id="bibcodes" cols="30" rows="5" class="form-control" aria-describedby="bibcodes_helper" style="min-width: 100%; max-width: 100%" required=""></textarea>
+                          <span class="help-block" id="bibcodes_helper">Enter list of Bibcodes (e.g. 1989ApJ...342L..71R), one per
+                            line.</span>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                      </button>
+                    </form>
+                  </div>
+                </div>
+            </div>
+    </div>
+
     </div>
   </div>
 </div>

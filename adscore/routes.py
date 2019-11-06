@@ -163,17 +163,29 @@ def paper_form():
     Paper form x if no search parameters are sent, otherwise process the parameters
     and redirect to the search results of a built query based on the parameters
     """
-    if request.method == 'POST':
-        # Right form with bibcode list
-        form = PaperForm(request.form)
-    else: # GET
-        # Left form with fields
+
+    if request.args.get('reference'): # GET
+        # Middle form with reference query
+        query = None
         form = PaperForm(request.args)
-    query = form.build_query()
+        results = api.resolve_reference(request.args.get('reference'))
+        if results.get('resolved', {}).get('bibcode'):
+            query = "bibcode:{}".format(results.get('resolved', {}).get('bibcode'))
+        else:
+            reference_error = "Error occurred resolving reference"
+    else:
+        reference_error = None
+        if request.method == 'POST':
+            # Bottom form with bibcode list
+            form = PaperForm(request.form)
+        else: # GET
+            # Top form with fields
+            form = PaperForm(request.args)
+        query = form.build_query()
     if query:
         return redirect(url_for('search', q=query))
     else:
-        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
+        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, reference_error=reference_error)
 
 @app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
 def public_libraries(identifier):
