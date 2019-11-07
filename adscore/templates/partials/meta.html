@@ -3,7 +3,7 @@
   {% if doc %}
     {% set title = doc.title|join(';') %}
     {% set authors = doc.author|join(';') %}
-    {% set url = "https://ui.adsabs.harvard.edu/" + doc.bibcode + "/abstract" %}
+    {% set url = "https://ui.adsabs.harvard.edu/abs/" + doc.bibcode + "/abstract" %}
     {% set logo = 'https://ui.adsabs.harvard.edu/styles/img/transparent_logo.svg' %}
   
     <link rel="canonical" href="http://ui.adsabs.harvard.edu/abs/{{ doc.bibcode }}/abstract"/>
