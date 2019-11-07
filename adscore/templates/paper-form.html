@@ -7,7 +7,7 @@
             <div class="paper-search-form">
                 <div class="row" style="margin-bottom: 15px">
                   <div class="col-sm-12 well well-default">
-                    <form class="form-horizontal" action="{{ base_url }}paper-form">
+                    <form class="form-horizontal" action="{{ base_url }}paper-form/">
                       <legend>Journal Search</legend>
                       <div class="col-sm-12">
                         <div class="form-group help-block">
@@ -52,7 +52,7 @@
 
                 <div class="row" style="margin-bottom: 15px">
                   <div class="well well-default col-sm-12">
-                    <form class="form-horizontal" role="form" data-form-type="reference">
+                    <form class="form-horizontal" role="form" data-form-type="reference" action="{{ base_url }}paper-form/">
                       <legend>Reference Query</legend>
                       <div class="col-sm-12">
                         <div class="form-group">
@@ -76,7 +76,7 @@
 
                 <div class="row" style="margin-bottom: 15px">
                   <div class="well well-default col-sm-12">
-                    <form class="form-horizontal" role="form" data-form-type="bibcodes" action="{{ base_url }}paper-form" method="post">
+                    <form class="form-horizontal" role="form" data-form-type="bibcodes" action="{{ base_url }}paper-form/" method="post">
                       <legend>Bibliographic Code Query</legend>
                       <div class="col-sm-12">
                         <div class="form-group">
