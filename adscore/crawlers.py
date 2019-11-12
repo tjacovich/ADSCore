@@ -3,6 +3,7 @@ import dns.name
 import dns.reversename
 import dns.resolver
 import dns.exception
+from collections import OrderedDict
 
 GOOGLE = dns.name.from_text('google.com')
 GOOGLEBOT = dns.name.from_text('googlebot.com')
@@ -15,44 +16,44 @@ YANDEX_NET = dns.name.from_text('yandex.net')
 YANDEX_COM = dns.name.from_text('yandex.com')
 ALEXA = dns.name.from_text('alexa.com')
 
-SEARCH_ENGINE_BOTS = {
-                        "googlebot": {
+SEARCH_ENGINE_BOTS = OrderedDict([
+                        ("googlebot", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
-                        },
-                        "adsbot-google": {
+                        }),
+                        ("adsbot-google", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
-                        },
-                        "mediapartners-google": {
+                        }),
+                        ("mediapartners-google", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
-                        },
-                        "feedfetcher-google": {
+                        }),
+                        ("feedfetcher-google", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
-                        },
-                        "AdsBot-Google-Mobile-Apps": {
+                        }),
+                        ("AdsBot-Google-Mobile-Apps", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
-                        },
-                        "bingbot": {
+                        }),
+                        ("bingbot", {
                             'type': 'DNS',
                             'DNS': [BING]
-                        },
-                        "bingpreview": {
+                        }),
+                        ("bingpreview", {
                             'type': 'DNS',
                             'DNS': [BING]
-                        },
-                        "msnbot": {
+                        }),
+                        ("msnbot", {
                             'type': 'DNS',
                             'DNS': [BING]
-                        },
-                        "slurp": {
+                        }),
+                        ("slurp", {
                             'type': 'DNS',
                             'DNS': [YAHOO]
-                        },
-                        "duckduckbot": {
+                        }),
+                        ("duckduckbot", {
                             'type': 'IPs',
                             'IPs': [
                                 # https://help.duckduckgo.com/duckduckgo-help-pages/results/duckduckbot/
@@ -66,36 +67,39 @@ SEARCH_ENGINE_BOTS = {
                                 '54.208.100.253',
                                 '23.21.227.69',
                             ]
-                        },
-                        "baidu": {
+                        }),
+                        ("baidu", {
                             'type': 'DNS',
                             'DNS': [BAIDU_COM, BAIDU_JP]
-                        },
-                        "yandex": {
+                        }),
+                        ("yandex", {
                             'DNS': [YANDEX_RU, YANDEX_NET, YANDEX_COM]
-                        },
-                        "ia_archiver": {
+                        }),
+                        ("ia_archiver", {
                             'DNS': [ALEXA]
-                        },
-                        "facebot": {
+                        }),
+                        ("facebot", {
                             'type': 'Unverifiable',
-                        },
-                        "facebookexternalhit": {
+                        }),
+                        ("facebookexternalhit", {
                             'type': 'Unverifiable',
-                        },
-                        "aolbuild": {
+                        }),
+                        ("aolbuild", {
                             'type': 'Unverifiable',
-                        },
-                        "slackbot": {
+                        }),
+                        ("slackbot", {
                             'type': 'Unverifiable',
-                        },
-                        "slack-imgproxy": {
+                        }),
+                        ("slack-imgproxy", {
                             'type': 'Unverifiable',
-                        },
-                        "twitterbot": {
+                        }),
+                        ("twitterbot", {
                             'type': 'Unverifiable',
-                        },
-}
+                        }),
+                        ("bot", {
+                            'type': 'Unverifiable',
+                        }),
+])
 
 VERIFIED_BOT = 0
 UNVERIFIABLE_BOT = 1
