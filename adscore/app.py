@@ -26,11 +26,17 @@ def create_app(**config):
 
     if app.config['MINIFY']:
         minify(app=app, html=True, js=True, cssless=True, cache=False, fail_safe=True, bypass=[])
-
+    
+    Limiter(app, key_func=get_remote_address)
+    FlaskRedisPool(app)
+    
+    if app.config['ENVIRONMENT'] == "localhost":
+        app.debug = True
+    
     return app
 
+
+# XXX:rca - used anywhere? is that the reasons redis_client variable is instantiated?
 app = create_app()
-limiter = Limiter(app, key_func=get_remote_address)
-redis_client = FlaskRedisPool(app)
-if app.config['ENVIRONMENT'] == "localhost":
-    app.debug = True
+limiter = app.extensions['limiter']
+redis_client = app.extensions['redis']

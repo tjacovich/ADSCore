@@ -95,9 +95,6 @@ SEARCH_ENGINE_BOTS = {
                         "twitterbot": {
                             'type': 'Unverifiable',
                         },
-                        "bot": {
-                            'type': 'Unverifiable',
-                        },
 }
 
 VERIFIED_BOT = 0
@@ -115,6 +112,16 @@ def evaluate(remote_ip, user_agent):
     """
     if user_agent is None:
         user_agent = ""
+    
+    if not remote_ip:
+        return UNVERIFIABLE_BOT
+    
+    if not isinstance(remote_ip, str):
+        return UNVERIFIABLE_BOT
+    
+    remote_ip = remote_ip.strip()
+    
+    
     try:
         redis_client = current_app.extensions['redis']
         result = redis_client.get("/".join((current_app.config['REDIS_REQUESTS_KEY_PREFIX'], remote_ip, user_agent)))
@@ -175,7 +182,7 @@ def _verify_bot(remote_ip, bot_verification_data):
             try:
                 return _verify_dns(remote_ip, search_engine_bot_domains, retry_counter=0)
             except:
-                current_app.logger.exception("Exception while reverse/forward resolving IP")
+                current_app.logger.exception("Exception while reverse/forward resolving IP remote_ip='{}'".format(remote_ip))
             else:
                 return False
     elif bot_type == "IPs":
