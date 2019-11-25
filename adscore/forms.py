@@ -142,7 +142,7 @@ class ClassicForm(FlaskForm):
     sort = StringField('sort', default="date desc")
 
     def _authors(self):
-        authors = self.author_names.data.split()
+        authors = self.author_names.data.splitlines()
         if self.author_logic.data == "OR":
             return "author:({})".format(" OR ".join(["\"{}\"".format(a) for a in authors]))
         elif self.author_logic.data == "AND":
@@ -152,7 +152,7 @@ class ClassicForm(FlaskForm):
 
     def _objects(self):
         # TODO: form.object_logic.data is not used (not even in BBB)
-        objects = self.object_names.data.split()
+        objects = self.object_names.data.splitlines()
         results = api.objects_query(objects)
         transformed_objects_query = results.get('query')
         if transformed_objects_query:
