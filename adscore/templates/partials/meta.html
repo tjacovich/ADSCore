@@ -1,66 +1,128 @@
-{% if view == "abstract" %}
+{% if view == "abstract" -%}
   <meta name="robots" content="noarchive">
-  {% if doc %}
-    {% set title = doc.title|join(';') %}
-    {% set authors = doc.author|join(';') %}
-    {% set url = "https://ui.adsabs.harvard.edu/abs/" + doc.bibcode + "/abstract" %}
-    {% set logo = 'https://ui.adsabs.harvard.edu/styles/img/transparent_logo.svg' %}
-  
-    <link rel="canonical" href="http://ui.adsabs.harvard.edu/abs/{{ doc.bibcode }}/abstract"/>
-
-    <meta name="description" content="{{ doc.abstract }}">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="{{ title }}">
-    <meta property="og:site_name" content="NASA/ADS">
-    <meta property="og:description" content="{{ doc.abstract }}">
-    <meta property="og:url" content="{{ url }}">
-    <meta property="og:image" content="{{ logo }}">
-    <meta property="article:published_time" content="{{ doc.pubdate }}">
-    {% for author in doc.author %}
-    <meta property="article:author" content="{{ author }}">
-    {% endfor %}
-
-    <!-- citation_* -->
-    <meta name="citation_language" content="en">
-    <meta name="citation_abstract_html_url" content="{{ url }}">
-    <meta name="citation_title" content="{{ title }}">
-    <meta name="citation_authors" content="{{ authors }}">
-    <meta name="citation_firstpage" content="{{ doc.page }}">
-    <meta name="citation_publication_date" content="{{ doc.pubdate }}">
-    <meta name="citation_journal_title" content="{{ doc.pub }}">
-    <meta name="citation_volume" content="{{ doc.volume }}">
-    <meta name="citation_issue" content="{{ doc.issue }}">
-    {% if doc.doi and doc.doi|length > 0 %}
-    <meta name="citation_doi" content="{{ doc.doi[0] }}">
-    {% endif %}
-    <meta name="citation_issn" content="{{ doc.issn }}">
-    <meta name="citation_isbn" content="{{ doc.isbn }}">
-    {% for aff in doc.aff %}
-      <meta name="citation_author_institution" content="{{ aff }}">
-    {% endfor %}
-    {% for keyword in doc.keyword %}
-      <meta name="citation_keywords" content="{{ keyword }}">
-    {% endfor %}
-    {% if "PUB_PDF" in doc.esources %}
-      <meta name="citation_pdf_url" content="https://ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_PDF">
-    {% endif %}
-
-    <!-- twitter card -->
-    <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:description" content="{{ doc.abstract }}"/>
-    <meta name="twitter:title" content="{{ title }}"/>
-    <meta name="twitter:site" content="@adsabs"/>
-    <meta name="twitter:domain" content="NASA/ADS"/>
-    <meta name="twitter:image:src" content="{{ logo }}"/>
-    <meta name="twitter:creator" content="@adsabs"/>
-    
-  {% endif %}
-{% else %}
+{% if doc -%}
+  {% set title = doc.title|join(';') -%}
+  {% set authors = doc.author|join(';') -%}
+  {% set url = "https://ui.adsabs.harvard.edu/abs/" + doc.bibcode + "/abstract" -%}
+  {% set logo = 'https://ui.adsabs.harvard.edu/styles/img/transparent_logo.svg' %}
+  <link rel="canonical" href="http://ui.adsabs.harvard.edu/abs/{{ doc.bibcode }}/abstract"/>
+  <meta name="description" content="{{ doc.abstract }}">
+  <!-- Open Graph -->
+  <meta property="og:type" content="{{ doc.doctype }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:site_name" content="NASA/ADS">
+  <meta property="og:description" content="{{ doc.abstract }}">
+  <meta property="og:url" content="{{ url }}">
+  <meta property="og:image" content="{{ logo }}">
+  {% if doc.formatted_numeric_pubdate -%}
+  <meta property="article:published_time" content="{{ doc.formatted_numeric_pubdate }}">
+  {% endif -%}
+  {% for author in doc.author -%}
+  <meta property="article:author" content="{{ author }}">
+  {% endfor -%}
+  <!-- citation_* -->
+  {% if doc.doctype == "Proceedings" -%}
+  {% if doc.bibstem and doc.bibstem|length > 0 -%}
+  <meta name="citation_conference" content="{{ doc.bibstem[0] }}">
+  {% endif -%}
+  {% else -%}
+  {% if doc.bibstem and doc.bibstem|length > 0 -%}
+  <meta name="citation_journal_title" content="{{ doc.bibstem[0] }}">
+  {% endif -%}
+  {% endif -%}
+  <meta name="citation_authors" content="{{ authors }}">
+  <meta name="citation_title" content="{{ title }}">
+  {% if doc.formatted_numeric_pubdate -%}
+  <meta name="citation_date" content="{{ doc.formatted_numeric_pubdate }}">
+  {% endif -%}
+  {% if doc.volume -%}
+  <meta name="citation_volume" content="{{ doc.volume }}">
+  {% endif -%}
+  {% if doc.issue -%}
+  <meta name="citation_issue" content="{{ doc.issue }}">
+  {% endif -%}
+  {% if doc.page -%}
+  <meta name="citation_firstpage" content="{{ doc.page }}">
+  {% endif -%}
+  {% if doc.doi and doc.doi|length > 0 -%}
+  <meta name="citation_doi" content="{{ doc.doi[0] }}">
+  {% endif -%}
+  {% if doc.issn and doc.issn|length > 0 -%}
+  <meta name="citation_issn" content="{{ doc.issn[0] }}">
+  {% endif -%}
+  {% if doc.isbn and doc.isbn|length > 0 -%}
+  <meta name="citation_isbn" content="{{ doc.isbn[0] }}">
+  {% endif -%}
+  <meta name="citation_language" content="en">
+  {% for keyword in doc.keyword -%}
+  <meta name="citation_keywords" content="{{ keyword }}">
+  {% endfor -%}
+  {% if doc.doctype == "PhD Thesis" -%}
+  <meta name="citation_dissertation_name" content="Phd" />
+  {% elif doc.doctype == "Masters Thesis" -%}
+  <meta name="citation_dissertation_name" content="MS" />
+  {% endif -%}
+  <meta name="citation_abstract_html_url" content="{{ url }}">
+  {% if doc.formatted_numeric_pubdate -%}
+  <meta name="citation_publication_date" content="{{ doc.formatted_numeric_pubdate }}">
+  {% endif -%}
+  {% for aff in doc.aff -%}
+  <meta name="citation_author_institution" content="{{ aff }}">
+  {% endfor -%}
+  {% if "PUB_PDF" in doc.esources -%}
+  <meta name="citation_pdf_url" content="https://ui.adsabs.harvard.edu/link_gateway/{{ doc.bibcode }}/PUB_PDF">
+  {% endif -%}
+  {% if doc.last_page -%}
+  <meta name="citation_lastpage" content="{{ doc.last_page }}" />
+  {% endif -%}
+  {% if doc.arXiv -%}
+  <meta name="citation_arxiv_id" content="{{ doc.arXiv }}" />
+  {% endif -%}
+  <link title="schema(PRISM)" rel="schema.prism" href="http://prismstandard.org/namespaces/1.2/basic/" />
+  {% if doc.formatted_numeric_pubdate -%}
+  <meta name="prism.publicationDate" content="{{ doc.formatted_numeric_pubdate }}" />
+  {% endif -%}
+  {% if doc.bibstem and doc.bibstem|length > 0 -%}
+  <meta name="prism.publicationName" content="{{ doc.bibstem[0] }}" />
+  {% endif -%}
+  {% if doc.issn and doc.issn|length > 0 -%}
+  <meta name="prism.issn" content="{{ doc.issn[0] }}" />
+  {% endif -%}
+  {% if doc.volume -%}
+  <meta name="prism.volume" content="{{ doc.volume }}" />
+  {% endif -%}
+  {% if doc.page -%}
+  <meta name="prism.startingPage" content="{{ doc.page }}" />
+  {% endif -%}
+  {% if doc.last_page -%}
+  <meta name="prism.endingPage" content="{{ doc.last_page }}" />
+  {% endif -%}
+  <link title="schema(DC)" rel="schema.dc" href="http://purl.org/dc/elements/1.1/" />
+  {% if doc.doi and doc.doi|length > 0 -%}
+  <meta name="dc.identifier" content="doi:{{ doc.doi[0] }}" />
+  {% endif -%}
+  {% if doc.formatted_numeric_pubdate -%}
+  <meta name="dc.date" content="{{ doc.formatted_numeric_pubdate }}" />
+  {% endif -%}
+  {% if doc.bibstem and doc.bibstem|length > 0 -%}
+  <meta name="dc.source" content="{{ doc.bibstem[0] }}" />
+  {% endif -%}
+  <meta name="dc.title" content="{{ title }}" />
+  {% for author in doc.author -%}
+  <meta name="dc.creator" content="{{ author }}">
+  {% endfor -%}
+  <!-- twitter card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:description" content="{{ doc.abstract }}"/>
+  <meta name="twitter:title" content="{{ title }}"/>
+  <meta name="twitter:site" content="@adsabs"/>
+  <meta name="twitter:domain" content="NASA/ADS"/>
+  <meta name="twitter:image:src" content="{{ logo }}"/>
+  <meta name="twitter:creator" content="@adsabs"/>
+  {% endif -%}
+{% else -%}
   <meta name="robots" content="none">
   <meta name="description" content="A powerful, streamlined Astrophysics Data System">
-{% endif %}
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% endif -%}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

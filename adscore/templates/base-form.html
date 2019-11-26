@@ -10,85 +10,82 @@
   <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ base_url }}styles/img/favicon.ico">
   <link rel="stylesheet" href="{{ base_url }}styles/css/styles.css">
-  <style>
-    .btn-full-ads {
-        color: #fff !important;
-        background-color: #1a1a1a !important;
-        border-color: #1a1a1a !important;
-        margin-top: 9px !important;
-        padding-bottom: 10px !important;
-        padding-top: 10px !important;
-    }
-    .btn-full-ads:hover, .btn-full-ads:focus, .btn-full-ads:active, .btn-full-ads.active, .open>.dropdown-toggle.btn-full-ads {
-        color: #000 !important;
-        background-color: #ddd !important;
-        border-color: #1a1a1a !important;
-    }
-
-    .dropdown-toggle:hover .dropdown-menu {
-      display: block;
-    }
-
-    .navbar-collapse.collapse {
-      display: block!important;
-    }
-
-    .navbar-nav>li, .navbar-nav {
-      float: left !important;
-    }
-
-    .navbar-nav.navbar-right:last-child {
-      margin-right: -15px !important;
-    }
-
-    .navbar-right {
-      float: right!important;
-    }
-  </style>
-  {% include 'partials/meta.html' %}
-  {% if request.endpoint == "abs" %}
+  {% include 'partials/meta.html' -%}
+  {% if request.endpoint == "abs" -%}
     {# This is needed for BBB hydration, otherwise it requests javascript files to /abs/ #}
     <base href="{{ base_url }}">
-  {% endif %}
+  {% endif -%}
+  <style>
+  .btn-full-ads {
+      color: #fff !important;
+      background-color: #1a1a1a !important;
+      border-color: #1a1a1a !important;
+      margin-top: 9px !important;
+      padding-bottom: 10px !important;
+      padding-top: 10px !important;
+  }
+  .btn-full-ads:hover, .btn-full-ads:focus, .btn-full-ads:active, .btn-full-ads.active, .open>.dropdown-toggle.btn-full-ads {
+      color: #000 !important;
+      background-color: #ddd !important;
+      border-color: #1a1a1a !important;
+  }
 
+  .dropdown-toggle:hover .dropdown-menu {
+    display: block;
+  }
 
-<style>
-/*the container must be positioned relative:*/
-.autocomplete {
-  position: relative;
-  display: inline-block;
-}
+  .navbar-collapse.collapse {
+    display: block!important;
+  }
 
-.autocomplete-items {
-  position: absolute;
-  border: 1px solid #d4d4d4;
-  border-bottom: none;
-  border-top: none;
-  z-index: 99;
-  /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
-}
+  .navbar-nav>li, .navbar-nav {
+    float: left !important;
+  }
 
-.autocomplete-items div {
-  padding: 10px;
-  cursor: pointer;
-  background-color: #fff; 
-  border-bottom: 1px solid #d4d4d4; 
-}
+  .navbar-nav.navbar-right:last-child {
+    margin-right: -15px !important;
+  }
 
-/*when hovering an item:*/
-.autocomplete-items div:hover {
-  background-color: #e9e9e9; 
-}
+  .navbar-right {
+    float: right!important;
+  }
 
-/*when navigating through the items using the arrow keys:*/
-.autocomplete-active {
-  background-color: #d7dfec !important; 
-  color: #000000; 
-}
-</style>
+  /*the container must be positioned relative:*/
+  .autocomplete {
+    position: relative;
+    display: inline-block;
+  }
+
+  .autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    /*position the autocomplete items to be the same width as the container:*/
+    top: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  .autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff; 
+    border-bottom: 1px solid #d4d4d4; 
+  }
+
+  /*when hovering an item:*/
+  .autocomplete-items div:hover {
+    background-color: #e9e9e9; 
+  }
+
+  /*when navigating through the items using the arrow keys:*/
+  .autocomplete-active {
+    background-color: #d7dfec !important; 
+    color: #000000; 
+  }
+  </style>
 
 </head>
 

@@ -158,9 +158,19 @@ class Search(Mapping):
                 # Parse publication date and store it as Month Year (e.g., September 2019)
                 if 'pubdate' in results['response']['docs'][i]:
                     try:
-                        results['response']['docs'][i]['formatted_pubdate'] = datetime.datetime.strptime(results['response']['docs'][i]['pubdate'], '%Y-%m-00').strftime("%B %Y")
+                        results['response']['docs'][i]['formatted_alphanumeric_pubdate'] = datetime.datetime.strptime(results['response']['docs'][i]['pubdate'], '%Y-%m-00').strftime("%B %Y")
+                        results['response']['docs'][i]['formatted_numeric_pubdate'] = datetime.datetime.strptime(results['response']['docs'][i]['pubdate'], '%Y-%m-00').strftime("%m/%Y")
                     except ValueError:
-                        pass
+                        try:
+                            results['response']['docs'][i]['formatted_alphanumeric_pubdate'] = datetime.datetime.strptime(results['response']['docs'][i]['pubdate'], '%Y-00-00').strftime("%Y")
+                            results['response']['docs'][i]['formatted_numeric_pubdate'] = results['response']['docs'][i]['formatted_alphanumeric_pubdate']
+                        except ValueError:
+                            pass
+
+                if 'page_range' in results['response']['docs'][i]:
+                    pages = results['response']['docs'][i]['page_range'].split("-")
+                    if len(pages) == 2:
+                        results['response']['docs'][i]['last_page'] = pages[1]
 
                 # Find arXiv ID
                 if 'identifier' in results['response']['docs'][i]:
@@ -300,7 +310,7 @@ def _abstract(identifier):
     Retrieve abstract
     """
     q = 'identifier:"{0}"'.format(urllib.parse.quote(identifier))
-    fields = 'identifier,[citations],abstract,author,bibcode,citation_count,comment,issn,isbn,doi,id,keyword,page,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data'
+    fields = 'identifier,[citations],abstract,author,bibcode,bibstem,citation_count,comment,issn,isbn,doi,id,keyword,page,page_range,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data,issue,doctype'
     search = Search(q, rows=1, start=0, sort="date desc", fields=fields)
     return search.get('response', {}).get('docs', [])
 
