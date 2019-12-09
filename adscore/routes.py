@@ -7,6 +7,15 @@ from adscore import crawlers
 from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.tools import is_expired
 
+def _url_for(*args, **kwargs):
+    """
+    When running in front of a ingress nginx, the correct protocol is HTTPS
+    and not HTTP.
+    """
+    if current_app.config['ENVIRONMENT'] != "localhost":
+        kwargs.update({'_external': True, '_scheme': 'https'})
+    return url_for(*args, **kwargs)
+
 @limiter.request_filter
 def probes():
     """
@@ -118,7 +127,6 @@ def index():
     form = ModernForm(request.args)
     return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
 
-
 @app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
 def search(params=None):
@@ -130,7 +138,7 @@ def search(params=None):
         # Redirect to correct the start parameter to match the requested page
         computed_start = (form.p_.data - 1) * form.rows.data
         if form.start.data != computed_start:
-            return redirect(url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
+            return redirect(_url_for('search', q=form.q.data, sort=form.sort.data, rows=form.rows.data, start=computed_start))
     elif form.q.data and len(form.q.data) > 0:
         if not form.sort.raw_data:
             # There was not previous sorting specified
@@ -142,7 +150,7 @@ def search(params=None):
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
         return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     else:
-        return redirect(url_for('index'))
+        return redirect(_url_for('index'))
 
 @app.route(app.config['SERVER_BASE_URL']+'classic-form', methods=['GET'], strict_slashes=False)
 def classic_form():
@@ -153,7 +161,7 @@ def classic_form():
     form = ClassicForm(request.args)
     query = form.build_query()
     if query:
-        return redirect(url_for('search', q=query, sort=form.sort.data))
+        return redirect(_url_for('search', q=query, sort=form.sort.data))
     else:
         return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, sort_options=current_app.config['SORT_OPTIONS'])
 
@@ -183,7 +191,7 @@ def paper_form():
             form = PaperForm(request.args)
         query = form.build_query()
     if query:
-        return redirect(url_for('search', q=query))
+        return redirect(_url_for('search', q=query))
     else:
         return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, reference_error=reference_error)
 
@@ -192,7 +200,7 @@ def public_libraries(identifier):
     """
     Display public library
     """
-    #return redirect(url_for('search', q=f"docs(library/{identifier})"))
+    #return redirect(_url_for('search', q=f"docs(library/{identifier})"))
     return search(params=f"q=docs(library/{identifier})")
 
 @app.route(app.config['SERVER_BASE_URL']+'abs/<path:alt_identifier>', methods=['GET'])
@@ -260,10 +268,7 @@ def _abstract(identifier, section=None):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         if doc['bibcode'] != identifier:
-            if current_app.config['ENVIRONMENT'] == "localhost":
-                target_url = url_for('abs', identifier=doc['bibcode'], section='abstract', _external=True, _scheme='https')
-            else:
-                target_url = url_for('abs', identifier=doc['bibcode'], section='abstract')
+            target_url = _url_for('abs', identifier=doc['bibcode'], section='abstract')
             return redirect(target_url, code=301)
         api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
@@ -281,7 +286,7 @@ def _operation(operation, identifier):
             sort = "first_author asc"
         else:
             sort = "date desc"
-        target_url = url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})', sort=sort)
+        target_url = _url_for('search', q=f'{operation}(bibcode:{doc["bibcode"]})', sort=sort)
         if request.cookies.get('core', 'never') == 'always':
             return redirect(target_url)
         else:
@@ -294,7 +299,7 @@ def _toc(identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         api.link_gateway(doc['bibcode'], "toc")
-        target_url = url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
+        target_url = _url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
         if request.cookies.get('core', 'never') == 'always':
             return redirect(target_url)
         else:
