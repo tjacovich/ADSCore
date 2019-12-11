@@ -59,6 +59,10 @@ class ModernForm(FlaskForm):
                     concat = "" # ignore unknown parameter (e.g., whatever=true)
                 else:
                     concat = "&" + param + concat
+        for key in parsed.keys():
+            # Convert 'bibstem:arxiv+((arxiv_class:astro-ph.*)+OR+(star+OR+planet))+entdate:["NOW-2DAYS"+TO+NOW]+pubdate:[2019-00+TO+*]'
+            # Into 'bibstem:arxiv ((arxiv_class:astro-ph.*) OR (star OR planet)) entdate:["NOW-2DAYS" TO NOW] pubdate:[2019-00 TO *]'
+            parsed[key] = urllib.parse.unquote_plus(parsed[key])
         return parsed
 
     @classmethod
