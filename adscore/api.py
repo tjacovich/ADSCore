@@ -3,7 +3,7 @@ import datetime
 import functools
 import urllib.parse
 from collections.abc import Mapping
-from flask import session, current_app
+from flask import session, current_app, abort
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 
 def bootstrap():
@@ -284,7 +284,10 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
             current_app.logger.info("Re-trying connection to microservice")
-            return _request(endpoint, params, method=method, retry_counter=retry_counter+1)
+            return _request(endpoint, params, method=method, retry_counter=retry_counter+1, json_format=json_format)
+        if r.status_code in (401, 429) or r.status_code >= 500:
+            # Unauthorized (401), too many requests (429), errors...
+            abort(r.status_code)
         try:
             msg = r.json().get('error', {})
             if type(msg) is dict:
