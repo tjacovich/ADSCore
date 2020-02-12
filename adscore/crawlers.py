@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 GOOGLE = dns.name.from_text('google.com')
 GOOGLEBOT = dns.name.from_text('googlebot.com')
+APPLEBOT = dns.name.from_text('applebot.apple.com')
 BING = dns.name.from_text('search.msn.com')
 YAHOO = dns.name.from_text('crawl.yahoo.net')
 BAIDU_COM = dns.name.from_text('crawl.baidu.com')
@@ -24,6 +25,10 @@ SEARCH_ENGINE_BOTS = OrderedDict([
                         ("adsbot-google", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
+                        }),
+                        ("applebot", {
+                            'type': 'DNS',
+                            'DNS': [APPLEBOT]
                         }),
                         ("mediapartners-google", {
                             'type': 'DNS',
@@ -116,16 +121,16 @@ def evaluate(remote_ip, user_agent):
     """
     if user_agent is None:
         user_agent = ""
-    
+
     if not remote_ip:
         return UNVERIFIABLE_BOT
-    
+
     if not isinstance(remote_ip, str):
         return UNVERIFIABLE_BOT
-    
+
     remote_ip = remote_ip.strip()
-    
-    
+
+
     try:
         redis_client = current_app.extensions['redis']
         result = redis_client.get("/".join((current_app.config['REDIS_REQUESTS_KEY_PREFIX'], remote_ip, user_agent)))
