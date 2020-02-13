@@ -274,7 +274,9 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
         url = endpoint
         data = params
     try:
-        r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False)
+        current_app.logger.debug("Dispatching '{}' request to endpoint '{}'".format(method, url))
+        r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+        current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         current_app.logger.exception("Exception while connecting to microservice")
         msg = str(e)
@@ -294,6 +296,7 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
                 msg = msg.get('msg', msg)
         except:
             msg = r.content
+        current_app.logger.debug("Response from endpoint '{}' ended with error message '{}'".format(url, msg))
         return {"error": "{} (HTTP status code {})".format(msg, r.status_code)}
     #r.raise_for_status()
     r.cookies.clear_expired_cookies()
