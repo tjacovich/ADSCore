@@ -3,7 +3,8 @@ import datetime
 import functools
 import urllib.parse
 from collections.abc import Mapping
-from flask import session, current_app, abort
+import flask
+from flask import request, session, current_app, abort
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 
 def bootstrap():
@@ -263,6 +264,13 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
     else:
         headers = {}
     headers['Accept'] = 'application/json; charset=utf-8'
+    if flask.has_request_context():
+        # Include key information from the original request
+        headers[u'X-Original-Uri'] = flask.request.headers.get(u'X-Original-Uri', u'-')
+        headers[u'X-Original-Forwarded-For'] = flask.request.headers.get(u'X-Original-Forwarded-For', u'-')
+        headers[u'X-Forwarded-For'] = flask.request.headers.get(u'X-Forwarded-For', u'-')
+        headers[u'X-Forwarded-Authorization'] = flask.request.headers.get(u'X-Forwarded-Authorization', flask.request.headers.get(u'Authorization', u'-'))
+        headers[u'X-Amzn-Trace-Id'] = flask.request.headers.get(u'X-Amzn-Trace-Id', '-')
 
     if method == "GET":
         if params:
@@ -281,6 +289,11 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
         current_app.logger.exception("Exception while connecting to microservice")
         msg = str(e)
         return {"error": "{}".format(msg)}
+    except Exception as e:
+        current_app.logger.exception("Exception (unexpected) while connecting to microservice")
+        msg = str(e)
+        return {"error": "{}".format(msg)}
+
     if not r.ok:
         if r.status_code == 401 and retry_counter == 0 and not session['auth'].get('bot', False): # Unauthorized
             # Re-try only once bootstrapping a new token
