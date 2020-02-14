@@ -289,8 +289,11 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
         current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         current_app.logger.exception("Exception while connecting to microservice")
-        msg = str(e)
-        return {"error": "{}".format(msg)}
+        if retry_counter == 0:
+            current_app.logger.info("Re-trying connection to microservice")
+            return _request(endpoint, params, method=method, retry_counter=retry_counter+1, json_format=json_format)
+        else:
+            abort(502)
     except Exception as e:
         current_app.logger.exception("Exception (unexpected) while connecting to microservice")
         msg = str(e)
@@ -300,7 +303,7 @@ def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
         if r.status_code == 401 and retry_counter == 0 and not session['auth'].get('bot', False): # Unauthorized
             # Re-try only once bootstrapping a new token
             session['auth'] = bootstrap()
-            current_app.logger.info("Re-trying connection to microservice")
+            current_app.logger.info("Re-trying connection to microservice after bootstrapping")
             return _request(endpoint, params, method=method, retry_counter=retry_counter+1, json_format=json_format)
         if r.status_code in (401, 429) or r.status_code >= 500:
             # Unauthorized (401), too many requests (429), errors...
