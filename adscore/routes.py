@@ -63,10 +63,6 @@ def before_request():
     g.request_time = lambda: "{:.3f}s".format((time.time() - g.request_start_time))
     if 'cookies' not in session:
         session['cookies'] = {}
-    if request.cookies.get('session'):
-        # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
-        # thus if the user was authenticated, it will use the user token
-        session['cookies']['session'] = request.cookies.get('session')
     if 'auth' not in session or is_expired(session['auth']):
         user_agent = request.headers.get('User-Agent')
         remote_ip = get_remote_address()
@@ -87,6 +83,10 @@ def before_request():
             # Rate limits as a regular user with the advantage that there is no bootstrap
             session['auth'] = { 'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
         else:
+            if request.cookies.get('session'):
+                # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
+                # thus if the user was authenticated, it will use the user token
+                session['cookies']['session'] = request.cookies.get('session')
             session['auth'] = api.bootstrap()
 
 @app.errorhandler(429)
@@ -270,7 +270,8 @@ def _abstract(identifier, section=None):
         if doc['bibcode'] != identifier:
             target_url = _url_for('abs', identifier=doc['bibcode'], section='abstract')
             return redirect(target_url, code=301)
-        api.link_gateway(doc['bibcode'], "abstract")
+        if session['cookies']:
+            api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
         return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
     else:
@@ -279,7 +280,8 @@ def _abstract(identifier, section=None):
 def _operation(operation, identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
-        api.link_gateway(doc['bibcode'], operation)
+        if session['cookies']:
+            api.link_gateway(doc['bibcode'], operation)
         if operation in ("trending", "similar"):
             sort = "score desc"
         elif operation == "references":
@@ -298,7 +300,8 @@ def _operation(operation, identifier):
 def _toc(identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
-        api.link_gateway(doc['bibcode'], "toc")
+        if session['cookies']:
+            api.link_gateway(doc['bibcode'], "toc")
         target_url = _url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
         if request.cookies.get('core', 'never') == 'always':
             return redirect(target_url)
@@ -314,7 +317,7 @@ def _export(identifier):
     """
     doc = api.Abstract(identifier)
     if doc.get('export'):
-        if 'bibcode' in doc:
+        if 'bibcode' in doc and session['cookies']:
             api.link_gateway(doc['bibcode'], "exportcitation")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'export'))
         return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
@@ -327,7 +330,7 @@ def _graphics(identifier):
     """
     doc = api.Abstract(identifier)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
-        if 'bibcode' in doc:
+        if 'bibcode' in doc and session['cookies']:
             api.link_gateway(doc['bibcode'], "graphics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'graphics'))
         return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
@@ -340,7 +343,7 @@ def _metrics(identifier):
     """
     doc = api.Abstract(identifier)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
-        if 'bibcode' in doc:
+        if 'bibcode' in doc and session['cookies']:
             api.link_gateway(doc['bibcode'], "metrics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'metrics'))
         return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
