@@ -18,6 +18,7 @@ API_TIMEOUT = 90
 SECRET_KEY = "mjnahGS3CmaVsSfSVGxxytGTGa2vX1CPPoT7gZvIpIQiOZREJwsvfNzWooQx1BA1"
 SESSION_COOKIE_NAME = "session-core"
 SESSION_COOKIE_PATH = SERVER_BASE_URL
+PERMANENT_SESSION_LIFETIME = 2678400 # seconds (31 days)
 #REDIS_URL = "redis://:@localhost:6379/0"
 REDIS_URL = "fakeredis://:@localhost:6379/0"
 REDIS_TIMEOUT = 2 # seconds
