@@ -269,14 +269,26 @@ def _cached_render_template(key, *args, **kwargs):
             raise
     return rendered_template
 
+def _register_click():
+    """
+    Decides if a click needs to be registered.
+    Returns True if the requests is not from a bot and it has a User-Agent
+    that starts with the word Mozilla.
+    """
+    is_bot = session.get('auth', {}).get('bot', True)
+    user_agent = request.headers.get('User-Agent')
+    if not is_bot and user_agent and user_agent.startswith("Mozilla"):
+        return True
+    else:
+        return False
+
 def _abstract(identifier, section=None):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
         if doc['bibcode'] != identifier:
             target_url = _url_for('abs', identifier=doc['bibcode'], section='abstract')
             return redirect(target_url, code=301)
-        is_bot = session.get('auth', {}).get('bot', True)
-        if not is_bot:
+        if _register_click():
             api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
         return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
@@ -286,8 +298,7 @@ def _abstract(identifier, section=None):
 def _operation(operation, identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
-        is_bot = session.get('auth', {}).get('bot', True)
-        if not is_bot:
+        if _register_click():
             api.link_gateway(doc['bibcode'], operation)
         if operation in ("trending", "similar"):
             sort = "score desc"
@@ -307,8 +318,7 @@ def _operation(operation, identifier):
 def _toc(identifier):
     doc = api.Abstract(identifier)
     if 'bibcode' in doc:
-        is_bot = session.get('auth', {}).get('bot', True)
-        if not is_bot:
+        if _register_click():
             api.link_gateway(doc['bibcode'], "toc")
         target_url = _url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
         if request.cookies.get('core', 'never') == 'always':
@@ -325,8 +335,7 @@ def _export(identifier):
     """
     doc = api.Abstract(identifier)
     if doc.get('export'):
-        is_bot = session.get('auth', {}).get('bot', True)
-        if 'bibcode' in doc and not is_bot:
+        if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "exportcitation")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'export'))
         return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
@@ -339,8 +348,7 @@ def _graphics(identifier):
     """
     doc = api.Abstract(identifier)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
-        is_bot = session.get('auth', {}).get('bot', True)
-        if 'bibcode' in doc and not is_bot:
+        if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "graphics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'graphics'))
         return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
@@ -353,8 +361,7 @@ def _metrics(identifier):
     """
     doc = api.Abstract(identifier)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
-        is_bot = session.get('auth', {}).get('bot', True)
-        if 'bibcode' in doc and not is_bot:
+        if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "metrics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'metrics'))
         return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
