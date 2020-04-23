@@ -244,7 +244,7 @@ def abs(identifier=None, section=None, alt_identifier=None):
             # An alternative identifier mistaken by a composition of id + section
             return _abstract(identifier+'/'+section)
     elif alt_identifier:
-        if "*" in identifier or "?" in identifier:
+        if "*" in alt_identifier or "?" in alt_identifier:
             # - Identifiers do not contain wildcards (*, ?)
             abort(404)
         # Alternative identifiers such as DOIs (e.g., /abs/10.1051/0004-6361/201423945)
