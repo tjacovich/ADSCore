@@ -216,6 +216,12 @@ def abs(identifier=None, section=None, alt_identifier=None):
     Show abstract given an identifier
     """
     if identifier:
+        if len(identifier) < 15 or "*" in identifier or "?" in identifier:
+            # - We do not have identifiers smaller than 15 characters,
+            #   bibcodes are 19 (2020arXiv200410735B) and current arXiv are 16
+            #   (arXiv:2004.10735)
+            # - Identifiers do not contain wildcards (*, ?)
+            abort(404)
         if section in (None, "abstract"):
             return _abstract(identifier)
         elif section == "citations":
@@ -238,6 +244,9 @@ def abs(identifier=None, section=None, alt_identifier=None):
             # An alternative identifier mistaken by a composition of id + section
             return _abstract(identifier+'/'+section)
     elif alt_identifier:
+        if "*" in identifier or "?" in identifier:
+            # - Identifiers do not contain wildcards (*, ?)
+            abort(404)
         # Alternative identifiers such as DOIs (e.g., /abs/10.1051/0004-6361/201423945)
         return _abstract(alt_identifier)
     else:
