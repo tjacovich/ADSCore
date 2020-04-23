@@ -22,6 +22,10 @@ SEARCH_ENGINE_BOTS = OrderedDict([
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
                         }),
+                        ("googledocs", {
+                            'type': 'DNS',
+                            'DNS': [GOOGLE, GOOGLEBOT]
+                        }),
                         ("adsbot-google", {
                             'type': 'DNS',
                             'DNS': [GOOGLE, GOOGLEBOT]
