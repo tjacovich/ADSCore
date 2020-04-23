@@ -45,7 +45,12 @@ def link_gateway(identifier, section, retry_counter=0):
     Log click
     """
     params = None
-    return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", retry_counter=0, json_format=False)
+    headers = {}
+    if request.user_agent.string:
+        headers['User-Agent'] = request.user_agent.string
+    if request.referrer:
+        headers['referer'] = request.referrer
+    return _request(current_app.config['LINKGATEWAY_SERVICE'] + identifier + "/" + section, params, method="GET", headers=headers, retry_counter=0, json_format=False)
 
 def resolve_reference(text):
     """
@@ -256,14 +261,12 @@ class Abstract(Mapping):
         return doc
 
 
-def _request(endpoint, params, method="GET", retry_counter=0, json_format=True):
+def _request(endpoint, params, method="GET", headers={}, retry_counter=0, json_format=True):
     """
     Execute query
     """
     if session.get('auth', {}).get('access_token'):
-        headers = { "Authorization": "Bearer:{}".format(session['auth']['access_token']), }
-    else:
-        headers = {}
+        headers["Authorization"] = "Bearer:{}".format(session['auth']['access_token'])
     headers['Accept'] = 'application/json; charset=utf-8'
     if flask.has_request_context():
         # Include key information from the original request
