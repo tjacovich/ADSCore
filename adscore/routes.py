@@ -215,31 +215,32 @@ def abs(identifier=None, section=None, alt_identifier=None):
     """
     Show abstract given an identifier
     """
+    if not hasattr(abs, "sections"):
+        # Initialize only once when the function abs() is called for the first time
+        abs.sections = {
+            "abstract": lambda identifier: _abstract(identifier),
+            "citations": lambda identifier: _operation("citations", identifier),
+            "references": lambda identifier: _operation("references", identifier),
+            "coreads": lambda identifier: _operation("trending", identifier),
+            "similar": lambda identifier: _operation("similar", identifier),
+            "toc": lambda identifier: _toc(identifier),
+            "exportcitation": lambda identifier: _export(identifier),
+            "graphics": lambda identifier: _graphics(identifier),
+            "metrics": lambda identifier: _metrics(identifier)
+        }
+
     if identifier:
-        if len(identifier) < 15 or "*" in identifier or "?" in identifier:
+        if (section in abs.sections and len(identifier) < 15) or "*" in identifier or "?" in identifier:
             # - We do not have identifiers smaller than 15 characters,
             #   bibcodes are 19 (2020arXiv200410735B) and current arXiv are 16
             #   (arXiv:2004.10735)
             # - Identifiers do not contain wildcards (*, ?)
             abort(404)
-        if section in (None, "abstract"):
+            section in ("abstract", "citations", "references", "coreads")
+        if section is None:
             return _abstract(identifier)
-        elif section == "citations":
-            return _operation("citations", identifier)
-        elif section == "references":
-            return _operation("references", identifier)
-        elif section == "coreads":
-            return _operation("trending", identifier)
-        elif section == "similar":
-            return _operation("similar", identifier)
-        elif section == "toc":
-            return _toc(identifier)
-        elif section == "exportcitation":
-            return _export(identifier)
-        elif section == "graphics":
-            return _graphics(identifier)
-        elif section == "metrics":
-            return _metrics(identifier)
+        elif section in abs.sections:
+            return abs.sections[section](identifier)
         else:
             # An alternative identifier mistaken by a composition of id + section
             return _abstract(identifier+'/'+section)
