@@ -87,6 +87,7 @@ def before_request():
                 # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
                 # thus if the user was authenticated, it will use the user token
                 session['cookies']['session'] = request.cookies.get('session')
+            session['auth'] = {} # Do not use old auth data that may still be around
             session['auth'] = api.bootstrap()
 
     is_bot = session.get('auth', {}).get('bot', True)
