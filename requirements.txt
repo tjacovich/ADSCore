@@ -1,4 +1,4 @@
-git+https://github.com/adsabs/ADSMicroserviceUtils.git@v1.1.2
+git+https://github.com/adsabs/ADSMicroserviceUtils.git@v1.1.5
 Flask==1.1.1
 Flask-WTF==0.14.2
 Jinja2==2.10.1
