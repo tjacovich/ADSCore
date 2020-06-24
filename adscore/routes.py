@@ -63,6 +63,7 @@ def before_request():
     g.request_time = lambda: "{:.3f}s".format((time.time() - g.request_start_time))
     if 'cookies' not in session:
         session['cookies'] = {}
+
     if 'auth' not in session or is_expired(session['auth']):
         user_agent = request.headers.get('User-Agent')
         remote_ip = get_remote_address()
@@ -83,17 +84,19 @@ def before_request():
             # Rate limits as a regular user with the advantage that there is no bootstrap
             session['auth'] = { 'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
         else:
-            if request.cookies.get('session'):
-                # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
-                # thus if the user was authenticated, it will use the user token
-                session['cookies']['session'] = request.cookies.get('session')
-            session['auth'] = {} # Do not use old auth data that may still be around
-            session['auth'] = api.bootstrap()
+            session['auth'] = { 'bot': False }
 
     is_bot = session.get('auth', {}).get('bot', True)
-    if is_bot and 'session' in session.get('cookies', {}):
-        # Temporary fix: Remove past session cookies stored in bot sessions
-        del session['cookies']['session']
+
+    if not is_bot:
+        # Always bootstrap, otherwise the browser may end up logged in with different
+        # users in BBB and core
+        if request.cookies.get('session'):
+            # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
+            # thus if the user was authenticated, it will use the user token
+            session['cookies']['session'] = request.cookies.get('session')
+        session['auth'] = api.bootstrap()
+
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
