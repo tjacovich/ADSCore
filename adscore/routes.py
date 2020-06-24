@@ -83,19 +83,24 @@ def before_request():
         elif evaluation == crawlers.POTENTIAL_MALICIOUS_BOT:
             # Rate limits as a regular user with the advantage that there is no bootstrap
             session['auth'] = { 'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
-        else:
-            session['auth'] = { 'bot': False }
 
-    is_bot = session.get('auth', {}).get('bot', True)
+    is_bot = session.get('auth', {}).get('bot', False)
 
     if not is_bot:
-        # Always bootstrap, otherwise the browser may end up logged in with different
-        # users in BBB and core
         if request.cookies.get('session'):
             # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
             # thus if the user was authenticated, it will use the user token
             session['cookies']['session'] = request.cookies.get('session')
-        session['auth'] = api.bootstrap()
+            # Always bootstrap, otherwise the browser may end up logged in with different
+            # users in BBB and core
+            session['auth'] = api.bootstrap()
+        elif 'auth' not in session:
+            # No BBB or core session
+            session['auth'] = api.bootstrap()
+        else:
+            # We have a core session and no BBB session, this is the only situation
+            # we do not bootstrap again
+            pass
 
 
 @app.errorhandler(429)
