@@ -100,6 +100,13 @@ def before_request():
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
+    if e.description.endswith('per 1 day'):
+        # ADS Core limit hit (to limit too many bootstraps)
+        remote_ip = get_remote_address()
+        description = "We have received too many requests from your IP ({}).".format(remote_ip)
+    else:
+        # API ratelimit hit
+        description = e.description
     user_agent = request.headers.get('User-Agent')
     remote_ip = get_remote_address()
     evaluation = crawlers.evaluate(remote_ip, user_agent)
@@ -115,7 +122,7 @@ def ratelimit_handler(e):
         # None
         app.logger.info("Rate limited a request not classified: '%s' - '%s'", remote_ip, user_agent)
     form = ModernForm()
-    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=429), 429
+    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=429, description=description), 429
 
 @app.errorhandler(404)
 def page_not_found(e):
