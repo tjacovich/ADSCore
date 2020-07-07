@@ -26,8 +26,8 @@
   <meta name="citation_conference" content="{{ doc.bibstem[0] }}">
   {% endif -%}
   {% else -%}
-  {% if doc.bibstem and doc.bibstem|length > 0 -%}
-  <meta name="citation_journal_title" content="{{ doc.bibstem[0] }}">
+  {% if doc.pub and doc.pub|length > 0 -%}
+  <meta name="citation_journal_title" content="{{ doc.pub }}">
   {% endif -%}
   {% endif -%}
   <meta name="citation_authors" content="{{ authors }}">
