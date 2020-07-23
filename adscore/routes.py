@@ -93,14 +93,18 @@ def before_request():
             session['cookies']['session'] = request.cookies.get('session')
             # Always bootstrap, otherwise the browser may end up logged in with different
             # users in BBB and core
+            session['auth'] = {} # Make sure bootstrap does not use core session (i.e., previous bootstrapped access token)
             session['auth'] = api.bootstrap()
         elif 'auth' not in session:
             # No BBB or core session
+            if 'session' in session['cookies']:
+                del session['cookies']['session']
             session['auth'] = api.bootstrap()
         else:
             # We have a core session and no BBB session, this is the only situation
             # we do not bootstrap again
-            pass
+            if 'session' in session['cookies']:
+                del session['cookies']['session']
 
 
 @app.errorhandler(429)

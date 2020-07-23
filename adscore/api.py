@@ -287,8 +287,8 @@ def _request(endpoint, params, method="GET", headers={}, retry_counter=0, json_f
         data = params
     try:
         current_app.logger.debug("Dispatching '{}' request to endpoint '{}'".format(method, url))
-        #r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
-        r = getattr(requests, method.lower())(url, json=data, headers=headers, cookies=session['cookies'], timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+        #r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=session.get('cookies'), timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+        r = getattr(requests, method.lower())(url, json=data, headers=headers, cookies=session.get('cookies'), timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
         current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
     except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
         current_app.logger.exception("Exception while connecting to microservice")
