@@ -16,6 +16,8 @@ def bootstrap():
     """
     params = None
     auth = _request(current_app.config['BOOTSTRAP_SERVICE'], params, method="GET", retry_counter=0)
+    if 'access_token' not in auth or 'expire_in' not in auth:
+        abort(500, "Missing bootstrapping data")
     current_app.logger.info("Bootstrapped access token '%s'", auth['access_token'])
     return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'], 'bot': False }
 
