@@ -39,8 +39,8 @@ class RequestsManager:
             """
             self.auth = auth
             self.cookies = cookies
-            if not auth:
-                self.auth = self._bootstrap()
+            if not self.auth:
+                self._bootstrap() # It will update self.auth
 
         def _bootstrap(self):
             """
@@ -48,13 +48,14 @@ class RequestsManager:
             will be recovered from the API unless it has expired (in which case, a new
             renewed one will be received)
             """
+            self.auth = {} # During bootstrap, make sure we do not bootstrap with an access token
             params = None
-            auth = self.request(current_app.config['BOOTSTRAP_SERVICE'], params,
+            bootstrap_response = self.request(current_app.config['BOOTSTRAP_SERVICE'], params,
                                  method="GET", retry_counter=0)
-            if 'access_token' not in auth or 'expire_in' not in auth:
+            if 'access_token' not in bootstrap_response or 'expire_in' not in bootstrap_response:
                 abort(500, "Bootstrap returned invalid data")
-            current_app.logger.info("Bootstrapped access token '%s'", auth['access_token'])
-            return { 'access_token': auth['access_token'], 'expire_in': auth['expire_in'], 'bot': False }
+            current_app.logger.info("Bootstrapped access token '%s'", bootstrap_response['access_token'])
+            self.auth = { 'access_token': bootstrap_response['access_token'], 'expire_in': bootstrap_response['expire_in'], 'bot': False }
 
         def request(self, endpoint, params, method="GET", headers={}, retry_counter=0, json_format=True):
             """
@@ -100,7 +101,7 @@ class RequestsManager:
             if not r.ok:
                 if r.status_code == 401 and retry_counter == 0 and not self.auth.get('bot', False): # Unauthorized
                     # Re-try only once bootstrapping a new token
-                    self.auth = self._bootstrap()
+                    self._bootstrap() # It will update self.auth
                     current_app.logger.info("Re-trying connection to microservice after bootstrapping")
                     return self.request(endpoint, params, method=method, retry_counter=retry_counter+1, json_format=json_format)
                 if r.status_code in (401, 429) or r.status_code >= 500:
