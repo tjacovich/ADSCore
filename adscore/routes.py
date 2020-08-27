@@ -105,7 +105,8 @@ def after_request(response):
     # Store up-to-date auth data in cookie session
     if RequestsManager.is_initialized():
         manager = RequestsManager()
-        session = {'auth': manager.auth}
+        session.clear()
+        session['auth'] = manager.auth
     return response
 
 
