@@ -2,7 +2,7 @@ import time
 import urllib.parse
 from flask import render_template, session, request, redirect, g, current_app, url_for, abort
 from adscore.app import app, limiter, redis_client, get_remote_address
-from adscore import api
+from adscore.api import API, RequestsManager
 from adscore import crawlers
 from adscore.forms import ModernForm, PaperForm, ClassicForm
 from adscore.tools import is_expired
@@ -76,35 +76,36 @@ def before_request():
         evaluation = crawlers.evaluate(remote_ip, user_agent)
         if evaluation == crawlers.VERIFIED_BOT:
             # Extremely high rate limit
-            session['auth'] = { 'access_token': app.config['VERIFIED_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+            RequestsManager.init(auth={'access_token': app.config['VERIFIED_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True}, cookies={})
         elif evaluation == crawlers.UNVERIFIABLE_BOT:
             # Slightly higher rate limit
-            session['auth'] = { 'access_token': app.config['UNVERIFIABLE_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+            RequestsManager.init(auth={'access_token': app.config['UNVERIFIABLE_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True}, cookies={})
         elif evaluation == crawlers.POTENTIAL_MALICIOUS_BOT:
             # Rate limits as a regular user with the advantage that there is no bootstrap
-            session['auth'] = { 'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True }
+            RequestsManager.init(auth={'access_token': app.config['MALICIOUS_BOTS_ACCESS_TOKEN'], 'expire_in': "2050-01-01T00:00:00", 'bot': True}, cookies={})
 
-    is_bot = session.get('auth', {}).get('bot', False)
-
-    if not is_bot:
+    if not RequestsManager.is_initialized():
         if request.cookies.get('session'):
-            # Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
+            # - Re-use BBB session, if it is valid, the same BBB token will be returned by bootstrap
             # thus if the user was authenticated, it will use the user token
-            session['cookies']['session'] = request.cookies.get('session')
-            # Always bootstrap, otherwise the browser may end up logged in with different
+            # - Always bootstrap, otherwise the browser may end up logged in with different
             # users in BBB and core
-            session['auth'] = {} # Make sure bootstrap does not use core session (i.e., previous bootstrapped access token)
-            session['auth'] = api.bootstrap()
+            # - Ignore any previous bootstrapped access token
+            RequestsManager.init(auth={}, cookies={'session': request.cookies.get('session')})
         elif 'auth' not in session:
-            # No BBB or core session
-            if 'session' in session['cookies']:
-                del session['cookies']['session']
-            session['auth'] = api.bootstrap()
+            # No BBB or core session, API will bootstrap
+            RequestsManager.init(auth={}, cookies={})
         else:
             # We have a core session and no BBB session, this is the only situation
-            # we do not bootstrap again
-            if 'session' in session['cookies']:
-                del session['cookies']['session']
+            # API will not bootstrap
+            RequestsManager.init(auth=session['auth'], cookies={})
+
+@app.after_request
+def after_request(response):
+    # Store up-to-date auth data in cookie session
+    manager = RequestsManager()
+    session = {'auth': manager.auth}
+    return response
 
 
 @app.errorhandler(429)
@@ -150,7 +151,7 @@ def index():
     Modern form if no search parameters are sent, otherwise show search results
     """
     form = ModernForm(request.args)
-    return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form)
+    return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form)
 
 @app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
@@ -171,9 +172,10 @@ def search(params=None):
                 form.sort.data = "score desc"
             elif "references(" in form.q.data:
                 form.sort.data = "first_author asc"
-        results = api.Search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
+        api = API()
+        results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
-        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
+        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     else:
         return redirect(_url_for('index'))
 
@@ -188,7 +190,7 @@ def classic_form():
     if query:
         return redirect(_url_for('search', q=query, sort=form.sort.data))
     else:
-        return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, sort_options=current_app.config['SORT_OPTIONS'])
+        return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, sort_options=current_app.config['SORT_OPTIONS'])
 
 @app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['GET', 'POST'], strict_slashes=False)
 def paper_form():
@@ -201,6 +203,7 @@ def paper_form():
         # Middle form with reference query
         query = None
         form = PaperForm(request.args)
+        api = API()
         results = api.resolve_reference(request.args.get('reference'))
         if results.get('resolved', {}).get('bibcode'):
             query = "bibcode:{}".format(results.get('resolved', {}).get('bibcode'))
@@ -218,7 +221,7 @@ def paper_form():
     if query:
         return redirect(_url_for('search', q=query))
     else:
-        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], form=form, reference_error=reference_error)
+        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, reference_error=reference_error)
 
 @app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
 def public_libraries(identifier):
@@ -313,7 +316,8 @@ def _register_click():
         return False
 
 def _abstract(identifier, section=None):
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if 'bibcode' in doc:
         if doc['bibcode'] != identifier:
             target_url = _url_for('abs', identifier=doc['bibcode'], section='abstract')
@@ -321,12 +325,13 @@ def _abstract(identifier, section=None):
         if _register_click():
             api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
-        return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
 def _operation(operation, identifier):
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if 'bibcode' in doc:
         if _register_click():
             api.link_gateway(doc['bibcode'], operation)
@@ -341,12 +346,13 @@ def _operation(operation, identifier):
             return redirect(target_url)
         else:
             key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, operation))
-            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
 def _toc(identifier):
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if 'bibcode' in doc:
         if _register_click():
             api.link_gateway(doc['bibcode'], "toc")
@@ -355,7 +361,7 @@ def _toc(identifier):
             return redirect(target_url)
         else:
             key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'toc'))
-            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
@@ -363,12 +369,13 @@ def _export(identifier):
     """
     Export bibtex given an identifier
     """
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if doc.get('export'):
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "exportcitation")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'export'))
-        return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
@@ -376,12 +383,13 @@ def _graphics(identifier):
     """
     Graphics for a given identifier
     """
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "graphics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'graphics'))
-        return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
@@ -389,12 +397,13 @@ def _metrics(identifier):
     """
     Metrics for a given identifier
     """
-    doc = api.Abstract(identifier)
+    api = API()
+    doc = api.abstract(identifier)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "metrics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'metrics'))
-        return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], doc=doc)
+        return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
     else:
         abort(404)
 
@@ -418,7 +427,7 @@ def core_never(url=None):
 @app.route(app.config['SERVER_BASE_URL']+'core/', methods=['GET'], strict_slashes=False)
 def core(url=None):
     target_url = _build_full_ads_url(request, url)
-    return render_template('switch.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], auth=session['auth'], request_path=request.path[1:], target_url=target_url)
+    return render_template('switch.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], target_url=target_url)
 
 def _build_full_ads_url(request, url):
     """

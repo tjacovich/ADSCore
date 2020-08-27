@@ -1,10 +1,11 @@
 import re
 import werkzeug
 import urllib.parse
+from flask import g
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired
-from adscore import api
+from adscore.api import API
 
 class ModernForm(FlaskForm):
     q = StringField('q', validators=[DataRequired()])
@@ -107,6 +108,7 @@ class PaperForm(FlaskForm):
             bibcode_list = self.bibcodes.data.split()
             if len(bibcode_list) > 0:
                 # Store query and get QID
+                api = API()
                 results = api.store_query(self.bibcodes.data.split()) # Split will get rid of \r\n
                 query = "docs({})".format(results['qid'])
                 return query
@@ -157,6 +159,7 @@ class ClassicForm(FlaskForm):
     def _objects(self):
         # TODO: form.object_logic.data is not used (not even in BBB)
         objects = self.object_names.data.splitlines()
+        api = API()
         results = api.objects_query(objects)
         transformed_objects_query = results.get('query')
         if transformed_objects_query:
