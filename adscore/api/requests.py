@@ -13,8 +13,8 @@ class RequestsManager:
     """
 
     @classmethod
-    def init(cls, auth={}, cookies={}):
-        g.manager_instance = RequestsManager.__RequestsManager(auth=auth, cookies=cookies)
+    def init(cls, auth, cookies):
+        g.manager_instance = RequestsManager.__RequestsManager(auth, cookies)
 
     @classmethod
     def is_initialized(cls):
@@ -32,7 +32,7 @@ class RequestsManager:
         Keeps track of authentication information used to issue requests to ADS API.
         """
 
-        def __init__(self, auth={}, cookies={}):
+        def __init__(self, auth, cookies):
             """
             Create an API object, bootstrap if auth is empty (it will use the provided
             cookies so that it can take into account any BBB session)
@@ -57,20 +57,25 @@ class RequestsManager:
             current_app.logger.info("Bootstrapped access token '%s'", bootstrap_response['access_token'])
             self.auth = { 'access_token': bootstrap_response['access_token'], 'expire_in': bootstrap_response['expire_in'], 'bot': False }
 
-        def request(self, endpoint, params, method="GET", headers={}, retry_counter=0, json_format=True):
+        def request(self, endpoint, params, method="GET", headers=None, retry_counter=0, json_format=True):
             """
             Execute query
             """
+            if headers is None:
+                new_headers = {}
+            else:
+                new_headers = headers.copy()
+
             if self.auth.get('access_token'):
-                headers["Authorization"] = "Bearer:{}".format(self.auth['access_token'])
-            headers['Accept'] = 'application/json; charset=utf-8'
+                new_headers["Authorization"] = "Bearer:{}".format(self.auth['access_token'])
+            new_headers['Accept'] = 'application/json; charset=utf-8'
             if flask.has_request_context():
                 # Include key information from the original request
-                headers[u'X-Original-Uri'] = flask.request.headers.get(u'X-Original-Uri', u'-')
-                headers[u'X-Original-Forwarded-For'] = flask.request.headers.get(u'X-Original-Forwarded-For', u'-')
-                headers[u'X-Forwarded-For'] = flask.request.headers.get(u'X-Forwarded-For', u'-')
-                #headers[u'X-Forwarded-Authorization'] = flask.request.headers.get(u'X-Forwarded-Authorization', flask.request.headers.get(u'Authorization', u'-')) # Core does not expect any token from the user and passing a '-' messes up vault/query store
-                headers[u'X-Amzn-Trace-Id'] = flask.request.headers.get(u'X-Amzn-Trace-Id', '-')
+                new_headers[u'X-Original-Uri'] = flask.request.headers.get(u'X-Original-Uri', u'-')
+                new_headers[u'X-Original-Forwarded-For'] = flask.request.headers.get(u'X-Original-Forwarded-For', u'-')
+                new_headers[u'X-Forwarded-For'] = flask.request.headers.get(u'X-Forwarded-For', u'-')
+                #new_headers[u'X-Forwarded-Authorization'] = flask.request.headers.get(u'X-Forwarded-Authorization', flask.request.headers.get(u'Authorization', u'-')) # Core does not expect any token from the user and passing a '-' messes up vault/query store
+                new_headers[u'X-Amzn-Trace-Id'] = flask.request.headers.get(u'X-Amzn-Trace-Id', '-')
 
             if method == "GET":
                 if params:
@@ -83,14 +88,14 @@ class RequestsManager:
                 data = params
             try:
                 current_app.logger.debug("Dispatching '{}' request to endpoint '{}'".format(method, url))
-                #r = getattr(current_app.client, method.lower())(url, json=data, headers=headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
-                r = getattr(requests, method.lower())(url, json=data, headers=headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+                #r = getattr(current_app.client, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+                r = getattr(requests, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
                 current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
             except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
                 current_app.logger.exception("Exception while connecting to microservice")
                 if retry_counter == 0:
                     current_app.logger.info("Re-trying connection to microservice")
-                    return self.request(endpoint, params, method=method, retry_counter=retry_counter+1, json_format=json_format)
+                    return self.request(endpoint, params, method=method, headers=headers, retry_counter=retry_counter+1, json_format=json_format)
                 else:
                     abort(502)
             except Exception as e:
