@@ -7,9 +7,9 @@
 """
 
 from werkzeug.serving import run_simple
-from werkzeug.wsgi import DispatcherMiddleware
-from adscore import app as application
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.middleware.http_proxy import ProxyMiddleware
+from adscore import app as application
 
 
 if __name__ == "__main__":
@@ -36,5 +36,5 @@ if __name__ == "__main__":
     })
 
     run_simple(
-        '0.0.0.0', 8000, application, use_reloader=False, use_debugger=True
+        '0.0.0.0', 8181, application, use_reloader=False, use_debugger=True
     )

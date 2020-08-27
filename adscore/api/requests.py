@@ -1,6 +1,5 @@
 import json
 import urllib.parse
-import flask
 from flask import current_app, abort, g
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
@@ -69,13 +68,6 @@ class RequestsManager:
             if self.auth.get('access_token'):
                 new_headers["Authorization"] = "Bearer:{}".format(self.auth['access_token'])
             new_headers['Accept'] = 'application/json; charset=utf-8'
-            if flask.has_request_context():
-                # Include key information from the original request
-                new_headers[u'X-Original-Uri'] = flask.request.headers.get(u'X-Original-Uri', u'-')
-                new_headers[u'X-Original-Forwarded-For'] = flask.request.headers.get(u'X-Original-Forwarded-For', u'-')
-                new_headers[u'X-Forwarded-For'] = flask.request.headers.get(u'X-Forwarded-For', u'-')
-                #new_headers[u'X-Forwarded-Authorization'] = flask.request.headers.get(u'X-Forwarded-Authorization', flask.request.headers.get(u'Authorization', u'-')) # Core does not expect any token from the user and passing a '-' messes up vault/query store
-                new_headers[u'X-Amzn-Trace-Id'] = flask.request.headers.get(u'X-Amzn-Trace-Id', '-')
 
             if method == "GET":
                 if params:
@@ -88,8 +80,7 @@ class RequestsManager:
                 data = params
             try:
                 current_app.logger.debug("Dispatching '{}' request to endpoint '{}'".format(method, url))
-                #r = getattr(current_app.client, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
-                r = getattr(requests, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+                r = getattr(current_app.client, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
                 current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
             except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
                 current_app.logger.exception("Exception while connecting to microservice")
