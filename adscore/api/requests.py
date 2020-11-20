@@ -80,7 +80,10 @@ class RequestsManager:
                 data = params
             try:
                 current_app.logger.debug("Dispatching '{}' request to endpoint '{}'".format(method, url))
-                r = getattr(current_app.client, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+                if current_app.config['REQUESTS_CONNECTION_POOL_ENABLED']:
+                    r = getattr(current_app.client, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
+                else:
+                    r = getattr(requests, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
                 current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
             except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
                 current_app.logger.exception("Exception while connecting to microservice")

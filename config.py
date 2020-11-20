@@ -29,6 +29,7 @@ REDIS_REQUESTS_KEY_PREFIX = "CORE/REQUESTS"
 REDIS_RENDER_KEY_PREFIX = "CORE/RENDER"
 DNS_LIFETIME = 2 # The total number of seconds to spend trying to get an answer to the question.
 DNS_TIMEOUT = 2 # The number of seconds to wait for a response from a server, before timing out.
+REQUESTS_CONNECTION_POOL_ENABLED = True
 RATELIMIT_DEFAULT = None # individual per route
 RATELIMIT_APPLICATION = "400 per 1 day" # shared by all routes; same value as in https://github.com/adsabs/adsws/blob/9ec9087d2baa4bbf754a8fb5cf915fa1032725ae/adsws/accounts/views.py#L853
 RATELIMIT_STORAGE_URL = "memory://" # "redis://redis-backend:6379"
