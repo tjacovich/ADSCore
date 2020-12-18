@@ -1,5 +1,4 @@
-git+https://github.com/adsabs/ADSMicroserviceUtils.git@v1.1.8
-Flask==1.1.2
+git+https://github.com/adsabs/ADSMicroserviceUtils.git@v1.1.9
 Flask-WTF==0.14.3
 Jinja2==2.11.2
 Flask-Minify==0.27
@@ -7,4 +6,3 @@ redis==3.5.3
 Flask-Limiter==1.4
 dnspython3==1.15.0
 fakeredis==1.4.3
-six==1.15.0
