@@ -51,11 +51,11 @@ class Abstract(Mapping):
         Retreive complementary data
         """
         # Retrieve extra information
-        associated = self._resolver(doc['bibcode'], resource="associated")
-        if 'error' not in associated:
-            doc['associated'] = associated.get('links', {}).get('records', [])
-        else:
-            doc['associated'] = []
+        doc['associated'] = []
+        if 'ASSOCIATED' in doc.get('property', []):
+            associated = self._resolver(doc['bibcode'], resource="associated")
+            if 'error' not in associated:
+                doc['associated'] = associated.get('links', {}).get('records', [])
 
         graphics = self._graphics(doc['bibcode'])
         if 'error' not in graphics:
