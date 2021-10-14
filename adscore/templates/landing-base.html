@@ -1,12 +1,15 @@
-{% set view = "landing" %}
-{% extends "base-form.html" %}
-
-{% block content %}
+{% set view = "landing" %} {% extends "base-form.html" %} {% block content %}
 <div id="landing-page-layout" class="s-landing-page-layout">
-  <div class="s-starry-background-wrapper" style="background-color: #120c2e; transition: none;">
+  <div
+    class="s-starry-background-wrapper"
+    style="background-color: #120c2e; transition: none"
+  >
     <section class="s-logo-header">
       <div>
-        <img src="{{ base_url }}styles/img/transparent_logo.svg" alt="The Astrophysics Data System Logo">
+        <img
+          src="{{ base_url }}styles/img/transparent_logo.svg"
+          alt="The Astrophysics Data System Logo"
+        />
         <b>astrophysics</b>&nbsp;data system
       </div>
     </section>
@@ -14,78 +17,55 @@
       <div>
         <nav class="s-landing-tabs">
           {% if request.endpoint == "classic_form" %}
-          <li class="landing-tab active">
-            {% else %}
-          <li class="landing-tab ">
+          <li class="landing-tab active">{% else %}</li>
+
+          <li class="landing-tab">
             {% endif %}
-            <a href="{{ url_for('classic_form') }}" data-widget-id="ClassicSearchForm" style="height: auto">
+            <a
+              href="{{ url_for('classic_form') }}"
+              data-widget-id="ClassicSearchForm"
+              style="height: auto"
+            >
               Classic
-              <span class="hidden-xs">
-                Form
-              </span>
+              <span class="hidden-xs"> Form </span>
             </a>
           </li>
           {% if request.endpoint == "index" %}
-          <li class="landing-tab active">
-            {% else %}
-          <li class="landing-tab ">
+          <li class="landing-tab active">{% else %}</li>
+
+          <li class="landing-tab">
             {% endif %}
-            <a href="{{ url_for('index') }}" data-widget-id="SearchWidget" style="height: auto">
+            <a
+              href="{{ url_for('index') }}"
+              data-widget-id="SearchWidget"
+              style="height: auto"
+            >
               Modern
-              <span class="hidden-xs">
-                Form
-              </span>
+              <span class="hidden-xs"> Form </span>
             </a>
           </li>
           {% if request.endpoint == "paper_form" %}
-          <li class="landing-tab active">
-            {% else %}
-          <li class="landing-tab ">
+          <li class="landing-tab active">{% else %}</li>
+
+          <li class="landing-tab">
             {% endif %}
-            <a href="{{ url_for('paper_form') }}" data-widget-id="PaperSearchForm" style="height: auto">
+            <a
+              href="{{ url_for('paper_form') }}"
+              data-widget-id="PaperSearchForm"
+              style="height: auto"
+            >
               Paper
-              <span class="hidden-xs">
-                Form
-              </span>
+              <span class="hidden-xs"> Form </span>
             </a>
           </li>
-
         </nav>
       </div>
     </div>
   </div>
-  <section class="s-search-bar-row  row">
+  <section class="s-search-bar-row row">
     <div class="search-bar-rows-container s-search-bar-rows-container">
-      <br><br>
+      <br /><br />
       {% block page %}{% endblock page %}
-    </div>
-    <div class="landing-faq row">
-      <a href="/classic-form">
-        <div class="col-sm-4">
-          <i class="fa fa-life-ring fa-2x"></i>
-          <div>
-            Use a classic ADS-style form
-          </div>
-        </div>
-      </a>
-      <a href="https://ui.adsabs.harvard.edu/help/search/search-syntax" target="_blank" rel="noopener">
-        <div class="col-sm-4">
-
-          <i class="fa fa-search fa-2x"></i>
-          <div>
-            Learn more about searching the ADS
-          </div>
-        </div>
-      </a>
-      <a href="https://github.com/adsabs/adsabs-dev-api" target="_blank" rel="noopener">
-        <div class="col-sm-4">
-
-          <i class="fa fa-code fa-2x"></i>
-          <div>
-            Access ADS data with our API
-          </div>
-        </div>
-      </a>
     </div>
   </section>
 </div>

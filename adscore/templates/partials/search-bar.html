@@ -1,4 +1,3 @@
-
 <div data-widget="SearchWidget">
   <div class="s-search-bar-widget">
     <div role="search">
@@ -6,19 +5,26 @@
 
       <div class="row">
         <div class="col-sm-12 search-bar-input-row s-search-bar-input-row">
-
           <form name="main-query" action="{{ base_url }}search/">
             <div class="form-group has-feedback">
               <div class="input-group">
-
-                <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
-                {{ form.q(size=64, autofocus=true, class="form-control q ui-autocomplete-input", autocomplete="off") }}
+                <span
+                  role="status"
+                  aria-live="polite"
+                  class="ui-helper-hidden-accessible"
+                ></span>
+                {{ form.q(size=64, autofocus=true, class="form-control q
+                ui-autocomplete-input", autocomplete="off") }}
                 <span class="input-group-btn">
-                  <button type="submit" class="btn btn-primary search-submit s-search-submit" style="transition: none;"
-                    aria-label="submit">
-                    <i class="fa fa-search"></i></button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary search-submit s-search-submit"
+                    style="transition: none"
+                    aria-label="submit"
+                  >
+                    <i class="fa fa-search"></i>
+                  </button>
                 </span>
-
               </div>
               <!-- /input-group -->
             </div>
@@ -28,43 +34,74 @@
       </div>
     </div>
     <div class="row">
-      <div class="only-show-on-landing">
+      <div class="search-examples only-show-on-landing">
         <div class="quick-reference">
-          <div class="col-sm-6">
             <dl class="dl-horizontal">
               <dt>author</dt>
-              <dd>author:"huchra, john"</dd>
+              <dd style="display: 'flex'">author:"huchra, john"</dd>
               <dt>first author</dt>
-              <dd>author:"^huchra, john"</dd>
+              <dd style="display: 'flex'">author:"^huchra, john"</dd>
               <dt>abstract + title</dt>
-              <dd>abs:"dark energy"</dd>
+              <dd style="display: 'flex'">abs:"dark energy"</dd>
               <dt>year</dt>
-              <dd>year:2000</dd>
+              <dd style="display: 'flex'">year:2000</dd>
               <dt>year range</dt>
-              <dd>year:2000-2005</dd>
+              <dd style="display: 'flex'">year:2000-2005</dd>
               <dt>full text</dt>
-              <dd>full:"gravitational waves"</dd>
+              <dd style="display: 'flex'">full:"super Earth"</dd>
               <dt>publication</dt>
-              <dd>bibstem:ApJ <i class="icon-help" title="this field requires the bibstem, or journal abbreviation--try going to the 'Paper form' tab above for an easy-to-use form version"></i>
+              <dd style="display: 'flex'">
+                bibstem:ApJ
+                <i
+                  class="icon-help"
+                  title="this field requires the bibstem, or journal abbreviation--try going to the 'Paper form' tab above for an easy-to-use form version"
+                ></i>
               </dd>
             </dl>
           </div>
-          <div class="col-sm-6  quick-reference">
+          <div class="quick-reference">
             <dl class="dl-horizontal">
               <dt>citations</dt>
-              <dd>citations(author:"huchra, j") <i class="icon-help" title="finds all papers that cite a given set of papers"></i></dd>
-              <dt>references</dt>
-              <dd>references(author:"huchra, j") <i class="icon-help" title="finds all papers referenced by a given set of papers"></i></dd>
-              <dt>reviews</dt>
-              <dd>reviews("gamma-ray bursts") <i class="icon-help" title="finds articles citing the most relevant papers on the topic being researched"></i>
+              <dd style="display: 'flex'">
+                citations(abstract:JWST)
+                <i
+                  class="icon-help"
+                  title="finds all papers that cite a given set of papers"
+                ></i>
               </dd>
-              <hr>
               <dt>refereed</dt>
-              <dd>property:refereed <i class="icon-help" title="limit to non-refereed papers by searching property:notrefereed"></i></dd>
+              <dd style="display: 'flex'">
+                property:refereed
+                <i
+                  class="icon-help"
+                  title="limit to refereed papers"
+                ></i>
+              </dd>
               <dt>astronomy</dt>
-              <dd>database:astronomy <i class="icon-help" title="limit to physics papers by searching database:physics"></i></dd>
-              <dt>OR</dt>
-              <dd>abs:(planet OR star) <i class="icon-help" title="default logic is AND, e.g. abs:(planet star) would be interpreted as abs:(planet AND star)"></i>
+              <dd style="display: 'flex'">
+                collection:astronomy
+                <i
+                  class="icon-help"
+                  title="limit search to collection"
+                ></i>
+              </dd>
+              <dt>exact search</dt>
+              <dd style="display: 'flex'">
+                =body:"intracluster medium"
+              </dd>
+              <dt>institution</dt>
+              <dd style="display: 'flex'">
+                inst:CfA
+              </dd>
+              <dt>author count
+              </dt>
+              <dd style="display: 'flex'">
+                author_count:[1 TO 10]
+              </dd>
+              <dt>record type
+              </dt>
+              <dd style="display: 'flex'">
+                doctype:software
               </dd>
             </dl>
           </div>
@@ -74,58 +111,78 @@
       {% if results %}
       <div class="col-sm-8">
         <span class="s-light-font description">Your search returned</span>
-        <b><span class="num-found-container">{{ "{:,.0f}".format(results.numFound) }}</span></b>
-        <span class="s-light-font"> results
-          {% if stats and stats.stats_fields.citation_count %}
-          with <b><span
-              class="num-found-container">{{ "{:,.0f}".format(stats.stats_fields.citation_count.sum) }}</span></b> total
-          citations
-          {% endif %}
-          {% if stats and stats.stats_fields.citation_count_norm %}
-          with <b><span
-              class="num-found-container">{{ "{:,.1f}".format(stats.stats_fields.citation_count_norm.sum) }}</span></b>
-          total normalized citations
-          {% endif %}
-          {% if environment == "localhost" %}
-          &nbsp;&nbsp;<small>[{{ qtime }} | {{ g.request_time() }}]</small>
+        <b
+          ><span class="num-found-container"
+            >{{ "{:,.0f}".format(results.numFound) }}</span
+          ></b
+        >
+        <span class="s-light-font">
+          results {% if stats and stats.stats_fields.citation_count %} with
+          <b
+            ><span class="num-found-container"
+              >{{ "{:,.0f}".format(stats.stats_fields.citation_count.sum)
+              }}</span
+            ></b
+          >
+          total citations {% endif %} {% if stats and
+          stats.stats_fields.citation_count_norm %} with
+          <b
+            ><span class="num-found-container"
+              >{{ "{:,.1f}".format(stats.stats_fields.citation_count_norm.sum)
+              }}</span
+            ></b
+          >
+          total normalized citations {% endif %} {% if environment ==
+          "localhost" %} &nbsp;&nbsp;<small
+            >[{{ qtime }} | {{ g.request_time() }}]</small
+          >
           {% endif %}
         </span>
       </div>
 
-      {% set sort_data = form.sort.data.split(' ') %}
-      {% if sort_data|length >= 1 %}
-        {% set sort_id = form.sort.data.split(' ')[0] %}
-        {% if sort_data|length >= 2 %}
-          {% set sort_dir = form.sort.data.split(' ')[1] %}
-        {% else %}
-          {% set sort_dir = 'desc' %}
-        {% endif %}
-      {% else %}
-        {% set sort_id = 'date' %}
-        {% set sort_dir = 'desc' %}
-      {% endif %}
+      {% set sort_data = form.sort.data.split(' ') %} {% if sort_data|length >=
+      1 %} {% set sort_id = form.sort.data.split(' ')[0] %} {% if
+      sort_data|length >= 2 %} {% set sort_dir = form.sort.data.split(' ')[1] %}
+      {% else %} {% set sort_dir = 'desc' %} {% endif %} {% else %} {% set
+      sort_id = 'date' %} {% set sort_dir = 'desc' %} {% endif %}
       <div class="col-sm-4">
         <div class="btn-group pull-right">
           {% if sort_dir == 'asc' %}
-            <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}" class="btn btn-default">
-              <i class="fa fa-sort-amount-asc"></i>
-            </a>
+          <a
+            type="button"
+            href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} desc&rows={{ form.rows.data }}"
+            class="btn btn-default"
+          >
+            <i class="fa fa-sort-amount-asc"></i>
+          </a>
           {% else %}
-            <a type="button" href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}" class="btn btn-default">
-              <i class="fa fa-sort-amount-desc"></i>
-            </a>
+          <a
+            type="button"
+            href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ sort_id }} asc&rows={{ form.rows.data }}"
+            class="btn btn-default"
+          >
+            <i class="fa fa-sort-amount-desc"></i>
+          </a>
           {% endif %}
 
-          <span class="btn btn-default dropdown-toggle" title="Select a sort option" style="min-width: 150px;">
-            {% for opt in sort_options %}
-              {% if sort_id == opt.id %}
-                {{ opt.text }} <span class="caret" aria-hidden="true"></span>
-              {% endif %}
-            {% endfor %}
+          <span
+            class="btn btn-default dropdown-toggle"
+            title="Select a sort option"
+            style="min-width: 150px"
+          >
+            {% for opt in sort_options %} {% if sort_id == opt.id %} {{ opt.text
+            }} <span class="caret" aria-hidden="true"></span>
+            {% endif %} {% endfor %}
             <ul class="dropdown-menu" role="menu">
-            {% for opt in sort_options %}
-              <li><a href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ opt.id }} {{ sort_dir }}&rows={{ form.rows.data }}" title="{{ opt.description }}">{{ opt.text }}</a></li>
-            {% endfor %}
+              {% for opt in sort_options %}
+              <li>
+                <a
+                  href="{{ base_url }}search/?q={{ form.q.data|urlencode }}&sort={{ opt.id }} {{ sort_dir }}&rows={{ form.rows.data }}"
+                  title="{{ opt.description }}"
+                  >{{ opt.text }}</a
+                >
+              </li>
+              {% endfor %}
             </ul>
           </span>
         </div>
