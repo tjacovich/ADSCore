@@ -146,6 +146,13 @@ def internal_error(e):
     form = ModernForm()
     return _render_template('500.html', request_path=request.path[1:], form=form, code=500), 500
 
+@app.route(app.config['SERVER_BASE_URL']+'unavailable/', methods=['GET'])
+def unavailable():
+    """
+    Endpoint to be used when the site needs to go into maintenance mode
+    """
+    form = ModernForm()
+    return _render_template('503.html', request_path=request.path[1:], form=form, code=503), 503
 
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
 def index():
