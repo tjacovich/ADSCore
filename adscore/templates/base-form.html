@@ -268,7 +268,7 @@
   </script>
 
 
-  {% if not code or (code and code == 200) %}
+  {% if (not code or (code and code == 200)) and not disable_full_ads_link %}
   {# - Do not include javascript in error messages such as 404 to avoid BBB taking the control #}
   <script>
     (function() {
