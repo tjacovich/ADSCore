@@ -134,17 +134,17 @@ def ratelimit_handler(e):
         # None
         app.logger.info("Rate limited a request not classified: '%s' - '%s'", remote_ip, user_agent)
     form = ModernForm()
-    return render_template('429.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=429, description=description), 429
+    return _render_template('429.html', request_path=request.path[1:], form=form, code=429, description=description), 429
 
 @app.errorhandler(404)
 def page_not_found(e):
     form = ModernForm()
-    return render_template('404.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=404), 404
+    return _render_template('404.html', request_path=request.path[1:], form=form, code=404), 404
 
 @app.errorhandler(500)
 def internal_error(e):
     form = ModernForm()
-    return render_template('500.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], form=form, code=500), 500
+    return _render_template('500.html', request_path=request.path[1:], form=form, code=500), 500
 
 
 @app.route(app.config['SERVER_BASE_URL'], methods=['GET'])
@@ -153,7 +153,7 @@ def index():
     Modern form if no search parameters are sent, otherwise show search results
     """
     form = ModernForm(request.args)
-    return render_template('modern-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form)
+    return _render_template('modern-form.html', form=form)
 
 @app.route(app.config['SERVER_BASE_URL']+'search/<path:params>', methods=['GET'])
 @app.route(app.config['SERVER_BASE_URL']+'search/', methods=['GET'])
@@ -177,7 +177,7 @@ def search(params=None):
         api = API()
         results = api.search(form.q.data, rows=form.rows.data, start=form.start.data, sort=form.sort.data)
         qtime = "{:.3f}s".format(float(results.get('responseHeader', {}).get('QTime', 0)) / 1000)
-        return render_template('search-results.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
+        return _render_template('search-results.html', form=form, results=results.get('response'), stats=results.get('stats'), error=results.get('error'), qtime=qtime, sort_options=current_app.config['SORT_OPTIONS'])
     else:
         return redirect(_url_for('index'))
 
@@ -192,7 +192,7 @@ def classic_form():
     if query:
         return redirect(_url_for('search', q=query, sort=form.sort.data))
     else:
-        return render_template('classic-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, sort_options=current_app.config['SORT_OPTIONS'])
+        return _render_template('classic-form.html', form=form, sort_options=current_app.config['SORT_OPTIONS'])
 
 @app.route(app.config['SERVER_BASE_URL']+'paper-form', methods=['GET', 'POST'], strict_slashes=False)
 def paper_form():
@@ -223,7 +223,7 @@ def paper_form():
     if query:
         return redirect(_url_for('search', q=query))
     else:
-        return render_template('paper-form.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], form=form, reference_error=reference_error)
+        return _render_template('paper-form.html', form=form, reference_error=reference_error)
 
 @app.route(app.config['SERVER_BASE_URL']+'public-libraries/<identifier>', methods=['GET'], strict_slashes=False)
 def public_libraries(identifier):
@@ -294,7 +294,7 @@ def _cached_render_template(key, *args, **kwargs):
         rendered_template = None
 
     if not rendered_template:
-        rendered_template = render_template(*args, **kwargs)
+        rendered_template = _render_template(*args, **kwargs)
 
     try:
         redis_client.set(key, rendered_template, ex=app.config['REDIS_EXPIRATION_TIME'])
@@ -302,6 +302,13 @@ def _cached_render_template(key, *args, **kwargs):
         # Do not affect users if connection to Redis is lost in production
         if app.debug:
             raise
+    return rendered_template
+
+def _render_template(*args, **kwargs):
+    """
+    Wrapper to render template with multiple default variables
+    """
+    rendered_template = render_template(*args, **kwargs, environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], alert_message=current_app.config['ALERT_MESSAGE'], disable_full_ads_link=current_app.config['DISABLE_FULL_ADS_LINK'])
     return rendered_template
 
 def _register_click():
@@ -327,7 +334,7 @@ def _abstract(identifier, section=None):
         if _register_click():
             api.link_gateway(doc['bibcode'], "abstract")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'abstract'))
-        return _cached_render_template(key, 'abstract.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+        return _cached_render_template(key, 'abstract.html', doc=doc)
     else:
         abort(404)
 
@@ -348,7 +355,7 @@ def _operation(operation, identifier):
             return redirect(target_url)
         else:
             key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, operation))
-            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+            return _cached_render_template(key, 'abstract-empty.html', doc=doc)
     else:
         abort(404)
 
@@ -363,7 +370,7 @@ def _toc(identifier):
             return redirect(target_url)
         else:
             key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'toc'))
-            return _cached_render_template(key, 'abstract-empty.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+            return _cached_render_template(key, 'abstract-empty.html', doc=doc)
     else:
         abort(404)
 
@@ -377,7 +384,7 @@ def _export(identifier):
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "exportcitation")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'export'))
-        return _cached_render_template(key, 'abstract-export.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+        return _cached_render_template(key, 'abstract-export.html', doc=doc)
     else:
         abort(404)
 
@@ -391,7 +398,7 @@ def _graphics(identifier):
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "graphics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'graphics'))
-        return _cached_render_template(key, 'abstract-graphics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+        return _cached_render_template(key, 'abstract-graphics.html', doc=doc)
     else:
         abort(404)
 
@@ -405,7 +412,7 @@ def _metrics(identifier):
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "metrics")
         key = "/".join((app.config['REDIS_RENDER_KEY_PREFIX'], identifier, 'metrics'))
-        return _cached_render_template(key, 'abstract-metrics.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], doc=doc)
+        return _cached_render_template(key, 'abstract-metrics.html', doc=doc)
     else:
         abort(404)
 
@@ -429,7 +436,7 @@ def core_never(url=None):
 @app.route(app.config['SERVER_BASE_URL']+'core/', methods=['GET'], strict_slashes=False)
 def core(url=None):
     target_url = _build_full_ads_url(request, url)
-    return render_template('switch.html', environment=current_app.config['ENVIRONMENT'], base_url=app.config['SERVER_BASE_URL'], request_path=request.path[1:], target_url=target_url)
+    return _render_template('switch.html', request_path=request.path[1:], target_url=target_url)
 
 def _build_full_ads_url(request, url):
     """

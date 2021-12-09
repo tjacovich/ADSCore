@@ -21,51 +21,53 @@
             <li data-match-route="/">
 
 
-            {% if request.endpoint == "classic_form" %}
-            <a href="{{ url_for('core_never', url='classic-form') }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
-            {% elif request.endpoint == "paper_form" %}
-            <a href="{{ url_for('core_never', url='paper-form') }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
-            {% elif request.endpoint == "index" %}
-            <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
-            {% elif request.endpoint == "abs" and doc %}
+            {% if not disable_full_ads_link %}
+                {% if request.endpoint == "classic_form" %}
+                <a href="{{ url_for('core_never', url='classic-form') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% elif request.endpoint == "paper_form" %}
+                <a href="{{ url_for('core_never', url='paper-form') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% elif request.endpoint == "index" %}
+                <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
+                  <i class="fa fa-refresh"></i> Enable full ADS
+                </a>
+                {% elif request.endpoint == "abs" and doc %}
+                    {% set path = request.path.split('/') %}
+                    {% if path[-1] == 'graphics'  %}
+                    <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/graphics') }}" style="transition: none; " class="btn btn-full-ads">
+                      <i class="fa fa-refresh"></i> Enable full ADS
+                    </a>
+                    {% elif path[-1] == 'metrics'  %}
+                    <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/metrics') }}" style="transition: none; " class="btn btn-full-ads">
+                      <i class="fa fa-refresh"></i> Enable full ADS
+                    </a>
+                    {% elif path[-1] == 'exportcitation'  %}
+                    <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="transition: none; " class="btn btn-full-ads">
+                      <i class="fa fa-refresh"></i> Enable full ADS
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="transition: none; " class="btn btn-full-ads">
+                      <i class="fa fa-refresh"></i> Enable full ADS
+                    </a>
+                    {% endif %}
+                {% elif request.endpoint == "public_libraries" %}
                 {% set path = request.path.split('/') %}
-                {% if path[-1] == 'graphics'  %}
-                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/graphics') }}" style="transition: none; " class="btn btn-full-ads">
+                <a href="{{ url_for('core_never', url='public-libraries/'+path[-1]) }}" style="transition: none; " class="btn btn-full-ads">
                   <i class="fa fa-refresh"></i> Enable full ADS
                 </a>
-                {% elif path[-1] == 'metrics'  %}
-                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/metrics') }}" style="transition: none; " class="btn btn-full-ads">
-                  <i class="fa fa-refresh"></i> Enable full ADS
-                </a>
-                {% elif path[-1] == 'exportcitation'  %}
-                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/exportcitation') }}" style="transition: none; " class="btn btn-full-ads">
+                {% elif request.endpoint == "search" %}
+                {% set p_ = (form.start.data / form.rows.data) | int %}
+                <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data, p_=p_) }}" style="transition: none; " class="btn btn-full-ads">
                   <i class="fa fa-refresh"></i> Enable full ADS
                 </a>
                 {% else %}
-                <a href="{{ url_for('core_never', url='abs/'+doc.bibcode+'/abstract') }}" style="transition: none; " class="btn btn-full-ads">
+                <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
                   <i class="fa fa-refresh"></i> Enable full ADS
                 </a>
                 {% endif %}
-            {% elif request.endpoint == "public_libraries" %}
-            {% set path = request.path.split('/') %}
-            <a href="{{ url_for('core_never', url='public-libraries/'+path[-1]) }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
-            {% elif request.endpoint == "search" %}
-            {% set p_ = (form.start.data / form.rows.data) | int %}
-            <a href="{{ url_for('core_never', url='search/', q=form.q.data, sort=form.sort.data, start=form.start.data, rows=form.rows.data, p_=p_) }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
-            {% else %}
-            <a href="{{ url_for('core_never') }}" style="transition: none; " class="btn btn-full-ads">
-              <i class="fa fa-refresh"></i> Enable full ADS
-            </a>
             {% endif %}
             </li>
           </ul>
@@ -74,3 +76,13 @@
     </nav>
   </div>
 </div>
+{% if alert_message %}
+<div id="alerts-container">
+  <div data-widget="AlertsWidget"><span class="alert-banner"><div class="alert alert-info" id="page-top-alert">
+  <div>
+      {{ alert_message | safe }}
+  </div>
+</div>
+</span></div>
+</div>
+{% endif %}
