@@ -148,7 +148,7 @@ def internal_error(e):
 
 @app.route(app.config['SERVER_BASE_URL']+'unavailable', methods=['GET', 'POST', 'PUT', 'DELETE'], strict_slashes=False)
 @app.route(app.config['SERVER_BASE_URL']+'v1', methods=['GET', 'POST', 'PUT', 'DELETE'], strict_slashes=False)
-@app.route(app.config['SERVER_BASE_URL']+'v1/<endpoint>', methods=['GET', 'POST', 'PUT', 'DELETE'], strict_slashes=False)
+@app.route(app.config['SERVER_BASE_URL']+'v1/<path:endpoint>', methods=['GET', 'POST', 'PUT', 'DELETE'], strict_slashes=False)
 def unavailable(endpoint=None):
     """
     Endpoint to be used when the site needs to go into maintenance mode
