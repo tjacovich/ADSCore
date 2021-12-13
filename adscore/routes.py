@@ -263,6 +263,11 @@ def abs(identifier=None, section=None, alt_identifier=None):
             "metrics": lambda identifier: _metrics(identifier)
         }
 
+    if section is not None and section not in abs.sections:
+        # Bad match (e.g., https://ui.adsabs.harvard.edu/abs/10.1051/0004-6361:20066170)
+        alt_identifier = identifier + "/" + section
+        identifier = None
+
     if identifier:
         if (section in abs.sections and len(identifier) < 15) or "*" in identifier or "?" in identifier:
             # - We do not have identifiers smaller than 15 characters,
@@ -282,6 +287,12 @@ def abs(identifier=None, section=None, alt_identifier=None):
         if "*" in alt_identifier or "?" in alt_identifier:
             # - Identifiers do not contain wildcards (*, ?)
             abort(404)
+        splitted_alt_identifier = alt_identifier.split("/")
+        if len(splitted_alt_identifier) > 1 and splitted_alt_identifier[-1] in abs.sections.keys():
+            # Example: https://ui.adsabs.harvard.edu/abs/10.1051/0004-6361:20066170/abstract
+            alt_identifier = "/".join(splitted_alt_identifier[:-1])
+            section = splitted_alt_identifier[-1]
+            return abs.sections[section](alt_identifier)
         # Alternative identifiers such as DOIs (e.g., /abs/10.1051/0004-6361/201423945)
         return _abstract(alt_identifier)
     else:
@@ -351,6 +362,9 @@ def _operation(operation, identifier):
     api = API()
     doc = api.abstract(identifier)
     if 'bibcode' in doc:
+        if doc['bibcode'] != identifier:
+            target_url = _url_for('abs', identifier=doc['bibcode'], section=operation)
+            return redirect(target_url, code=301)
         if _register_click():
             api.link_gateway(doc['bibcode'], operation)
         if operation in ("trending", "similar"):
@@ -372,6 +386,9 @@ def _toc(identifier):
     api = API()
     doc = api.abstract(identifier)
     if 'bibcode' in doc:
+        if doc['bibcode'] != identifier:
+            target_url = _url_for('abs', identifier=doc['bibcode'], section='toc')
+            return redirect(target_url, code=301)
         if _register_click():
             api.link_gateway(doc['bibcode'], "toc")
         target_url = _url_for('search', q=f'bibcode:{doc["bibcode"][:13]}*')
@@ -389,6 +406,9 @@ def _export(identifier):
     """
     api = API()
     doc = api.abstract(identifier)
+    if 'bibcode' in doc and doc['bibcode'] != identifier:
+        target_url = _url_for('abs', identifier=doc['bibcode'], section='exportcitation')
+        return redirect(target_url, code=301)
     if doc.get('export'):
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "exportcitation")
@@ -403,6 +423,9 @@ def _graphics(identifier):
     """
     api = API()
     doc = api.abstract(identifier)
+    if 'bibcode' in doc and doc['bibcode'] != identifier:
+        target_url = _url_for('abs', identifier=doc['bibcode'], section='graphics')
+        return redirect(target_url, code=301)
     if len(doc.get('graphics', {}).get('figures', [])) > 0:
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "graphics")
@@ -417,6 +440,9 @@ def _metrics(identifier):
     """
     api = API()
     doc = api.abstract(identifier)
+    if 'bibcode' in doc and doc['bibcode'] != identifier:
+        target_url = _url_for('abs', identifier=doc['bibcode'], section='metrics')
+        return redirect(target_url, code=301)
     if int(doc.get('metrics', {}).get('citation stats', {}).get('total number of citations', 0)) > 0 or int(doc.get('metrics', {}).get('basic stats', {}).get('total number of reads', 0)) > 0:
         if 'bibcode' in doc and _register_click():
             api.link_gateway(doc['bibcode'], "metrics")
