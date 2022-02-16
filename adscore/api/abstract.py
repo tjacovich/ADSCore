@@ -82,7 +82,7 @@ class Abstract(Mapping):
         Retrieve abstract
         """
         q = 'identifier:"{0}"'.format(identifier)
-        fields = 'identifier,[citations],abstract,author,bibcode,bibstem,citation_count,comment,issn,isbn,doi,id,keyword,page,page_range,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data,issue,doctype'
+        fields = 'identifier,[citations],abstract,author,bibcode,bibstem,book_author,citation_count,comment,issn,isbn,doi,id,keyword,page,page_range,property,esources,pub,pub_raw,pubdate,pubnote,read_count,title,volume,data,issue,doctype'
         search = Search(q, rows=1, start=0, sort="date desc", fields=fields)
         return search.get('response', {}).get('docs', [])
 

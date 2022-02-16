@@ -59,6 +59,17 @@
                     <div id="article-publication">{{ doc.pub }}</div>
                   </dd>
 
+                  {% if doc.book_author and doc.book_author|length > 0 %}
+                  <dt>Book Author(s):</dt>
+                  <dd>
+                      <ul class="list-inline">
+                      {% for author in doc.book_author %}
+                      <li><a href="{{ url_for('search', q='book_author:\"' + author + '\"') }}">{{ author }}</a>{% if not loop.last %};{% endif %}</li>
+                      {% endfor %}
+                      </ul>
+                  </dd>
+                  {% endif %}
+
                   <dt>Pub Date:</dt>
                   <dd>{{ doc.formatted_alphanumeric_pubdate }}</dd>
 
