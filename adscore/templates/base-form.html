@@ -8,13 +8,13 @@
 
 <head>
   <title>{% block title %}{% endblock title %}{% if self.title() %} - {% endif %}NASA/ADS</title>
-  
+
   <!-- favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ base_url }}/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ base_url }}/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ base_url }}/favicon-16x16.png" />
-  <link rel="manifest" href="{{ base_url }}/site.webmanifest" />
-  <link rel="mask-icon" href="{{ base_url }}/safari-pinned-tab.svg" color="#5bbad5" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ base_url }}/styles/favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ base_url }}/styles/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ base_url }}/styles/favicon/favicon-16x16.png" />
+  <link rel="manifest" href="{{ base_url }}/styles/favicon/site.webmanifest" />
+  <link rel="mask-icon" href="{{ base_url }}/styles/favicon/safari-pinned-tab.svg" color="#5bbad5" />
   <meta name="apple-mobile-web-app-title" content="NASA ADS" />
   <meta name="application-name" content="NASA ADS" />
   <meta name="msapplication-TileColor" content="#ffc40d" />
@@ -77,19 +77,19 @@
   .autocomplete-items div {
     padding: 10px;
     cursor: pointer;
-    background-color: #fff; 
-    border-bottom: 1px solid #d4d4d4; 
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
   }
 
   /*when hovering an item:*/
   .autocomplete-items div:hover {
-    background-color: #e9e9e9; 
+    background-color: #e9e9e9;
   }
 
   /*when navigating through the items using the arrow keys:*/
   .autocomplete-active {
-    background-color: #d7dfec !important; 
-    color: #000000; 
+    background-color: #d7dfec !important;
+    color: #000000;
   }
   </style>
 
