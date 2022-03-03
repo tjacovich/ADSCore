@@ -7,3 +7,4 @@ Flask-Limiter==1.4
 dnspython3==1.15.0
 fakeredis==1.4.3
 MarkupSafe==2.0.1
+itsdangerous==2.0.1
