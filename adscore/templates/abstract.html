@@ -76,10 +76,12 @@
                   {% if doc.doi and doc.doi|length > 0 %}
                   <dt>DOI:</dt>
                   <dd>
-                    <span>
-                        <a href="/link_gateway/{{ doc.bibcode }}/doi:{{ doc.doi[0] }}" target="_blank" rel="noopener">{{ doc.doi[0] }}</a>
+                    {% for doi in doc.doi %}
+                    <p class="doi-p">
+                        <a href="/link_gateway/{{ doc.bibcode }}/doi:{{ doi }}" target="_blank" rel="noreferrer noopener">{{ doi }}</a>
                         <i class="fa fa-external-link"></i>
-                    </span>
+                    </p>
+                    {% endfor %}
                   </dd>
                   {% endif %}
 
@@ -87,7 +89,7 @@
                   <dt>arXiv:</dt>
                   <dd>
                     <span>
-                        <a href="/link_gateway/{{ doc.bibcode }}/{{ doc.arXiv }}" target="_blank" rel="noopener">{{ doc.arXiv }}</a>
+                        <a href="/link_gateway/{{ doc.bibcode }}/{{ doc.arXiv }}" target="_blank" rel="noreferrer noopener">{{ doc.arXiv }}</a>
                         <i class="fa fa-external-link"></i>
                     </span>
                   </dd>
