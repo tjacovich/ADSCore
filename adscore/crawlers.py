@@ -108,6 +108,13 @@ SEARCH_ENGINE_BOTS = OrderedDict([
                         ("bot", {
                             'type': 'Unverifiable',
                         }),
+                        ("GPTbot", {
+                            'type': 'IPs',
+                            'IPs': [
+                                # https://openai.com/gptbot-ranges.txt
+                                '40.83.2.64',
+                            ]
+                        }),
 ])
 
 VERIFIED_BOT = 0
