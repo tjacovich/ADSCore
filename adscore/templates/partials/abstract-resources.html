@@ -26,7 +26,13 @@
             </div>
             {% if "PUB_PDF" in doc.esources or "PUB_HTML" in doc.esources %}
             <div class="resources__content">
-              <div class="resources__content__title">Publisher</div>
+              <div class="resources__content__title">
+                {% if doc.publisher %}
+                  {{ doc.publisher }}
+                {% else %}
+                  Publisher
+                {% endif %}
+              </div>
               <div class="resources__content__links">
                 <span>
                   {% if "PUB_PDF" in doc.esources %}

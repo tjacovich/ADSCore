@@ -12,7 +12,7 @@ class API(object):
         """
         self.manager = RequestsManager()
 
-    def search(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,citation_count_norm,pubdate,[citations],property,esources,data"):
+    def search(self, q, rows=25, start=0, sort="date desc", fields="title,bibcode,author,citation_count,citation_count_norm,pubdate,[citations],property,esources,data,publisher"):
         return Search(q, rows=rows, start=start, sort=sort, fields=fields)
 
     def abstract(self, identifier):

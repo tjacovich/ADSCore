@@ -87,9 +87,10 @@
                         {% endif %}
                       {% endif %}
                     </div>
+
+
                     <div class="col-xs-4 col-sm-4 pull-right">
                       <div class="s-results-links">
-
 
                         <div class="letter-icon s-letter-icon">
                               {% if "ESOURCE" in doc.property and ("PUB_HTML" in doc.esources or "PUB_PDF" in doc.esources or "EPRINT_HTML" in doc.esources or "EPRINT_PDF" in doc.esources) %}
@@ -100,14 +101,22 @@
                                     {% if "PUB_HTML" in doc.esources %}
                                       <div >
                                       <a href="/link_gateway/{{ doc.bibcode }}/PUB_HTML" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                        Publisher Article
+                                        {% if doc.publisher %}
+                                          {{doc.publisher}} Article
+                                        {% else %}
+                                          Publisher Article
+                                        {% endif %}
                                       </a>
                                       </div>
                                     {% endif %}
                                     {% if "PUB_PDF" in doc.esources %}
                                       <div >
                                       <a href="/link_gateway/{{ doc.bibcode }}/PUB_PDF" rel="noopener" class="btn-link active-link s-active-link" aria-disabled="false">
-                                        Publisher PDF
+                                        {% if doc.publisher %}
+                                          {{doc.publisher}} PDF
+                                        {% else %}
+                                          Publisher PDF
+                                        {% endif %}
                                       </a>
                                       </div>
                                     {% endif %}
