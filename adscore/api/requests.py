@@ -67,7 +67,7 @@ class RequestsManager:
                 new_headers = headers.copy()
 
             if self.auth.get('access_token'):
-                new_headers["Authorization"] = "Bearer:{}".format(self.auth['access_token'])
+                new_headers["Authorization"] = "Bearer {}".format(self.auth['access_token'])
             new_headers['Accept'] = 'application/json; charset=utf-8'
 
             if method == "GET":
