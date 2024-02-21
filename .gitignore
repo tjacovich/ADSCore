@@ -113,3 +113,5 @@ python/
 
 logs/
 local_config.py
+
+scripts/
