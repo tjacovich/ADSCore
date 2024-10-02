@@ -115,7 +115,7 @@ def ratelimit_handler(e):
     if e.description.endswith('per 1 day'):
         # ADS Core limit hit (to limit too many bootstraps)
         remote_ip = get_remote_address()
-        description = "We have received too many requests from your IP ({}).".format(remote_ip)
+        description = "We have received too many requests from your IP ({}) for the current 24 hour period. Please try again later.".format(remote_ip)
     else:
         # API ratelimit hit
         description = e.description
