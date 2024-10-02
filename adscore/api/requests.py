@@ -52,10 +52,10 @@ class RequestsManager:
             params = None
             bootstrap_response = self.request(current_app.config['BOOTSTRAP_SERVICE'], params,
                                  method="GET", retry_counter=0)
-            if 'access_token' not in bootstrap_response or 'expire_in' not in bootstrap_response:
+            if 'access_token' not in bootstrap_response or 'expires_at' not in bootstrap_response:
                 abort(500, "Bootstrap returned invalid data")
             current_app.logger.info("Bootstrapped access token '%s'", bootstrap_response['access_token'])
-            self.auth = { 'access_token': bootstrap_response['access_token'], 'expire_in': bootstrap_response['expire_in'], 'bot': False }
+            self.auth = { 'access_token': bootstrap_response['access_token'], 'expires_at': bootstrap_response['expires_at'], 'bot': False }
 
         def request(self, endpoint, params, method="GET", headers=None, retry_counter=0, json_format=True):
             """
