@@ -93,14 +93,14 @@ class RequestsManager:
                     r = getattr(requests, method.lower())(url, json=data, headers=new_headers, cookies=self.cookies, timeout=current_app.config['API_TIMEOUT'], verify=False, allow_redirects=False)
                 current_app.logger.debug("Received response from endpoint '{}' with status code '{}'".format(url, r.status_code))
             except (ConnectionError, ConnectTimeout, ReadTimeout) as e:
-                current_app.logger.exception("Exception while connecting to microservice")
+                current_app.logger.exception("Exception while connecting to microservice {}".format(endpoint))
                 if retry_counter == 0:
-                    current_app.logger.info("Re-trying connection to microservice")
+                    current_app.logger.info("Re-trying connection to microservice {}".format(endpoint))
                     return self.request(endpoint, params, method=method, headers=headers, retry_counter=retry_counter+1, json_format=json_format)
                 else:
                     abort(502)
             except Exception as e:
-                current_app.logger.exception("Exception (unexpected) while connecting to microservice")
+                current_app.logger.exception("Exception (unexpected) while connecting to microservice {}".format(endpoint))
                 msg = str(e)
                 return {"error": "{}".format(msg)}
 
